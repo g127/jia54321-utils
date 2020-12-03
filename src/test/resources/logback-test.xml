@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds" debug="false">
+	<property name="logPath" value="${app.log.parent.path:-/tmp/logs}/${app.log.name:-entity}" />
+
+	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+	<include resource="entity-conf/logback/base.xml"/>
+	<!-- 
+	   <appender-ref ref="rootConsole" />
+	   <appender-ref ref="rootFile" />
+	   <appender-ref ref="businessFile" />
+	-->
+	<!-- root -->
+	<root level="DEBUG">
+	  <appender-ref ref="rootConsole" />
+	</root>
+	<logger name="com.topflames.entity" level="DEBUG">
+	    <appender-ref ref="rootConsole" />
+	</logger>
+	<logger name="com.sun.jna" level="DEBUG">
+	    <appender-ref ref="rootConsole" />
+	</logger>
+	<logger name="com.tls.sigcheck" level="DEBUG">
+	    <appender-ref ref="rootConsole" />
+	</logger>
+	
+</configuration>
