@@ -28,9 +28,16 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +69,7 @@ public class DateUtil {
         } else if (obj instanceof String) {
             String srcTime = ((String) obj).trim();
             try {
-                time = Formatter.valueOfSourceLength(srcTime).parse(srcTime, Locale.CHINESE);
+                time = Formatter.valueOfSourceLength(srcTime).parse2(srcTime, TimeZone.getDefault());
 
             } catch (ParseException e) {
                 //log
@@ -201,6 +208,8 @@ public class DateUtil {
     public static Timestamp toNowTimestamp() {
         return toTimestamp(Calendar.getInstance().getTime());
     }
+
+
 
     /**
      * 时间常用表达
@@ -496,6 +505,11 @@ public class DateUtil {
         public static final String PATTERN_YYMMDDHHMMSS = "yyMMddHHmmss";
         public static final Formatter YYMMDDHHMMSS = new Formatter(PATTERN_YYMMDDHHMMSS);
         /**
+         * 常量 日期格式 "yyyyMMddHHmm"          12位长度
+         */
+        public static final String PATTERN_YYYYMMDDHHMM = "yyyyMMddHHmm";
+        public static final Formatter YYYYMMDDHHMM = new Formatter(PATTERN_YYYYMMDDHHMM);
+        /**
          * 常量 日期格式 "yyyyMMddHHmmss"        14位长度
          */
         public static final String PATTERN_YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
@@ -511,10 +525,39 @@ public class DateUtil {
         public static final String PATTERN_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
         public static final Formatter YYYY_MM_DD_HH_MM_SS = new Formatter(PATTERN_YYYY_MM_DD_HH_MM_SS);
 
+        /**
+         * 常量 日期格式 "yyyy-MM-dd HH:mm:ss.SSS"  21位长度
+         */
+        public static final String PATTERN_YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
+        public static final Formatter YYYY_MM_DD_HH_MM_SS_S = new Formatter(PATTERN_YYYY_MM_DD_HH_MM_SS_S);
+
+        /**
+         * 常量 日期格式 "yyyy-MM-dd HH:mm:ss.SS"  22位长度
+         */
+        public static final String PATTERN_YYYY_MM_DD_HH_MM_SS_SS = "yyyy-MM-dd HH:mm:ss.SS";
+        public static final Formatter YYYY_MM_DD_HH_MM_SS_SS = new Formatter(PATTERN_YYYY_MM_DD_HH_MM_SS_SS);
+
+        /**
+         * 常量 日期格式 "yyyy-MM-dd HH:mm:ss.SSS"  23位长度
+         */
+        public static final String PATTERN_YYYY_MM_DD_HH_MM_SS_SSS = "yyyy-MM-dd HH:mm:ss.SSS";
+        public static final Formatter YYYY_MM_DD_HH_MM_SS_SSS = new Formatter(PATTERN_YYYY_MM_DD_HH_MM_SS_SSS);
+
         final public String pattern;
+        final private DateTimeFormatter dateTimeFmt;
 
         private Formatter(String pattern) {
             this.pattern = pattern;
+//            this.dateTimeFmt = DateTimeFormatter.ofPattern(this.pattern);
+            this.dateTimeFmt = new DateTimeFormatterBuilder().appendPattern(this.pattern)
+                               .parseDefaulting(ChronoField.YEAR_OF_ERA, 1970)
+                    .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+                    .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+                    .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                    .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                    .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+//                    .parseDefaulting(ChronoField.MILLI_OF_SECOND, 0)
+                    .toFormatter();
         }
 
         public static Formatter valueOf(String pattern) {
@@ -538,6 +581,12 @@ public class DateUtil {
                 return YYYY_MM_DD_HH_MM;
             } else if (YYYY_MM_DD_HH_MM_SS.pattern.equalsIgnoreCase(pattern)) {
                 return YYYY_MM_DD_HH_MM_SS;
+            } else if (YYYY_MM_DD_HH_MM_SS_S.pattern.equalsIgnoreCase(pattern)) {
+                return YYYY_MM_DD_HH_MM_SS_S;
+            } else if (YYYY_MM_DD_HH_MM_SS_SS.pattern.equalsIgnoreCase(pattern)) {
+                return YYYY_MM_DD_HH_MM_SS_SS;
+            } else if (YYYY_MM_DD_HH_MM_SS_SSS.pattern.equalsIgnoreCase(pattern)) {
+                return YYYY_MM_DD_HH_MM_SS_SSS;
             }
             return new Formatter(pattern);
         }
@@ -589,8 +638,15 @@ public class DateUtil {
                 // 19位
             } else if (YYYY_MM_DD_HH_MM_SS.pattern.length() == source.length()) {
                 return YYYY_MM_DD_HH_MM_SS;
+                // 21 23位
+            } else if (YYYY_MM_DD_HH_MM_SS_S.pattern.length() == source.length()) {
+                return YYYY_MM_DD_HH_MM_SS_S;
+            } else if (YYYY_MM_DD_HH_MM_SS_SS.pattern.length() == source.length()) {
+                return YYYY_MM_DD_HH_MM_SS_SS;
+            } else if (YYYY_MM_DD_HH_MM_SS_SSS.pattern.length() == source.length()) {
+                return YYYY_MM_DD_HH_MM_SS_SSS;
             }
-            return YYYY_MM_DD_HH_MM_SS;
+            return YYYY_MM_DD_HH_MM_SS_SSS;
         }
 
         public String print(Date date, Locale locale) {
@@ -610,9 +666,22 @@ public class DateUtil {
             return getDateFormat(locale).parse(source);
         }
 
+
         private DateFormat getDateFormat(Locale locale) {
             return new SimpleDateFormat(this.pattern, locale);
         }
+        /**
+         *
+         * @param source
+         * @param zoneId
+         * @return
+         * @throws ParseException
+         */
+        public Date parse2(String source, TimeZone timeZone) throws ParseException {
+            LocalDateTime localDateTime = LocalDateTime.parse(source, dateTimeFmt);
+            return Date.from(localDateTime.atZone(timeZone.toZoneId()).toInstant());
+        }
+
     }
 
 
