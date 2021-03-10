@@ -50,7 +50,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-
+import com.jia54321.utils.entity.EntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +74,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.jia54321.utils.entity.DynamicEntity;
-import com.jia54321.utils.entity.PEntityType;
 import com.jia54321.utils.fastjson.ComplexPropertyPreFilter;
 
 
@@ -216,7 +215,9 @@ public class JsonHelper extends DateUtil {
 			{ 
 				// 默认不处理 definedEntityType
 				// 默认不处理 result
-                put(PEntityType.class, new String[] { "definedEntityType" });
+//                put(PEntityType.class, new String[] { "definedEntityType" });
+				put(EntityType.class, new String[] { "tableDesc", "metaItems" });
+
                 put(List.class, new String[] { "result" });
             }
         });
@@ -941,6 +942,46 @@ public class JsonHelper extends DateUtil {
 //		} else if(jsonStringOrMap instanceof ServletRequest) {
 //			params = org.springframework.web.util.WebUtils.getParametersStartingWith((ServletRequest)jsonStringOrMap, prefix);
 //		}
+		else if( ClassUtils.servletRequestIsAvailable
+				&& ClassUtils.isAssignableFrom("javax.servlet.ServletRequest", jsonStringOrMap )) {
+			// javax.servlet.ServletRequest getParameterMap
+			/**
+			 * Returns a java.util.Map of the parameters of this request. Request
+			 * parameters are extra information sent with the request. For HTTP
+			 * servlets, parameters are contained in the query string or posted form
+			 * data.
+			 *
+			 * @return an immutable java.util.Map containing parameter names as keys and
+			 *         parameter values as map values. The keys in the parameter map are
+			 *         of type String. The values in the parameter map are of type
+			 *         String array.
+			 */
+			// public Map<String, String[]> getParameterMap();
+			try {
+				// parameterMap
+				Map<String, String[]> parameterMap
+						= (Map<String, String[]>)ClassUtils.invokeMethodIfAvailable(jsonStringOrMap, "getParameterMap");
+				//
+				if( null!= parameterMap && parameterMap.size() > 0) {
+					for ( Map.Entry<String, String[]> param: parameterMap.entrySet() ) {
+						if ("".equals(prefix) || param.getKey().startsWith(prefix)) {
+							String unprefixed = param.getKey().substring(prefix.length());
+							String[] values = param.getValue();
+							if (values == null || values.length == 0) {
+								// Do nothing, no values found at all.
+							}
+							else if (values.length > 1) {
+								params.put(unprefixed, values);
+							}
+							else {
+								params.put(unprefixed, values[0]);
+							}
+						}
+					}
+				}
+			} catch (Throwable t) {
+			}
+		}
 		return params;
 	}
 	

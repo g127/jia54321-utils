@@ -29,12 +29,51 @@ import java.util.Set;
  * ClassUtils
  */
 public class ClassUtils {
+	/** Is javax.servlet.ServletRequest available */
+	static protected boolean servletRequestIsAvailable = false;
+	static {
 
+		// Is Log4J Available?
+		try {
+			servletRequestIsAvailable = null != Class.forName("javax.servlet.ServletRequest");
+		} catch (Throwable t) {
+			servletRequestIsAvailable = false;
+		}
+	}
 	/** The package separator character: '.' */
 	private static final char PACKAGE_SEPARATOR = '.';
 
 	/** The inner class separator character: '$' */
 	private static final char INNER_CLASS_SEPARATOR = '$';
+
+	/**
+	 * 标识 “当前Class 是否是给定的 Class 的超类或者超接口”。是 返回true，否则返回false。
+	 * 标识 “当前Class 是否与定的 Class 的相同”。是 返回true，否则返回false。
+	 * 如果 “如果该 Class 表示一个基本类型，且指定的 Class 参数正是该 Class 对象”，是则返回true，否则放回false。
+	 * @param cls 当前Class
+	 * @param target 给定的 Class
+	 * @return 是 返回true，否则返回false
+	 */
+	public static boolean isAssignableFrom(Class<?> cls, Object target) {
+		return cls.isAssignableFrom(target.getClass());
+	}
+
+	/**
+	 * 标识 “当前Class 是否是给定的 Class 的超类或者超接口”。是 返回true，否则返回false。
+	 * 标识 “当前Class 是否与定的 Class 的相同”。是 返回true，否则返回false。
+	 * 如果 “如果该 Class 表示一个基本类型，且指定的 Class 参数正是该 Class 对象”，是则返回true，否则放回false。
+	 * @param clsName 当前Class
+	 * @param target 给定的 Class
+	 * @return 是 返回true，否则返回false
+	 */
+	public static boolean isAssignableFrom(String clsName, Object target) {
+		try {
+			Class<?> cls = Class.forName(clsName);
+			return cls.isAssignableFrom(target.getClass());
+		} catch (Exception e) {
+		}
+		return false;
+	}
 
 
 	private static Object invokeMethod(Method method, Object target, Object... args) {

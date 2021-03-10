@@ -37,7 +37,7 @@ import com.jia54321.utils.CamelNameUtil;
  * @create
  * @description 2009-7-31 郭罡 新建
  */
-public class DynamicEntity extends PEntityType implements IDynamicEntity {
+public class DynamicEntity extends EntityType implements IDynamicEntity {
 	/**  */
 	private static final long serialVersionUID = 6641411787227589811L;
 
@@ -107,7 +107,7 @@ public class DynamicEntity extends PEntityType implements IDynamicEntity {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("DynamicDx [typeId=").append(getTypeId()).append(", items=").append(items).append("]");
+		builder.append("DynamicDx [typeId=").append(getTableDesc().getTypeId()).append(", items=").append(items).append("]");
 		return builder.toString();
 	}
 }

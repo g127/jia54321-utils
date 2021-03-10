@@ -24,11 +24,12 @@
  */
 package com.jia54321.utils.entity;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import com.jia54321.utils.entity.query.CrudTableDesc;
+import com.jia54321.utils.entity.query.ITableDesc;
+
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 /**
  * EntityType
@@ -37,136 +38,39 @@ import java.util.Map.Entry;
  */
 public class EntityType implements IEntityType {
 	/**  */
-	private static final long serialVersionUID = -3618164022281940398L;
-	
-	/** 类型ID */
-	private String typeId;
-	/** 类型别名ID */
-	private String typeAliasId;
-	
-	
-	/** 类型显示名称 */
-	private String typeDisplayName;
-	
-	/** 类型模块 */
-	private String typeMk;
-	/** 类型实体名称 */
-	private String typeEntityName;
-	
-	/** 类型主键 字段名 */
-	private String typePkName;
-	/** 类型主键 显示名称 字段名 */
-	private String typePkDisplayName;
-	
-	/** 类型 拥有者 */
-	private String ownerId;
-	/** 类型 拥有者 名称 */
-	private String ownerDisplayName;
-	
-	/** 类型 可选项 */
-	private Long typeOpts;
+	private static final long       serialVersionUID = -3618164022281940398L;
+	/**类型实体描述  */
+	private ITableDesc tableDesc;
+//
+//	/** 类型 拥有者 */
+//	private String ownerId;
+//	/** 类型 拥有者 名称 */
+//	private String ownerDisplayName;
 	
 	/**  元数据定义.  */
 	private Map<String, MetaItem> metaItems = new HashMap<String, MetaItem>();
 
-	@Override
+	public ITableDesc getTableDesc() {
+		return tableDesc;
+	}
+
+	public void setTableDesc(ITableDesc tableDesc) {
+		this.tableDesc = tableDesc;
+	}
+
 	public String getTypeId() {
-		return typeId;
+		return tableDesc.getTypeId();
 	}
 
-	@Override
 	public void setTypeId(String typeId) {
-		this.typeId = typeId;
-	}
-
-	@Override
-	public String getTypeAliasId() {
-		return typeAliasId;
-	}
-
-	@Override
-	public void setTypeAliasId(String typeAliasId) {
-		this.typeAliasId = typeAliasId;
-	}
-
-	@Override
-	public String getTypeDisplayName() {
-		return typeDisplayName;
-	}
-
-	@Override
-	public void setTypeDisplayName(String typeDisplayName) {
-		this.typeDisplayName = typeDisplayName;
-	}
-
-	@Override
-	public String getTypeMk() {
-		return typeMk;
-	}
-
-	@Override
-	public void setTypeMk(String typeMk) {
-		this.typeMk = typeMk;
-	}
-
-	@Override
-	public String getTypeEntityName() {
-		return typeEntityName;
-	}
-
-	@Override
-	public void setTypeEntityName(String typeEntityName) {
-		this.typeEntityName = typeEntityName;
-	}
-
-	@Override
-	public String getTypePkName() {
-		return typePkName;
-	}
-
-	@Override
-	public void setTypePkName(String typePkName) {
-		this.typePkName = typePkName;
-	}
-
-	@Override
-	public String getTypePkDisplayName() {
-		return typePkDisplayName;
-	}
-
-	@Override
-	public void setTypePkDisplayName(String typePkDisplayName) {
-		this.typePkDisplayName = typePkDisplayName;
-	}
-
-	@Override
-	public String getOwnerId() {
-		return ownerId;
-	}
-
-	@Override
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
-	}
-
-	@Override
-	public String getOwnerDisplayName() {
-		return ownerDisplayName;
-	}
-
-	@Override
-	public void setOwnerDisplayName(String ownerDisplayName) {
-		this.ownerDisplayName = ownerDisplayName;
-	}
-
-	@Override
-	public Long getTypeOpts() {
-		return typeOpts;
-	}
-
-	@Override
-	public void setTypeOpts(Long typeOpts) {
-		this.typeOpts = typeOpts;
+		try {
+			ITableDesc desc = CrudTableDesc.CACHE.get(typeId);
+			setTableDesc(desc);
+		} catch (ExecutionException e) {
+			// e.printStackTrace();
+		}
+		// setTableDesc(CrudTableDesc.CACHE.getIfPresent(typeId));
+		this.tableDesc.setTypeId(typeId);
 	}
 
 	@Override
@@ -194,17 +98,13 @@ public class EntityType implements IEntityType {
 	public Iterator<Entry<String, MetaItem>> iteratorMetaItems() {
 		return metaItems.entrySet().iterator();
 	}
-	
+
+
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("EntityType [typeId=").append(typeId)
-				.append(", typeDisplayName=").append(typeDisplayName)
-				.append(", typeMk=").append(typeMk).append(", typeEntityName=")
-				.append(typeEntityName).append(", typePkName=")
-				.append(typePkName).append(", metaItems=").append(metaItems)
-				.append("]");
-		return builder.toString();
+		return new StringJoiner(", ", EntityType.class.getSimpleName() + "[", "]")
+				.add("tableDesc=" + tableDesc)
+				.add("metaItems=" + metaItems)
+				.toString();
 	}
-	
 }

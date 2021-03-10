@@ -24,6 +24,8 @@
  */
 package com.jia54321.utils.entity;
 
+import com.jia54321.utils.entity.query.ITableDesc;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,49 +36,18 @@ import java.util.Map.Entry;
  * @author 郭罡
  * @description 2009-7-31 郭罡 新建
  */
-public interface IEntityType extends Serializable{
+public interface IEntityType extends Serializable {
 
 	public abstract String getTypeId();
 	public abstract void setTypeId(String typeId);
-	
-	public abstract String getTypeAliasId();
-	public abstract void setTypeAliasId(String typeAliasId);
 
-	public abstract String getTypeDisplayName();
-	public abstract void setTypeDisplayName(String typeDisplayName);
+	public abstract ITableDesc getTableDesc();
+	public abstract void setTableDesc(ITableDesc tableDesc);
 
-	
-	public abstract String getTypeMk();
-	public abstract void setTypeMk(String typeMk);
-
-	public abstract String getTypeEntityName();
-	public abstract void setTypeEntityName(String typeEntityName);
-	
-
-	public abstract String getTypePkName();
-	public abstract void setTypePkName(String typePkName);
-	
-	public abstract String getTypePkDisplayName();
-	public abstract void setTypePkDisplayName(String typePkDisplayName);
-	
-	
-	public abstract String getOwnerId();
-	public abstract void setOwnerId(String ownerId);
-
-	public abstract String getOwnerDisplayName();
-	public abstract void setOwnerDisplayName(String ownerDisplayName);
-	
-	
-	public abstract Long getTypeOpts();
-	public abstract void setTypeOpts(Long typeOpts);
-	
-	
 	public abstract Collection<MetaItem> getMetaItems();
 
-	
 	public abstract void setMetaItem(String itemName, MetaItem value);
 	public abstract MetaItem getMetaItem(String itemName);
-
 	
 	public abstract Iterator<Entry<String, MetaItem>> iteratorMetaItems();
 
