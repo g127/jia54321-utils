@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jia54321</groupId>
     <artifactId>jia54321-utils</artifactId>
-    <version>0.0.11.v20201229</version>
+    <version>0.0.12.v20210311</version>
 
     <name>jia54321-utils</name>
     <description>Official Java SDK for jia54321-utils. https://github.com/g127/jia54321-utils</description>
@@ -20,6 +20,9 @@
         <!-- file encoding, use UTF-8 for everything -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- aspectj -->
+        <aspectj.version>1.8.13</aspectj.version>
 
         <!-- netty4 -->
         <netty.version>4.1.54.Final</netty.version>
@@ -196,6 +199,20 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+<!--            <scope>runtime</scope>-->
+            <scope>test</scope>
+        </dependency>
+
         <!-- servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -250,6 +267,31 @@
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>1.11</version>
+                <configuration>
+                    <complianceLevel>1.8</complianceLevel>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <showWeaveInfo>true</showWeaveInfo>
+                    <Xlint>ignore</Xlint>
+                    <encoding>UTF-8</encoding>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

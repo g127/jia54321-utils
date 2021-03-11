@@ -19,7 +19,7 @@ import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 public class MailTest {
-    static final Logger log = LoggerFactory.getLogger(DateUtilTest.class);
+    static final Logger log = LoggerFactory.getLogger(MailTest.class);
 
     public static void sendMail() throws Exception {
 
