@@ -1,11 +1,14 @@
 package com.jia54321.utils.entity.query;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.*;
+import com.jia54321.utils.cache.ICache;
+import com.jia54321.utils.cache.caffeine.CaffeineCache;
 
 
 /**
@@ -14,7 +17,7 @@ import com.google.common.cache.*;
  */
 public class CrudTableDesc {
 
-	public static final LoadingCache<String, ITableDesc> CACHE = CacheBuilder.newBuilder()
+	public static final  LoadingCache<String, ITableDesc> CACHE = CacheBuilder.newBuilder()
 			.expireAfterWrite(10, TimeUnit.MINUTES)// 给定时间内没有被读/写访问，则回收。
 			.refreshAfterWrite(10, TimeUnit.MINUTES)// 给定时间内没有被读/写访问，则回收。
 			.expireAfterAccess(1, TimeUnit.HOURS)// 缓存过期时间和redis缓存时长一样

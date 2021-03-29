@@ -29,6 +29,7 @@ import com.jia54321.utils.entity.query.ITableDesc;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -50,5 +51,13 @@ public interface IEntityType extends Serializable {
 	public abstract MetaItem getMetaItem(String itemName);
 	
 	public abstract Iterator<Entry<String, MetaItem>> iteratorMetaItems();
+
+	public abstract Map<String, Object> getItems();
+	public abstract void setItems(Map<String, Object> items);
+
+	public void set(String propertyName, Object value);
+	public Object get(String propertyName);
+
+	public abstract void setDefinedEntityType(IEntityType entityType);
 
 }

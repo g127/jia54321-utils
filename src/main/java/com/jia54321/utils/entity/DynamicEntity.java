@@ -39,13 +39,7 @@ import com.jia54321.utils.CamelNameUtil;
  */
 public class DynamicEntity extends EntityType implements IDynamicEntity {
 	/**  */
-	private static final long serialVersionUID = 6641411787227589811L;
-
-	/** 动态实体. */
-	private Map<String, Object> items = new HashMap<String, Object>();
-
-	/** 动态实体. */
-	private Map<String, Object> javaBeanItems = new HashMap<String, Object>();
+	private static final long serialVersionUID = 1L;
 
 	public Map<String, Object> getItems() {
 		return items;

@@ -24,6 +24,7 @@
  */
 package com.jia54321.utils.entity;
 
+import com.jia54321.utils.CamelNameUtil;
 import com.jia54321.utils.entity.query.CrudTableDesc;
 import com.jia54321.utils.entity.query.ITableDesc;
 
@@ -38,9 +39,9 @@ import java.util.concurrent.ExecutionException;
  */
 public class EntityType implements IEntityType {
 	/**  */
-	private static final long       serialVersionUID = -3618164022281940398L;
+	private static final long       serialVersionUID = 1L;
 	/**类型实体描述  */
-	private ITableDesc tableDesc;
+	protected ITableDesc tableDesc;
 //
 //	/** 类型 拥有者 */
 //	private String ownerId;
@@ -48,7 +49,13 @@ public class EntityType implements IEntityType {
 //	private String ownerDisplayName;
 	
 	/**  元数据定义.  */
-	private Map<String, MetaItem> metaItems = new HashMap<String, MetaItem>();
+	protected Map<String, MetaItem> metaItems = new HashMap<String, MetaItem>();
+
+	/** 动态实体. */
+	protected Map<String, Object> items = new HashMap<String, Object>();
+
+	/** 动态实体. */
+	protected Map<String, Object> javaBeanItems = new HashMap<String, Object>();
 
 	public ITableDesc getTableDesc() {
 		return tableDesc;
@@ -97,6 +104,45 @@ public class EntityType implements IEntityType {
 	@Override
 	public Iterator<Entry<String, MetaItem>> iteratorMetaItems() {
 		return metaItems.entrySet().iterator();
+	}
+
+	@Override
+	public Map<String, Object> getItems() {
+		return items;
+	}
+
+	@Override
+	public void setItems(Map<String, Object> items) {
+		this.items = items;
+		if (null != items) {
+			for (Map.Entry<String, Object> e : items.entrySet()) {
+				javaBeanItems.put(CamelNameUtil.underlineToCamelLowerCase(e.getKey()), e.getValue());
+			}
+		}
+	}
+
+	@Override
+	public void set(String propertyName, Object value) {
+		if (items == null) {
+			items = new HashMap<String, Object>();
+		}
+		javaBeanItems.put(CamelNameUtil.underlineToCamelLowerCase(propertyName), value);
+		items.put(CamelNameUtil.camelToUnderlineUpperCase(propertyName), value);
+	}
+
+	@Override
+	public Object get(String propertyName) {
+		return items.get(CamelNameUtil.camelToUnderlineUpperCase(propertyName));
+	}
+
+
+	@Override
+	public void setDefinedEntityType(IEntityType entityType) {
+		this.setTableDesc(entityType.getTableDesc());
+		this.getMetaItems().clear();
+		for (MetaItem metaItem: entityType.getMetaItems()) {
+			this.metaItems.put(metaItem.getItemColName(), metaItem);
+		}
 	}
 
 

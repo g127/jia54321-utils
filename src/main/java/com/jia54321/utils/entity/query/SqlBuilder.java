@@ -24,7 +24,7 @@ public class SqlBuilder {
      * @param table
      * @return
      */
-    public SqlContent buildInsertSql(CrudTableDesc table) {
+    public SqlContext buildInsertSql(CrudTableDesc table) {
         StringBuilder sql = new StringBuilder();
         StringBuilder args = new StringBuilder();
         List<Object> params = new ArrayList<Object>();
@@ -101,7 +101,7 @@ public class SqlBuilder {
         args.append(")");
         sql.append(args);
 
-        return new SqlContent(sql, primaryName, params);
+        return new SqlContext(sql, primaryName, params);
     }
 
     /**
@@ -110,7 +110,7 @@ public class SqlBuilder {
      * @param table
      * @return
      */
-    public SqlContent buildUpdateSql(CrudTableDesc table) {
+    public SqlContext buildUpdateSql(CrudTableDesc table) {
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<Object>();
 
@@ -142,7 +142,7 @@ public class SqlBuilder {
             throw new RuntimeException("更新操作需要明确主键。");
         }
 
-        return new SqlContent(sql, primaryName, params);
+        return new SqlContext(sql, primaryName, params);
     }
 
     /**
@@ -151,7 +151,7 @@ public class SqlBuilder {
      * @param table
      * @return
      */
-    public SqlContent buildDeleteSql(CrudTableDesc table) {
+    public SqlContext buildDeleteSql(CrudTableDesc table) {
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<Object>();
 
@@ -179,7 +179,7 @@ public class SqlBuilder {
         sql.append(" AND ").append(primaryName).append(" = ?");
         params.add(primaryValue);
 
-        return new SqlContent(sql, primaryName, params);
+        return new SqlContext(sql, primaryName, params);
     }
 
 
@@ -189,7 +189,7 @@ public class SqlBuilder {
      * @param table
      * @return SqlContent
      */
-    public SqlContent buildGetSql(CrudTableDesc table) {
+    public SqlContext buildGetSql(CrudTableDesc table) {
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<Object>();
 
@@ -212,7 +212,7 @@ public class SqlBuilder {
         sql.append(" WHERE ").append(primaryName).append(" = ?");
         params.add(primaryValue);
 
-        return new SqlContent(sql, primaryName, params);
+        return new SqlContext(sql, primaryName, params);
     }
 
     /**
@@ -223,7 +223,7 @@ public class SqlBuilder {
      * @param sort
      * @return
      */
-    public SqlContent buildQueryCondition(CrudTableDesc table, List<? extends OperationBean> cons, List<? extends OperationBean> sort) {
+    public SqlContext buildQueryCondition(CrudTableDesc table, List<? extends OperationBean> cons, List<? extends OperationBean> sort) {
         if (null == cons) {
             cons = new ArrayList<OperationBean>(0);
         }
@@ -243,7 +243,7 @@ public class SqlBuilder {
      * @param operations
      * @return
      */
-    public SqlContent buildQueryOperation(CrudTableDesc table, List<? extends OperationBean> operations) {
+    public SqlContext buildQueryOperation(CrudTableDesc table, List<? extends OperationBean> operations) {
         return buildQueryOperation(table, operations, true);
     }
 
@@ -257,7 +257,7 @@ public class SqlBuilder {
      * @param isNeedTotalElements
      * @return
      */
-    public SqlContent buildQuerySQL(CrudTableDesc table, String whereSql, List<Object> params, Boolean isNeedTotalElements) {
+    public SqlContext buildQuerySQL(CrudTableDesc table, String whereSql, List<Object> params, Boolean isNeedTotalElements) {
         // Assert.notNull(whereSql, "not null.");
         if (whereSql == null) {
             throw new IllegalArgumentException("not null.");
@@ -288,7 +288,7 @@ public class SqlBuilder {
                 filterParams.add(p);
             }
         }
-        SqlContent returnObj = new SqlContent(sql, primaryName, filterParams);
+        SqlContext returnObj = new SqlContext(sql, primaryName, filterParams);
 
         if (isNeedTotalElements) {
             totalElementsSql.append("SELECT COUNT(*) FROM ").append(tableName);
@@ -315,7 +315,7 @@ public class SqlBuilder {
      * @param isNeedTotalElements
      * @return
      */
-    private SqlContent buildQueryOperation(CrudTableDesc table, List<? extends OperationBean> operations, Boolean isNeedTotalElements) {
+    private SqlContext buildQueryOperation(CrudTableDesc table, List<? extends OperationBean> operations, Boolean isNeedTotalElements) {
         //Assert.notNull(operations, "not null.");
         if (operations == null) {
             throw new IllegalArgumentException("not null.");

@@ -68,10 +68,8 @@ import com.alibaba.fastjson.serializer.ObjectSerializer;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.TypeUtils;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.jia54321.utils.entity.DynamicEntity;
 import com.jia54321.utils.fastjson.ComplexPropertyPreFilter;
@@ -842,7 +840,13 @@ public class JsonHelper extends DateUtil {
 	 * @return LinkedHashSet
 	 */
 	public static LinkedHashSet<String> toSplitAsLinkedHashSet(Object o, String separator) {
-		return  Sets.newLinkedHashSet(Splitter.on(separator).trimResults().splitToList(toStr(o, "")));
+		LinkedHashSet<String> result = new LinkedHashSet<String>();
+		String[] values = toStr(o, "").split(separator);
+		for (String v: values ) {
+			result.add(toStr(v, "").trim());
+        }
+		return result;
+//		return  Sets.newLinkedHashSet(Splitter.on(separator).trimResults().splitToList(toStr(o, "")));
 	}
 	
 	/**

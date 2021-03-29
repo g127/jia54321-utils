@@ -6,6 +6,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 import java.beans.Introspector;
@@ -98,44 +99,44 @@ public class ClassUtils {
 //		return null;
 //    }
 //
-//    /**
-//     * Map keyed by class containing CachedIntrospectionResults.
-//     * Needs to be a WeakHashMap with WeakReferences as values to allow
-//     * for proper garbage collection in case of multiple class loaders.
-//     */
-//    private static final Map<Class<?>, BeanInfo> classCache = Collections.synchronizedMap(new WeakHashMap<Class<?>, BeanInfo>());
-//
-//
-//    /**
-//     * 获取类本身的PropertyDescriptor[]，不包含父类属性
-//     *
-//     * @param clazz
-//     * @return PropertyDescriptor[]
-//	 */
-//    public static PropertyDescriptor[] getSelfPropertyDescriptors(Class<?> clazz) {
-//        try {
-//            BeanInfo beanInfo;
-//            if (classCache.get(clazz) == null) {
-//                beanInfo = Introspector.getBeanInfo(clazz, clazz.getSuperclass());
-//                classCache.put(clazz, beanInfo);
-//                // Immediately remove class from Introspector cache, to allow for proper
-//                // garbage collection on class loader shutdown - we cache it here anyway,
-//                // in a GC-friendly manner. In contrast to CachedIntrospectionResults,
-//                // Introspector does not use WeakReferences as values of its WeakHashMap!
-//                Class<?> classToFlush = clazz;
-//                do {
-//                    Introspector.flushFromCaches(classToFlush);
-//                    classToFlush = classToFlush.getSuperclass();
-//                } while (classToFlush != null);
-//            } else {
-//                beanInfo = classCache.get(clazz);
-//            }
-//            return beanInfo.getPropertyDescriptors();
-//        } catch (IntrospectionException e) {
-//            //LOG.error("获取BeanInfo失败", e);
-//            throw new RuntimeException(e);
-//        }
-//    }
+    /**
+     * Map keyed by class containing CachedIntrospectionResults.
+     * Needs to be a WeakHashMap with WeakReferences as values to allow
+     * for proper garbage collection in case of multiple class loaders.
+     */
+    private static final Map<Class<?>, BeanInfo> classCache = Collections.synchronizedMap(new WeakHashMap<Class<?>, BeanInfo>());
+
+
+    /**
+     * 获取类本身的PropertyDescriptor[]，不包含父类属性
+     *
+     * @param clazz
+     * @return PropertyDescriptor[]
+	 */
+    public static PropertyDescriptor[] getSelfPropertyDescriptors(Class<?> clazz) {
+        try {
+            BeanInfo beanInfo;
+            if (classCache.get(clazz) == null) {
+                beanInfo = Introspector.getBeanInfo(clazz, clazz.getSuperclass());
+                classCache.put(clazz, beanInfo);
+                // Immediately remove class from Introspector cache, to allow for proper
+                // garbage collection on class loader shutdown - we cache it here anyway,
+                // in a GC-friendly manner. In contrast to CachedIntrospectionResults,
+                // Introspector does not use WeakReferences as values of its WeakHashMap!
+                Class<?> classToFlush = clazz;
+                do {
+                    Introspector.flushFromCaches(classToFlush);
+                    classToFlush = classToFlush.getSuperclass();
+                } while (classToFlush != null);
+            } else {
+                beanInfo = classCache.get(clazz);
+            }
+            return beanInfo.getPropertyDescriptors();
+        } catch (IntrospectionException e) {
+            //LOG.error("获取BeanInfo失败", e);
+            throw new RuntimeException(e);
+        }
+    }
 //
     /**
      *
@@ -143,21 +144,12 @@ public class ClassUtils {
      * @return boolean
      */
     public static boolean isEntityOrDto(Class<?> propType) {
-		boolean isPrimitiveOrWrapperOrStrProp = propType.isPrimitive()
-				//
-		        || Boolean.class.equals(propType)
-				|| Byte.class.equals(propType)
-				|| Character.class.equals(propType)
-				|| Double.class.equals(propType)
-				|| Float.class.equals(propType)
-				|| Integer.class.equals(propType)
-				|| Long.class.equals(propType)
-				|| Short.class.equals(propType)
+		boolean isPrimitiveOrWrapperOrStrProp = isPrimitiveOrWrapper(propType)
 				|| Void.class.equals(propType)
 				//
 
 				|| BigDecimal.class.equals(propType)
-				|| String.class.equals(propType);
+				|| String.class.equals(propType);;
 
 		boolean isTimeProp = java.sql.Timestamp.class.equals(propType)
 				|| java.sql.Date.class.equals(propType)
@@ -168,8 +160,28 @@ public class ClassUtils {
 
     	return !isPrimitiveOrWrapperOrStrProp && !isTimeProp && !isEnumProp;
     }
-    
-    /**
+
+	/**
+	 * 是否为原生对象，或者包装类
+	 * @param propType
+	 * @return
+	 */
+	public static boolean isPrimitiveOrWrapper(Class<?> propType) {
+		return propType.isPrimitive()
+				//
+				|| Boolean.class.equals(propType)
+				|| Byte.class.equals(propType)
+				|| Character.class.equals(propType)
+				|| Double.class.equals(propType)
+				|| Float.class.equals(propType)
+				|| Integer.class.equals(propType)
+				|| Long.class.equals(propType)
+				|| Short.class.equals(propType)
+				|| BigInteger.class.equals(propType);
+
+	}
+
+	/**
      * 是否时间类型字段
      * @param propType  类型
      * @return true or false
@@ -190,6 +202,7 @@ public class ClassUtils {
 				|| Integer.class.getName().equals(propType.getName())
 				|| Long.class.getName().equals(propType.getName())
 				|| Short.class.getName().equals(propType.getName())
+				|| BigInteger.class.getName().equals(propType.getName())
 
 				|| double.class.getName().equals(propType.getName())
 				|| float.class.getName().equals(propType.getName())
@@ -217,6 +230,8 @@ public class ClassUtils {
 			return new Long(val);
 		} else if (Short.class.getName().equals(propType.getName())) {
 			return new Short(val);
+		} else if (BigInteger.class.getName().equals(propType.getName())) {
+			return new BigInteger(val);
 
 		} else if (double.class.getName().equals(propType.getName())) {
 			return new Double(val).doubleValue();
@@ -378,22 +393,37 @@ public class ClassUtils {
 			if (vals.length > 0 && method.getParameterTypes().length > 0) {
 				Object[] newVals = new Object[vals.length];
 				for (int i = 0; i < method.getParameterTypes().length; i++) {
-					//
-					if(vals[i] instanceof String
-							&& !String.class.getName().equals(method.getParameterTypes()[i].getName())) {
-						Class<?> propType = method.getParameterTypes()[i];
-						String val = (String)vals[i];
-						Object newVal = val;
-						if(isTimePropType(propType)) {
-							newVal = createTimePropTypeByVal(propType, val);
-						} else if(isNumbericPropType(propType)){
-							newVal = createNumbericPropTypeByVal(propType, val);
-						} else if(Object.class.getName().equals(propType.getName())){
-							newVal = val;
-						}
-						newVals[i] = newVal;
-					} else {
+					if( null == vals[i] ) {
 						newVals[i] = vals[i];
+					}
+					// 两个字段类型不一致
+					else if( null != vals[i]  && ! vals[i].getClass().equals(method.getParameterTypes()[i].getClass()) ) {
+						Class<?> propType = method.getParameterTypes()[i];
+						Object val = vals[i];
+						Object newVal = val;
+						// 待设置的值为字符串。两个字段类型不一致
+						if(vals[i] instanceof String ) {
+							if(isTimePropType(propType)) {
+								newVal = createTimePropTypeByVal(propType, String.valueOf(val));
+							} else if(isNumbericPropType(propType)){
+								newVal = createNumbericPropTypeByVal(propType,  String.valueOf(val));
+							} else if(Object.class.getName().equals(propType.getName())){
+								newVal = val;
+							}
+							newVals[i] = newVal;
+						}
+						// 待设置的值为数字。 两个字段类型不一致
+						else if(isNumbericPropType(vals[i].getClass())) {
+							newVal = createNumbericPropTypeByVal(propType, String.valueOf(val));
+							newVals[i] = newVal;
+
+						}
+						// 待设置的值为时间。 两个字段类型不一致
+						else if(isTimePropType(vals[i].getClass())) {
+							newVal = createTimePropTypeByVal(propType, String.valueOf(val));
+						} else {
+							newVals[i] = vals[i];
+						}
 					}
 
 				}

@@ -142,21 +142,34 @@ public class ITableDesc implements Serializable {
 	 * @return 表名称
 	 */
 	public String getTableName() {
+
 		Long value = getTypeOpts();
 //	    is( 2, value ) && !is( 4, value )  = 表名由 模块 + 类型标识  组成, 例如： SYS_1001
 //	   !is( 2, value ) &&  is( 4, value )  = 表名由 模块 + 实体名称  组成, 例如： SYS_USER
 //	    is( 2, value ) &&  is( 4, value )  = 表名由 模块 + 实体名称 + 类型标识  组成, 例如： SYS_USER_1001
 
-		if( is( 2, value ) &&  is( 4, value ) ) {
-			// 模块名TypeMk + 类型实体名称TypeEntityName
-			return getTypeMk() + getTypeEntityName() ;
-		}
-		if( !is( 2, value ) &&  is( 4, value ) ) {
-			// 模块名TypeMk + 唯一类型IDTypeId
-			return getTypeMk() + getTypeId();
+		String typeMk = getTypeMk();
+
+		if( typeMk != null &&  value != null ) {
+
+			if( typeMk.length() > 1 && typeMk.lastIndexOf('_') != typeMk.length() - 1  ) {
+				typeMk = typeMk + '_';
+			}
+
+			if( is( 2, value ) &&  is( 4, value ) ) {
+				// 模块名TypeMk + 类型实体名称TypeEntityName
+				return typeMk + getTypeEntityName() ;
+			}
+			if( !is( 2, value ) &&  is( 4, value ) ) {
+				// 模块名TypeMk + 唯一类型IDTypeId
+				return typeMk + getTypeId();
+			}
+
+			// 默认
+			return typeMk + getTypeEntityName() ;
 		}
 		// 默认
-		return getTypeMk() + getTypeEntityName() ;
+		return null;
 	}
 
 	/**

@@ -3,7 +3,10 @@ package com.jia54321.utils.entity.query;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class SqlContent {
+/**
+ * Sql 上下文
+ */
+public class SqlContext {
     /** 执行的sql */
     private StringBuilder sql;
 
@@ -16,7 +19,7 @@ public class SqlContent {
 	/** 总数量sql,类似 select count(*) from xxx */
 	private StringBuilder totalElementsSql;
 
-    public SqlContent(StringBuilder sql, String primaryKey, List<Object> params) {
+    public SqlContext(StringBuilder sql, String primaryKey, List<Object> params) {
         this.sql = sql;
         this.primaryKey = primaryKey;
         this.params = params;
@@ -56,7 +59,7 @@ public class SqlContent {
 
 	@Override
 	public String toString() {
-		return new StringJoiner(", ", SqlContent.class.getSimpleName() + "[", "]")
+		return new StringJoiner(", ", SqlContext.class.getSimpleName() + "[", "]")
 				.add("sql=" + sql)
 				.add("primaryKey='" + primaryKey + "'")
 				.add("params=" + params)

@@ -5,12 +5,8 @@ import com.jia54321.utils.Kv;
 import com.jia54321.utils.entity.query.*;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class DynamicEntityTest {
 
@@ -26,7 +22,7 @@ public class DynamicEntityTest {
 
 
 
-        SqlContent test =  sqlBuilder.buildInsertSql(userTable);
+        SqlContext test =  sqlBuilder.buildInsertSql(userTable);
         System.out.println(test);
 
 
@@ -45,9 +41,9 @@ public class DynamicEntityTest {
         SimpleCondition sc = SimpleConditionFactory.createByAnd(Kv.init().set("EQ_TYPE_MK","SYS").set("EQ_TYPE_ENTITY_NAME","USER"), 1, 20);
         QueryContent qc = QueryContentFactory.createQueryContent(sc);
         // 构造查询 buildQueryCondition
-        SqlContent querySqlContent = sqlBuilder.buildQueryCondition(userTable, qc.getConditions(), qc.getSorts());
+        SqlContext querySqlContext = sqlBuilder.buildQueryCondition(userTable, qc.getConditions(), qc.getSorts());
 
-        test = querySqlContent;
+        test = querySqlContext;
 
         System.out.println(test);
 

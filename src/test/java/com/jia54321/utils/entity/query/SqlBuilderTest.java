@@ -21,7 +21,7 @@ public class SqlBuilderTest {
         CrudTableDesc table = new CrudTableDesc();
         table.setTableDesc(tableDesc);
 
-        SqlContent test =  sqlBuilder.buildInsertSql(table);
+        SqlContext test =  sqlBuilder.buildInsertSql(table);
 
         System.out.println(test);
     }
@@ -34,7 +34,7 @@ public class SqlBuilderTest {
         table.setTableDesc(tableDesc);
         table.getColumnProps().put(table.getTableDesc().getTypePkName(), "2");
 
-        SqlContent test =  sqlBuilder.buildUpdateSql(table);
+        SqlContext test =  sqlBuilder.buildUpdateSql(table);
 
 //        table.getColumnProps().clear();
 
@@ -48,7 +48,7 @@ public class SqlBuilderTest {
         CrudTableDesc table = new CrudTableDesc();
         table.setTableDesc(tableDesc);
 
-        SqlContent test =  sqlBuilder.buildDeleteSql(table);
+        SqlContext test =  sqlBuilder.buildDeleteSql(table);
 
         System.out.println(test);
     }
@@ -60,7 +60,7 @@ public class SqlBuilderTest {
         CrudTableDesc table = new CrudTableDesc();
         table.setTableDesc(tableDesc);
 
-        SqlContent test =  sqlBuilder.buildGetSql(table);
+        SqlContext test =  sqlBuilder.buildGetSql(table);
 
         System.out.println(test);
     }
@@ -80,7 +80,7 @@ public class SqlBuilderTest {
         CrudTableDesc table = new CrudTableDesc();
         table.setTableDesc(tableDesc);
 
-        SqlContent test =  sqlBuilder.buildQuerySQL(table, "", new ArrayList<>(0), true);
+        SqlContext test =  sqlBuilder.buildQuerySQL(table, "", new ArrayList<>(0), true);
 
         System.out.println(test);
 
