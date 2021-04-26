@@ -1,8 +1,8 @@
 /**
  * MIT License
- * 
+ *
  * Copyright (c) 2009-present GuoGang and other contributors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,6 +24,7 @@
  */
 package com.jia54321.utils.entity;
 
+import com.google.common.collect.Ordering;
 import com.jia54321.utils.CamelNameUtil;
 import com.jia54321.utils.entity.query.CrudTableDesc;
 import com.jia54321.utils.entity.query.ITableDesc;
@@ -47,7 +48,7 @@ public class EntityType implements IEntityType {
 //	private String ownerId;
 //	/** 类型 拥有者 名称 */
 //	private String ownerDisplayName;
-	
+
 	/**  元数据定义.  */
 	protected Map<String, MetaItem> metaItems = new HashMap<String, MetaItem>();
 
@@ -66,15 +67,19 @@ public class EntityType implements IEntityType {
 	}
 
 	public String getTypeId() {
+		if( tableDesc == null ) return null;
 		return tableDesc.getTypeId();
 	}
 
 	public void setTypeId(String typeId) {
-		try {
-			ITableDesc desc = CrudTableDesc.CACHE.get(typeId);
-			setTableDesc(desc);
-		} catch (ExecutionException e) {
-			// e.printStackTrace();
+//		try {
+//			ITableDesc desc = CrudTableDesc.CACHE.get(typeId);
+//			setTableDesc(desc);
+//		} catch (ExecutionException e) {
+//			// e.printStackTrace();
+//		}
+		if(this.tableDesc == null) {
+			this.tableDesc = new ITableDesc();
 		}
 		// setTableDesc(CrudTableDesc.CACHE.getIfPresent(typeId));
 		this.tableDesc.setTypeId(typeId);
@@ -85,9 +90,17 @@ public class EntityType implements IEntityType {
 		if (metaItems == null) {
 			metaItems = new HashMap<String, MetaItem>();
 		}
-		return metaItems.values();
+		Ordering<MetaItem> sortMetaItemAsc = Ordering.from(new Comparator<MetaItem>() {
+			@Override
+			public int compare(MetaItem o1, MetaItem o2) {
+				return o1.getItemId().compareToIgnoreCase(o2.getItemId());
+			}
+		});
+		List<MetaItem> metaItemList = new ArrayList<MetaItem>(metaItems.values());
+		Collections.sort(metaItemList, sortMetaItemAsc);
+		return metaItemList;
 	}
-	
+
 	@Override
 	public void setMetaItem(String itemName, MetaItem value) {
 		if (metaItems == null) {

@@ -1,8 +1,8 @@
 /**
  * MIT License
- * 
+ *
  * Copyright (c) 2009-present GuoGang and other contributors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -234,7 +234,7 @@ public class DateUtil {
                 cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
                 cal.setTime(timestamp);
                 cal.set(Calendar.HOUR_OF_DAY, 0);
-                
+
                 cal.set(Calendar.MINUTE, 0);
                 cal.set(Calendar.SECOND, 0);
                 cal.set(Calendar.MILLISECOND, 0);
@@ -313,7 +313,7 @@ public class DateUtil {
 
                 return toTimestamp(cal.getTime());
             }
-            
+
             if ("lastYear".equalsIgnoreCase(type)) {
                 Calendar cal = Calendar.getInstance();
                 cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
@@ -352,7 +352,7 @@ public class DateUtil {
                 cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
                 cal.setTime(timestamp);
                 cal.set(Calendar.HOUR_OF_DAY, 24);
-                
+
                 cal.set(Calendar.MINUTE, 0);
                 cal.set(Calendar.SECOND, 0);
                 cal.set(Calendar.MILLISECOND, 0);
@@ -392,7 +392,7 @@ public class DateUtil {
                 cal.setTime(timestamp);
                 cal.set(cal.get(Calendar.YEAR), 0, 0, 0, 0, 0);
                 cal.set(Calendar.DAY_OF_YEAR, cal.getActualMaximum(Calendar.DAY_OF_YEAR));
-                cal.set(Calendar.HOUR_OF_DAY, 24);
+                nextDay(cal, Calendar.HOUR_OF_DAY, 24);
 
                 cal.set(Calendar.MINUTE, 0);
                 cal.set(Calendar.SECOND, 0);
@@ -434,17 +434,17 @@ public class DateUtil {
 
                 return toTimestamp(cal.getTime());
             }
-            
+
             if ("lastYear".equalsIgnoreCase(type)) {
                 Calendar cal = Calendar.getInstance();
                 cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
                 cal.setTime(timestamp);
                 cal.set(cal.get(Calendar.YEAR), 0, 0, 0, 0, 0);
                 cal.set(Calendar.DAY_OF_YEAR, cal.getActualMaximum(Calendar.DAY_OF_YEAR));
-                
+
                 // 减去一年
                 cal.add(Calendar.YEAR, -1);
-              
+
                 cal.set(Calendar.HOUR_OF_DAY, 24);
                 cal.set(Calendar.MINUTE, 0);
                 cal.set(Calendar.SECOND, 0);
@@ -453,6 +453,10 @@ public class DateUtil {
                 return toTimestamp(cal.getTime());
             }
             return toTimestamp(Calendar.getInstance().getTime());
+        }
+
+        private static void nextDay(Calendar cal, int hourOfDay, int i) {
+            cal.set(hourOfDay, i);
         }
 
 

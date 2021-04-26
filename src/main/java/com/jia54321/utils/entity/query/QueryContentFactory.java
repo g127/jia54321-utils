@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import com.jia54321.utils.ClassUtils;
 import com.jia54321.utils.JsonHelper;
 import com.jia54321.utils.NumberUtils;
 
@@ -17,7 +18,7 @@ import com.jia54321.utils.entity.DynamicEntity;
 
 
 /**
- * 
+ *
  * @author G
  *
  */
@@ -27,7 +28,7 @@ public class QueryContentFactory {
 	private static final String DOT_SPLIT_REGEX = "\\.";
 
 	/**
-	 * 
+	 *
 	 * @param sc
 	 * @return
 	 */
@@ -38,9 +39,9 @@ public class QueryContentFactory {
 		}
 		return rs;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param sc
 	 * @return
 	 */
@@ -49,29 +50,29 @@ public class QueryContentFactory {
 		if (sc != null) {
 			queryContent.setKey(sc.getKey());
 			queryContent.setTypeId(sc.getTypeId());
-			
+
 			queryContent.setP(sc.getP());
 			queryContent.setW(sc.getW());
-			
+
 			queryContent.setIds(sc.getIds());
-			
+
 			List<OperationBean> conditions = new ArrayList<OperationBean>();
 			conditions = OperationBean.conditionOneMapAnd(conditions, sc.getSearch());
 			conditions = OperationBean.conditionOneListMapAnd(conditions, sc.getAnd());
 			conditions = OperationBean.conditionOneListMapOr(conditions, sc.getOr());
 			queryContent.setConditions(conditions);
-			
+
 			List<OperationBean> sort = new ArrayList<OperationBean>();
 			sort = OperationBean.conditionOneListMapAnd(sort, sc.getSorts());
 			queryContent.setSorts(sort);
-			
+
 			if (null != sc.getPage()) {
 				queryContent.setPage(sc.getPage());
 			}
 		}
 		return queryContent;
 	}
-	
+
 	public static SimpleQueryContent<Map<String, Object>> createSimpleQueryContent(QueryContent<DynamicEntity> qc){
 		final SimpleQueryContent<Map<String, Object>> qresult = new SimpleQueryContent<Map<String, Object>>();
 		List<?> list = qc.getResult();
@@ -81,7 +82,7 @@ public class QueryContentFactory {
 		qresult.setPageSize(qc.getPage().getPageSize());
 		qresult.setTotalPages(qc.getPage().getTotalPages());
 		qresult.setTotalElements(qc.getPage().getTotalElements());
-		
+
 		List<Map<String, Object>> qresultlist = new ArrayList<Map<String, Object>>(list.size());
 		qresult.setRows(qresultlist);
 
@@ -94,7 +95,7 @@ public class QueryContentFactory {
 		}
 		return qresult;
 	}
-	
+
 	public static List<SimpleQueryContent<Map<String, Object>>> createSimpleQueryContents(List<QueryContent<DynamicEntity>> qcList) {
 		List<SimpleQueryContent<Map<String, Object>>> rs = Lists.newArrayList();
 		for (QueryContent<DynamicEntity> queryContent : qcList) {
@@ -102,7 +103,7 @@ public class QueryContentFactory {
 		}
 		return rs;
 	}
-	
+
 	/**
 	 * 排序
 	 * @param source
@@ -112,8 +113,8 @@ public class QueryContentFactory {
 	public static QueryContent<DynamicEntity> sortByField(QueryContent<DynamicEntity> source, final String fieldName ){
 		if (null != source && null != source.getResult() && source.getResult().size() > 0) {
 			if(null!=source.getResult().get(0).getMetaItem(fieldName)){
-				// 根据fieldName升序排序  
-		        Collections.sort(source.getResult(), new Comparator<DynamicEntity>() {  
+				// 根据fieldName升序排序
+		        Collections.sort(source.getResult(), new Comparator<DynamicEntity>() {
 					@Override
 					public int compare(DynamicEntity arg0, DynamicEntity arg1) {
 						return Integer.valueOf(NumberUtils.toInt(String.valueOf(arg0.get(fieldName))))
@@ -125,7 +126,7 @@ public class QueryContentFactory {
 		}
 		return source;
 	}
-	
+
 	/**
 	 * 常用转换  将数据，转换为keyValues中描述的数据
 	 * keyValues的个数为新列表的列数   新列名=原列名，  如 "value=SEND_DOC_HEAD_ID","text=SEND_DOC_HEAD"
@@ -145,7 +146,7 @@ public class QueryContentFactory {
 		}
 		return distMap;
 	}
-	
+
 	/**
 	 * 常用转换  将列表数据，转换为keyValues中描述的列表数据 ，用于将列表数据转换为下拉框中数据
 	 * keyValues的个数为新列表的列数   新列名=原列名，  如 "value=SEND_DOC_HEAD_ID","text=SEND_DOC_HEAD"
@@ -162,8 +163,8 @@ public class QueryContentFactory {
 		}
 		return qresultlist;
 	}
-	
-	
+
+
 	/**
 	 * 常用转换  将数据，转换为keyValues中描述的数据
 	 * keyValues的个数为新列表的列数   新列名=原列名，  如 "value=SEND_DOC_HEAD_ID","text=SEND_DOC_HEAD"
@@ -183,7 +184,7 @@ public class QueryContentFactory {
 			if(IdKeyValue.length == 3 || IdKeyValue.length == 4) {
 				// id.0.男 id.1.女  id==0?id_name=男 id==1?id_name=女
 				String condtionField = IdKeyValue[0], condtionEqualVal = IdKeyValue[1], newField, newVal;
-				
+
 				Object condtionActualObjectVal = srcMap.get(condtionField);
 				boolean equalsIdValue = false;
 				if(condtionActualObjectVal instanceof String) {
@@ -194,9 +195,9 @@ public class QueryContentFactory {
 					BigDecimal condtionActualVal = (BigDecimal) condtionActualObjectVal;
 					equalsIdValue = condtionActualVal.equals(new BigDecimal(condtionEqualVal));
 				} else {
-					
+
 				}
-				
+
 				if(IdKeyValue.length == 3){
 					newField = IdKeyValue[0] + "_NAME";
 					newVal	=  IdKeyValue[2];
@@ -221,11 +222,11 @@ public class QueryContentFactory {
 //				if ( notExistDefinedNameField && equalsIdValue) {
 //					distMap.put(definedNameField, definedNameValue);
 //				}
-//			} 
+//			}
 		}
 		return distMap;
 	}
-	
+
 	/**
 	 * 常用转换   将列表数据，转换为keyValues中描述的列表数据
 	 * @param sqc
@@ -241,35 +242,35 @@ public class QueryContentFactory {
 		}
 		return qresultlist;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param sqc
 	 * @param keyValues
 	 * @return
 	 */
 	public static List<Map<String,Object>> createListKVBySplitDot(Object queryContentOrSimpleQueryContent, String... keyValues){
-		if(queryContentOrSimpleQueryContent.getClass().getName().equals(SimpleQueryContent.class.getName())){
+		if(ClassUtils.isAssignableFrom(SimpleQueryContent.class, queryContentOrSimpleQueryContent)){
 			return createListKV((SimpleQueryContent)queryContentOrSimpleQueryContent, DOT_SPLIT_REGEX, keyValues);
-		} else if(queryContentOrSimpleQueryContent.getClass().getName().equals(QueryContent.class.getName())){
+		} else if(ClassUtils.isAssignableFrom(QueryContent.class, queryContentOrSimpleQueryContent)){
 			return createListKV(createSimpleQueryContent((QueryContent)queryContentOrSimpleQueryContent), DOT_SPLIT_REGEX, keyValues);
 		}
 		return null;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param sqc
 	 * @param keyValues
 	 * @return
 	 */
 	public static List<Map<String,Object>> createListIdKVBySplitDot(Object queryContentOrSimpleQueryContent, String... keyValues){
-		if(queryContentOrSimpleQueryContent.getClass().getName().equals(SimpleQueryContent.class.getName())){
+		if(ClassUtils.isAssignableFrom(SimpleQueryContent.class, queryContentOrSimpleQueryContent)){
 			return createListIdKV((SimpleQueryContent)queryContentOrSimpleQueryContent, DOT_SPLIT_REGEX, keyValues);
-		} else if(queryContentOrSimpleQueryContent.getClass().getName().equals(QueryContent.class.getName())){
+		} else if(ClassUtils.isAssignableFrom(QueryContent.class, queryContentOrSimpleQueryContent)){
 			return createListIdKV(createSimpleQueryContent((QueryContent)queryContentOrSimpleQueryContent), DOT_SPLIT_REGEX, keyValues);
 		}
 		return null;
 	}
-	
+
 }

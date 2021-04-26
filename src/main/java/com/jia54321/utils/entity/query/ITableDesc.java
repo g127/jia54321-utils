@@ -1,5 +1,7 @@
 package com.jia54321.utils.entity.query;
 
+import com.jia54321.utils.JsonHelper;
+
 import java.io.Serializable;
 import java.util.StringJoiner;
 
@@ -37,11 +39,11 @@ public class ITableDesc implements Serializable {
 	/**主键名称  */
 	private String              typePkName;
 	/**类型选项  */
-	private Long                typeOpts;
+	private Long                typeOpts = 9L;
 
 	/**实体类  */
 	private Class<?>            entityClass;
-	
+
 	// ============================================================
 	public String getTypeId() {
 		return typeId;
@@ -150,6 +152,8 @@ public class ITableDesc implements Serializable {
 
 		String typeMk = getTypeMk();
 
+		String typeEntityName = getTypeEntityName();
+
 		if( typeMk != null &&  value != null ) {
 
 			if( typeMk.length() > 1 && typeMk.lastIndexOf('_') != typeMk.length() - 1  ) {
@@ -158,7 +162,7 @@ public class ITableDesc implements Serializable {
 
 			if( is( 2, value ) &&  is( 4, value ) ) {
 				// 模块名TypeMk + 类型实体名称TypeEntityName
-				return typeMk + getTypeEntityName() ;
+				return typeMk + typeEntityName ;
 			}
 			if( !is( 2, value ) &&  is( 4, value ) ) {
 				// 模块名TypeMk + 唯一类型IDTypeId
@@ -166,7 +170,7 @@ public class ITableDesc implements Serializable {
 			}
 
 			// 默认
-			return typeMk + getTypeEntityName() ;
+			return typeMk + typeEntityName ;
 		}
 		// 默认
 		return null;
@@ -200,17 +204,17 @@ public class ITableDesc implements Serializable {
 	public String toString() {
 		return new StringJoiner(", ", ITableDesc.class.getSimpleName() + "[", "]")
 				.add("tableName='" + getTableName() + "'")
-				.add("typeId='" + typeId + "'")
-				.add("typeAliasId='" + typeAliasId + "'")
-				.add("typeMk='" + typeMk + "'")
-				.add("typeEntityName='" + typeEntityName + "'")
-				.add("typeDisplayName='" + typeDisplayName + "'")
-				.add("typePkName='" + typePkName + "'")
-				.add("typeOpts=" + typeOpts)
+				.add("typeId='" + String.valueOf(typeId) + "'")
+				.add("typeAliasId='" + String.valueOf(typeAliasId) + "'")
+				.add("typeMk='" + String.valueOf(typeMk) + "'")
+				.add("typeEntityName='" + String.valueOf(typeEntityName) + "'")
+				.add("typeDisplayName='" + String.valueOf(typeDisplayName) + "'")
+				.add("typePkName='" + String.valueOf(typePkName) + "'")
+				.add("typeOpts=" + String.valueOf(typeOpts))
 				.add("isPkUseDbAutoIncreaseId=" + isPkUseDbAutoIncreaseId())
 				.add("isPkUseVarcharId=" + isPkUseVarcharId())
 				.add("isPkUseNumberId=" + isPkUseNumberId())
-				.add("entityClass=" + entityClass)
+				.add("entityClass=" + String.valueOf(entityClass))
 				.toString();
 	}
 

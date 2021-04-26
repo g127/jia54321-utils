@@ -4,6 +4,7 @@ import com.jia54321.utils.DateUtil;
 import com.jia54321.utils.IdGeneration;
 import com.jia54321.utils.JsonHelper;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.UUID;
@@ -40,7 +41,9 @@ public abstract class Oss {
      * @param path    文件路径，包含文件名
      * @return        返回http地址
      */
-    public abstract String upload(byte[] data, String path);
+    public String upload(byte[] data, String path) {
+        return upload(new ByteArrayInputStream(data), path);
+    }
 
     /**
      * 文件上传

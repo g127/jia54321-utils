@@ -22,6 +22,8 @@ import com.jia54321.utils.entity.service.context.IEntityEnvContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Env
  * @author gg
@@ -230,12 +232,12 @@ public class EntityEnvContext implements IEntityEnvContext {
 	@Override
 	public String envWebRootPath(String... relativePath) {
 		String webRoot = null;
-//		HttpServletRequest request = httpServletRequest();
-//		if (null == request) {
-//			webRoot = null;
-//		} else {
-//			webRoot = request.getContextPath();
-//		}
+		HttpServletRequest request = EnvHelper.requestContext().getRequest();
+		if (null == request) {
+			webRoot = null;
+		} else {
+			webRoot = request.getContextPath();
+		}
 
 		if (null == webRoot || "".equals(webRoot)) {
 			webRoot = getProperty("entity.web.root");
@@ -258,6 +260,10 @@ public class EntityEnvContext implements IEntityEnvContext {
 			}
 			// 拼接和替换操作
 			webRoot = webRoot + '/' + Joiner.on('/').skipNulls().join(relativePath);
+			// 进行replace操作
+			webRoot = webRoot.replaceAll("////", "//").replaceAll("///", "//");
+			// 进行replace操作
+			webRoot = webRoot.replace("//", "/");
 		}
 
 		return webRoot;
@@ -267,17 +273,21 @@ public class EntityEnvContext implements IEntityEnvContext {
 	public String envWebRealPath(String... relativePath) {
 		String realPath = null;
 
-//		HttpServletRequest request = httpServletRequest();
-//		if (null == request) {
-//			realPath = null;
-//		} else {
-//			realPath = request.getServletContext().getRealPath("/");
-//		}
-//
-//		if (!JsonHelper.isEmpty(relativePath)) {
-//			// 拼接和替换操作
-//			realPath = realPath + '/' + Joiner.on('/').skipNulls().join(relativePath);
-//		}
+		HttpServletRequest request = EnvHelper.requestContext().getRequest();
+		if (null == request) {
+			realPath = null;
+		} else {
+			realPath = request.getServletContext().getRealPath("/");
+		}
+
+		if (!JsonHelper.isEmpty(relativePath)) {
+			// 拼接和替换操作
+			realPath = realPath + '/' + Joiner.on('/').skipNulls().join(relativePath);
+			// 进行replace操作
+			realPath = realPath.replaceAll("////", "//").replaceAll("///", "//");
+			// 进行replace操作
+			realPath = realPath.replace("//", "/");
+		}
 
 		return realPath;
 

@@ -56,6 +56,9 @@ public class ClassUtils {
 	 * @return 是 返回true，否则返回false
 	 */
 	public static boolean isAssignableFrom(Class<?> cls, Object target) {
+		if(target instanceof Class) {
+			return cls.isAssignableFrom((Class<?>)target);
+		}
 		return cls.isAssignableFrom(target.getClass());
 	}
 
@@ -169,16 +172,22 @@ public class ClassUtils {
 	public static boolean isPrimitiveOrWrapper(Class<?> propType) {
 		return propType.isPrimitive()
 				//
-				|| Boolean.class.equals(propType)
-				|| Byte.class.equals(propType)
-				|| Character.class.equals(propType)
-				|| Double.class.equals(propType)
-				|| Float.class.equals(propType)
-				|| Integer.class.equals(propType)
-				|| Long.class.equals(propType)
-				|| Short.class.equals(propType)
-				|| BigInteger.class.equals(propType);
+				|| isAssignableFrom(Boolean.class, propType)
+				|| isAssignableFrom(Byte.class, propType)
+				|| isAssignableFrom(Character.class, propType)
+				|| isAssignableFrom(Double.class, propType)
+				|| isAssignableFrom(Float.class, propType)
+				|| isAssignableFrom(Integer.class, propType)
+				|| isAssignableFrom(Long.class, propType)
+				|| isAssignableFrom(Short.class, propType)
+				|| isAssignableFrom(BigInteger.class, propType)
 
+				|| isAssignableFrom(boolean.class, propType)
+				|| isAssignableFrom(double.class, propType)
+				|| isAssignableFrom(float.class, propType)
+				|| isAssignableFrom(int.class, propType)
+				|| isAssignableFrom(long.class, propType)
+				|| isAssignableFrom(short.class, propType);
 	}
 
 	/**
@@ -187,9 +196,12 @@ public class ClassUtils {
      * @return true or false
      */
     public static boolean isTimePropType(Class<?> propType) {
-		return java.sql.Timestamp.class.getName().equals(propType.getName())
-				|| java.sql.Date.class.getName().equals(propType.getName())
-				|| java.util.Date.class.getName().equals(propType.getName());
+		return 	isAssignableFrom(java.sql.Timestamp.class, propType)
+				|| isAssignableFrom(java.sql.Date.class, propType)
+				|| isAssignableFrom(java.util.Date.class, propType);
+//		return java.sql.Timestamp.class.getName().equals(propType.getName())
+//				|| java.sql.Date.class.getName().equals(propType.getName())
+//				|| java.util.Date.class.getName().equals(propType.getName());
     }
     /**
      * 是否数字类型字段
@@ -197,20 +209,20 @@ public class ClassUtils {
      * @return true or false
      */
     public static boolean isNumbericPropType(Class<?> propType) {
-		return Double.class.getName().equals(propType.getName())
-				|| Float.class.getName().equals(propType.getName())
-				|| Integer.class.getName().equals(propType.getName())
-				|| Long.class.getName().equals(propType.getName())
-				|| Short.class.getName().equals(propType.getName())
-				|| BigInteger.class.getName().equals(propType.getName())
+		return isAssignableFrom(Double.class, propType)
+				|| isAssignableFrom(Float.class, propType)
+				|| isAssignableFrom(Integer.class, propType)
+				|| isAssignableFrom(Long.class, propType)
+				|| isAssignableFrom(Short.class, propType)
+				|| isAssignableFrom(BigInteger.class, propType)
 
-				|| double.class.getName().equals(propType.getName())
-				|| float.class.getName().equals(propType.getName())
-				|| int.class.getName().equals(propType.getName())
-				|| long.class.getName().equals(propType.getName())
-				|| short.class.getName().equals(propType.getName())
+				|| isAssignableFrom(double.class, propType)
+				|| isAssignableFrom(float.class, propType)
+				|| isAssignableFrom(int.class, propType)
+				|| isAssignableFrom(long.class, propType)
+				|| isAssignableFrom(short.class, propType)
 
-				|| BigDecimal.class.getName().equals(propType.getName());
+				|| isAssignableFrom(BigDecimal.class, propType);
     }
 
     /**
@@ -220,31 +232,31 @@ public class ClassUtils {
      * @return Object
      */
 	public static Object createNumbericPropTypeByVal(Class<?> propType, String val) {
-		if (Double.class.getName().equals(propType.getName())) {
+		if (isAssignableFrom(Double.class, propType)) {
 			return new Double(val);
-		} else if (Float.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(Float.class, propType)) {
 			return new Float(val);
-		} else if (Integer.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(Integer.class, propType)) {
 			return new Integer(val);
-		} else if (Long.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(Long.class, propType)) {
 			return new Long(val);
-		} else if (Short.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(Short.class, propType)) {
 			return new Short(val);
-		} else if (BigInteger.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(BigInteger.class, propType)) {
 			return new BigInteger(val);
 
-		} else if (double.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(double.class, propType)) {
 			return new Double(val).doubleValue();
-		} else if (float.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(float.class, propType)) {
 			return new Float(val).floatValue();
-		} else if (int.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(int.class, propType)) {
 			return new Integer(val).intValue();
-		} else if (long.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(long.class, propType)) {
 			return new Long(val).longValue();
-		} else if (short.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(short.class, propType)) {
 			return new Short(val).shortValue();
 
-		} else if (BigDecimal.class.getName().equals(propType.getName())) {
+		} else if (isAssignableFrom(BigDecimal.class, propType)) {
 			return new BigDecimal(val);
 		}
 
@@ -264,9 +276,9 @@ public class ClassUtils {
 			return null;
 		}
 
-		if (java.sql.Timestamp.class.getName().equals(propType.getName())) {
+		if (	isAssignableFrom(java.sql.Timestamp.class, propType) ) {
 			return new java.sql.Timestamp(time.getTime());
-		} else if (java.sql.Date.class.getName().equals(propType.getName())) {
+		} else if (	isAssignableFrom(java.sql.Date.class, propType)) {
 			return new java.sql.Date(time.getTime());
 		} else {
 			return time;
@@ -407,7 +419,7 @@ public class ClassUtils {
 								newVal = createTimePropTypeByVal(propType, String.valueOf(val));
 							} else if(isNumbericPropType(propType)){
 								newVal = createNumbericPropTypeByVal(propType,  String.valueOf(val));
-							} else if(Object.class.getName().equals(propType.getName())){
+							} else if(Object.class.isAssignableFrom(propType)) {
 								newVal = val;
 							}
 							newVals[i] = newVal;
@@ -581,7 +593,7 @@ public class ClassUtils {
 			throw ex;
 		}
 	}
-	
+
 	/**
 	 * 获取类名和方法名.
 	 *

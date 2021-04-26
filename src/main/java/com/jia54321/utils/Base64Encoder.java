@@ -7,20 +7,20 @@ import java.io.*;
  * details of the Base64 algorithm.
  * <p>
  * This class can be used for encoding strings: <blockquote>
- * 
+ *
  * <pre>
  * String unencoded = &quot;webmaster:try2gueSS&quot;;
  * String encoded = Base64Encoder.encode(unencoded);
  * </pre>
- * 
+ *
  * </blockquote> or for encoding streams: <blockquote>
- * 
+ *
  * <pre>
  * OutputStream out = new Base64Encoder(System.out);
  * </pre>
- * 
+ *
  * </blockquote>
- * 
+ *
  * @author <b>Jason Hunter</b>, Copyright &#169; 2000
  * @version 1.2, 2002/11/01, added encode(byte[]) method to better handle binary
  *          data (thanks to Sean Graham)
@@ -42,7 +42,7 @@ public class Base64Encoder extends FilterOutputStream {
 	/***************************************************************************
 	 * Constructs a new Base64 encoder that writes output to the given
 	 * OutputStream.
-	 * 
+	 *
 	 * @param out
 	 *            the output stream
 	 */
@@ -52,7 +52,7 @@ public class Base64Encoder extends FilterOutputStream {
 
 	/***************************************************************************
 	 * Writes the given byte to the output stream in an encoded form.
-	 * 
+	 *
 	 * @exception IOException
 	 *                if an I/O error occurs
 	 */
@@ -101,7 +101,7 @@ public class Base64Encoder extends FilterOutputStream {
 
 	/***************************************************************************
 	 * Writes the given byte array to the output stream in an encoded form.
-	 * 
+	 *
 	 * @param buf
 	 *            the data to be written
 	 * @param off
@@ -122,7 +122,7 @@ public class Base64Encoder extends FilterOutputStream {
 	/***************************************************************************
 	 * Closes the stream, this MUST be called to ensure proper padding is
 	 * written to the end of the output stream.
-	 * 
+	 *
 	 * @exception IOException
 	 *                if an I/O error occurs
 	 */
@@ -147,28 +147,30 @@ public class Base64Encoder extends FilterOutputStream {
 	 * the ISO-8859-1 (Latin-1) encoding to convert the string to bytes. For
 	 * greater control over the encoding, encode the string to bytes yourself
 	 * and use encode(byte[]).
-	 * 
+	 *
 	 * @param unencoded
 	 *            the string to encode
 	 * @return the encoded form of the unencoded string
 	 */
 	public static String encode(String unencoded) {
+		Assert.notNull(unencoded, "unencoded must not be null");
 		byte[] bytes = null;
 		try {
 			bytes = unencoded.getBytes("8859_1");
-		} catch (UnsupportedEncodingException ignored) {
+		} catch (Exception ignored) {
 		}
 		return encode(bytes);
 	}
 
 	/***************************************************************************
 	 * Returns the encoded form of the given unencoded string.
-	 * 
+	 *
 	 * @param bytes
 	 *            the bytes to encode
 	 * @return the encoded form of the unencoded string
 	 */
 	public static String encode(byte[] bytes) {
+		Assert.notNull(bytes, "bytes must not be null");
 		ByteArrayOutputStream out = new ByteArrayOutputStream((int) (bytes.length * 1.37));
 		Base64Encoder encodedOut = new Base64Encoder(out);
 

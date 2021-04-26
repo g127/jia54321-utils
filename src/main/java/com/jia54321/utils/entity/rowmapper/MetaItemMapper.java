@@ -1,6 +1,7 @@
 package com.jia54321.utils.entity.rowmapper;
 
 import com.jia54321.utils.CamelNameUtil;
+import com.jia54321.utils.JsonHelper;
 import com.jia54321.utils.Kv;
 import com.jia54321.utils.entity.MetaItem;
 import com.jia54321.utils.entity.MetaItemType;
@@ -44,7 +45,7 @@ public class MetaItemMapper extends AbstractRowMapper<MetaItem> {
             String itemType =  rs.getString(2);
             String itemColDesc = result.get("COMMENT", "" );
 
-            sourceEntity.setItemId(String.format("%s%02d", sourceEntity.getTypeId(), rs.getRow()));
+            sourceEntity.setItemId(String.format("%s%02d", JsonHelper.toStr(sourceEntity.getTypeId(), ""), rs.getRow()));
             sourceEntity.setItemColName(itemColName);
             sourceEntity.setItemCodeName(CamelNameUtil.underlineToCamelLowerCase(itemColName));
             sourceEntity.setItemDisplayName(sourceEntity.getItemCodeName());

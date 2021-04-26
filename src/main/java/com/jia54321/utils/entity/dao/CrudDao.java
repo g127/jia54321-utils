@@ -3,6 +3,7 @@ package com.jia54321.utils.entity.dao;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.jia54321.utils.Assert;
 import com.jia54321.utils.entity.DynamicEntity;
 import com.jia54321.utils.entity.IDynamicEntity;
 import com.jia54321.utils.entity.IEntityType;
@@ -45,6 +46,7 @@ public abstract class CrudDao<T extends IEntityType> {
      * @return IEntityType
      */
     public IEntityType create(String typeId, String id) {
+        // Assert.notNull(typeId, "无法创建类型不存在的数据，具体原因：Entity.typeId must not be empty");
         return template.create(typeId, id);
     }
 

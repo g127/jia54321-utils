@@ -1,5 +1,7 @@
 package com.jia54321.utils;
 
+import junit.framework.Assert;
+import org.checkerframework.checker.units.qual.A;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -14,42 +16,48 @@ public class JsonHelperTest {
 
     @Test
     public void toJson() {
+        Assert.assertTrue("toJson",  JsonHelper.toJson(new Object()).length() > 0);
     }
 
     @Test
     public void fromJson() {
+        Assert.assertTrue("fromJson",  JsonHelper.fromJson("{}", Object.class) != null);
     }
 
     @Test
     public void fromJsonAsLinkedHashMap() {
+        Assert.assertTrue("fromJsonAsLinkedHashMap",  JsonHelper.fromJsonAsLinkedHashMap("{}") != null);
     }
 
     @Test
     public void fromJsonAsHashMap() {
+        Assert.assertTrue("fromJsonAsHashMap",  JsonHelper.fromJsonAsLinkedHashMap("{}") != null);
     }
 
     @Test
     public void fromJsonToList() {
+        Assert.assertTrue("fromJsonToList",  JsonHelper.fromJsonToList("[]", String.class).size() == 0);
     }
 
     @Test
     public void fromJsonToHashMapList() {
+        Assert.assertTrue("fromJsonToHashMapList",  JsonHelper.fromJsonToHashMapList("[]").size() == 0);
     }
 
     @Test
     public void fromJsonToLinkedHashMapList() {
+        Assert.assertTrue("fromJsonToLinkedHashMapList",  JsonHelper.fromJsonToLinkedHashMapList("[]").size() == 0);
     }
 
     @Test
     public void fromJsonToMapList() {
+        Assert.assertTrue("fromJsonToMapList",  JsonHelper.fromJsonToMapList("[]").size() == 0);
     }
 
     @Test
     public void toJSONString() {
-    }
-
-    @Test
-    public void testToJSONString() {
+        Assert.assertTrue("fromJsonToMapList",  JsonHelper.toJSONString(new Object()).length() > 0);
+        Assert.assertTrue("fromJsonToMapList",  JsonHelper.toJSONString(new Object(), true).length() > 0);
     }
 
     @Test

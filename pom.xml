@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jia54321</groupId>
     <artifactId>jia54321-utils</artifactId>
-    <version>0.0.13.v20210329</version>
+    <version>0.0.13.v20210426</version>
 
     <name>jia54321-utils</name>
     <description>Official Java SDK for jia54321-utils. https://github.com/g127/jia54321-utils</description>
@@ -218,8 +218,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-<!--            <scope>provided</scope>-->
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.mail/mail -->
         <!--发送邮件-->
@@ -313,7 +312,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <!-- 
+            <!--
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>

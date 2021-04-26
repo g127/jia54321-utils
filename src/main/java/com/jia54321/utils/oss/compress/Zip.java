@@ -21,7 +21,7 @@ public class Zip {
      * @param tempFile 输出文件
      * @return 输出文件
      */
-    public File zipFile(String baseName, File[] subs, String[] newNames, File tempFile) {
+    public static File zipFile(String baseName, File[] subs, String[] newNames, File tempFile) {
         ZipOutputStream zos = null;
         try {
             zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(tempFile)));
@@ -42,7 +42,7 @@ public class Zip {
      * @param zos      ZipOutputStream
      * @throws IOException 异常
      */
-    private void zipFile(String baseName, File[] subs, String[] newNames, ZipOutputStream zos) throws IOException {
+    private static void zipFile(String baseName, File[] subs, String[] newNames, ZipOutputStream zos) throws IOException {
         // 基础路径，可为空
         if (null == baseName) {
             baseName = "";
@@ -60,13 +60,21 @@ public class Zip {
                     n = n.substring(1);
                 }
                 zos.putNextEntry(new ZipEntry(n));
-                FileInputStream fis = new FileInputStream(f);
-                byte[] buffer = new byte[1024];
-                int r = 0;
-                while ((r = fis.read(buffer)) != -1) {
-                    zos.write(buffer, 0, r);
+
+                FileInputStream fis = null;
+                try	{
+                    fis = new FileInputStream(f);
+                    byte[] buffer = new byte[1024];
+                    int r = 0;
+                    while ((r = fis.read(buffer)) != -1) {
+                        zos.write(buffer, 0, r);
+                    }
+                } catch (Exception e) {
+                } finally {
+                    if(fis != null) {
+                        fis.close();
+                    }
                 }
-                fis.close();
             }
         }
     }

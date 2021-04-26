@@ -210,10 +210,10 @@ public class LinkedCaseInsensitiveMap<V> implements Map<String, V>, Serializable
         return this.targetMap.entrySet();
     }
 
-    @Override
-    public LinkedCaseInsensitiveMap<V> clone() {
-        return new LinkedCaseInsensitiveMap<V>(this);
-    }
+//    @Override
+//    public LinkedCaseInsensitiveMap<V> clone() {
+//        return new LinkedCaseInsensitiveMap<V>(this);
+//    }
 
     @Override
     public boolean equals(Object obj) {

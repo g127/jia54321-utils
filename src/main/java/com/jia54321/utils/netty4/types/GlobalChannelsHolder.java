@@ -420,12 +420,12 @@ public class GlobalChannelsHolder {
      */
     public static void remove(Channel channel) {
         ChannelCtx ctx      = channel.attr(G_CHANNEL_CTX).get();
-        String     clientId = ctx.clientOriginName;
-        if (null != clientId) {
+        String     clientOriginName = ctx == null ? "" : ctx.clientOriginName;
+        if (null != clientOriginName || "".equals(clientOriginName)) {
             if (logger.isInfoEnabled()) {
                 logger.info(channelDescText(LOG_DEL, channel));
             }
-            client(clientId).remove(channel);
+            client(clientOriginName).remove(channel);
 
             channel.closeFuture().removeListener(remover);
         }
@@ -467,14 +467,15 @@ public class GlobalChannelsHolder {
         String remoteAddress = getRemoteAddress(c);
         String[]   remote  = remoteAddress.split(":");
         //
-        String     actName = (null == action) ? "" : action;
-        ChannelCtx ctx     = c.attr(G_CHANNEL_CTX).get();
-        String     ip      = remote[0];
-        int        port    = NumberUtils.toInt(remote[1], -1);
-        int[]      sizes   = innerSize();
-
+        String     actName          = (null == action) ? "" : action;
+        ChannelCtx ctx              = c.attr(G_CHANNEL_CTX).get();
+        String     clientOriginName = ctx == null ? "" : ctx.clientOriginName;
+        String     ip               = remote[0];
+        int        port             = NumberUtils.toInt(remote[1], -1);
+        int[]      sizes            = innerSize();
+        // 定位日志
         return String.format(L8_LOC, //
-                actName, ctx.clientOriginName, sizes[0], sizes[1], sizes[2], ip, port, "");
+                actName, clientOriginName, sizes[0], sizes[1], sizes[2], ip, port, "");
     }
 
     public static String getRemoteAddress(Channel c) {

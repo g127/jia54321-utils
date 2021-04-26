@@ -20,16 +20,16 @@ import java.security.cert.X509Certificate;
  * OK Http 工具类
  * @author G
  */
-public class OKHttpUtils {	
+public class OKHttpUtils {
 	/** 日志 */
-	private static Logger logger = LoggerFactory.getLogger(OKHttpUtils.class);
-	
+	private static Logger log = LoggerFactory.getLogger(OKHttpUtils.class);
+
 	private final static OkHttpClient M_OK_HTTP_CLIENT;
 
 	private final static OkHttpClient M_OK_HTTPS_CLIENT;
-	
+
 	private final static long DEFULTE_CONNECTION_TIMEOUT = 30L;
-	
+
 	static {
 		M_OK_HTTP_CLIENT = new OkHttpClient().newBuilder()
 				.connectTimeout(DEFULTE_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
@@ -55,10 +55,10 @@ public class OKHttpUtils {
 	public static Builder newBuilder() {
 		return new okhttp3.Request.Builder();
 	}
-	
+
 	/**
 	 * 请求数据，不开启异步线程
-	 * 
+	 *
 	 * @param request 请求体
 	 * @return Response
 	 * @throws IOException  IOException
@@ -66,10 +66,10 @@ public class OKHttpUtils {
 	public static Response execute(Request request) throws IOException {
 		return getOkHttpClient(request).newCall(request).execute();
 	}
-	
+
 	/**
 	 * 请求数据，不开启异步线程
-	 * 
+	 *
 	 * @param url  请求地址
 	 * @param type 媒体类型  如  OKHttpUtils.JSON
 	 * @param postData  post数据
@@ -81,7 +81,7 @@ public class OKHttpUtils {
 					new okhttp3.Request.Builder().url(url).post(okhttp3.RequestBody.create(type, postData)).build())
 					.body().string();
 		} catch (Exception e) {
-			logger.error(String.format("请求%s 数据 %s", url, postData), e);
+			log.error(String.format("请求%s 数据 %s", url, postData), e);
 			return "";
 		}
 	}
@@ -96,10 +96,10 @@ public class OKHttpUtils {
 	}
 
 
-	
+
 	/**
 	 * 开启异步线程访问,不对访问结果进行处理
-	 * 
+	 *
 	 * @param request request
 	 */
 	public static void enqueue(Request request) {
@@ -108,9 +108,9 @@ public class OKHttpUtils {
 			public void onResponse(Call call, Response response)
 					throws IOException {
 				if (!response.isSuccessful()) {
-                    if (logger.isErrorEnabled()) {
+                    if (log.isErrorEnabled()) {
                         //logger.error("Unexpected code " + response);
-                        logger.error("Unexpected code " + response);
+                        log.error("Unexpected code " + response);
                     }
                 }
 				response.close();
@@ -124,7 +124,7 @@ public class OKHttpUtils {
 
 	/**
 	 * 为HttpGet请求拼接一个参数
-	 * 
+	 *
 	 * @param url   地址
 	 * @param name  参数名
 	 * @param value 参数值
@@ -136,7 +136,7 @@ public class OKHttpUtils {
 
 	/**
 	 * 为HttpGet请求拼接多个参数
-	 * 
+	 *
 	 * @param url   地址
 	 * @param values  参数名，值对
 	 * @return string
@@ -173,10 +173,12 @@ public class OKHttpUtils {
 	public static class OkHttpsTrustManager implements X509TrustManager {
 		@Override
 		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			log.debug("checkClientTrusted");
 		}
 
 		@Override
 		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			log.debug("checkServerTrusted");
 		}
 
 		@Override
@@ -189,7 +191,8 @@ public class OKHttpUtils {
 	private static class TrustAllHostnameVerifier implements HostnameVerifier {
 		@Override
 		public boolean verify(String hostname, SSLSession session) {
-			return true;
+			return hostname.equalsIgnoreCase(session.getPeerHost()); //符合
+//			return true;
 		}
 	}
 

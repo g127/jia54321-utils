@@ -1,22 +1,17 @@
 package com.jia54321.utils.entity.impl;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import javax.imageio.ImageIO;
 
 import com.jia54321.utils.*;
 import com.jia54321.utils.entity.IStorageConstants;
@@ -36,8 +31,8 @@ import com.jia54321.utils.entity.DynamicEntity;
 
 
 import com.jia54321.utils.hash.FileHashUtil;
+import com.jia54321.utils.oss.compress.Zip;
 import com.jia54321.utils.oss.image.Image;
-import net.coobird.thumbnailator.Thumbnails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,12 +64,12 @@ public class StorageContext implements IStorageContext {
 				result.put(list[i].toString(), rootPath(list[i]));
 			}
 		} else {
-			
+
 		}
 
 		return result;
 	}
-	
+
 	@Override
 	public Boolean isFileResourceAvailable(String localOrUrl) {
 		if (log.isDebugEnabled()) {
@@ -82,7 +77,7 @@ public class StorageContext implements IStorageContext {
 		}
 		return IOUtil.contentIsAvailable(localOrUrl, rootPath(StorageRoot.webRoot));
 	}
-	
+
 	@Override
 	public Map<String,Object> getObject(String id) {
 		SimpleCondition sc = null;
@@ -103,7 +98,7 @@ public class StorageContext implements IStorageContext {
 	public List<Map<String,Object>> simpleQuery(String typeId, SimpleCondition sc) {
 		return queryObjects(Lists.newArrayList(sc));
 	}
-	
+
 	@Override
 	public List<Map<String, Object>> queryObjects(List<SimpleCondition> sc) {
 		List<Map<String,Object>> result = new ArrayList<Map<String,Object>>();
@@ -119,7 +114,7 @@ public class StorageContext implements IStorageContext {
 						Map<String, Object> objectInfo = ((List<DynamicEntity>)rqc.getResult()).get(i).getItems();
 						objectInfo.put(ITEM_KEY, rqc.getKey());
 						updateLocalInfo(objectInfo);
-						
+
 						result.add(objectInfo);
 					}
 				}
@@ -131,7 +126,7 @@ public class StorageContext implements IStorageContext {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public long count(List<SimpleCondition> sc) {
 		long result = 0;
@@ -151,7 +146,7 @@ public class StorageContext implements IStorageContext {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Map<String,Object> putObject(InputStream input, String jsonItems, Map<String, Object> extItems) {
 		if (log.isDebugEnabled()) {
@@ -161,8 +156,8 @@ public class StorageContext implements IStorageContext {
 		File temp = IOUtil.createParentDirByFilePath(filePath);
 
 		IOUtil.copyByPath(input, temp.getPath());
-		
-		
+
+
 		// 文件关联对象
 		DynamicEntity objectAssociationInfo = dynamicEntityContext.newDynamicEntity(TYPE_ID_OBJECT, jsonItems, extItems);
 		// SHA1
@@ -170,10 +165,10 @@ public class StorageContext implements IStorageContext {
 		objectAssociationInfo.set(ITEM_OBJECT_DIGEST, sha1);
 		File renameTemp = IOUtil.createParentDirByFilePath(temp.getParentFile().getAbsolutePath() + '/' + sha1);
 		temp.renameTo(renameTemp);
-		
+
 		// 1 首次更新
 		updateLocalInfo(objectAssociationInfo.getItems());
-		
+
 		String objectId = String.valueOf(objectAssociationInfo.get(ITEM_OBJECT_ID));
 		if(JsonHelper.isEmpty(objectAssociationInfo.get(ITEM_OBJECT_ID))){
 			//保存成功，返回 objectId
@@ -182,18 +177,18 @@ public class StorageContext implements IStorageContext {
 			dynamicEntityContext.get(TYPE_ID_OBJECT, objectId);
 			dynamicEntityContext.update(objectAssociationInfo);
 		}
-		
+
 		objectAssociationInfo.set(ITEM_OBJECT_ID, objectId);
 		//objectAssociationInfo.setItems(getObjectWithRealPath(objectId, null));
-		
+
 		// 2 再次更新
 		updateLocalInfo(objectAssociationInfo.getItems());
-		
+
 		// 保存文件对象
 		saveObject(renameTemp, objectAssociationInfo.getItems());
-		
+
 		//tempFile.delete();
-		
+
 		return objectAssociationInfo.getItems();
 	}
 
@@ -210,7 +205,7 @@ public class StorageContext implements IStorageContext {
 		for (Map<String, Object> map : queryList) {
 			String oldId = (String) map.get(ITEM_OBJECT_ID);
 			newMap.putAll(map);
-			// new 
+			// new
 			newMap.put(ITEM_OBJECT_BLOCK_NAME, JsonHelper.toStr(targetOverItems.get(ITEM_OBJECT_BLOCK_NAME), (String)map.get(ITEM_OBJECT_BLOCK_NAME)));
 			newMap.put(ITEM_OBJECT_PATH_KEY, JsonHelper.toStr(targetOverItems.get(ITEM_OBJECT_PATH_KEY), (String)map.get(ITEM_OBJECT_PATH_KEY)));
 			newMap.put(ITEM_OBJECT_NAME, JsonHelper.toStr(targetOverItems.get(ITEM_OBJECT_NAME), (String)map.get(ITEM_OBJECT_NAME)));
@@ -222,8 +217,8 @@ public class StorageContext implements IStorageContext {
 		}
 		return result;
 	}
-	
-	
+
+
 	@Override
 	public List<Map<String, Object>> upObjects(List<Map<String, Object>> targetOverItems) {
 		List<Map<String, Object>> result = Lists.newArrayList();
@@ -233,11 +228,11 @@ public class StorageContext implements IStorageContext {
 				continue;
 			}
 			Map<String, Object> newMap = getObject(objectId);
-			
+
 			// 敏感字段禁止更新
 			overItems.remove(ITEM_OBJECT_DIGEST);
 			overItems.remove(ITEM_OBJECT_SIZE);
-			
+
 			newMap.putAll(overItems);
 			DynamicEntity upObject = dynamicEntityContext.newDynamicEntity( TYPE_ID_OBJECT, null, newMap);
 			dynamicEntityContext.update(upObject);
@@ -245,31 +240,31 @@ public class StorageContext implements IStorageContext {
 		}
 		return result;
 	}
-	
-	
-	
+
+
+
 //	/**
-//	 * 
+//	 *
 //	 */
 //	public Map<String,Object> getObject(OutputStream os, String objectId, SimpleCondition sc){
 //		//文件关联对象
 //		Map<String,Object> items = getObjectWithRealPath(objectId, sc);
-//		
+//
 //		String inputPath = String.valueOf(items.get(ITEM_OBJECT_REAL_PATH));
-//		
+//
 //		IOUtil.copyByPath(inputPath, os);
-//        
+//
 //        items.remove(ITEM_OBJECT_REAL_PATH);
-//        
+//
 //		return items;
 //
 //	}
-	
+
 	@Override
 	public List<Map<String,Object>> delObjects(List<SimpleCondition> sc) {
 		StringBuffer allIds = new StringBuffer();
 		List<DynamicEntity> willDelLst = new ArrayList<DynamicEntity>();
-		
+
 		if( null != sc ) {
 			for (SimpleCondition simpleCondition : sc) {
 				simpleCondition.setTypeId(TYPE_ID_OBJECT);
@@ -278,26 +273,26 @@ public class StorageContext implements IStorageContext {
 			for (QueryContent<DynamicEntity> rqc : rqcList) {
 				willDelLst.addAll((List<DynamicEntity>)rqc.getResult());
 			}
-		} 
-		
+		}
+
 		for (Iterator<DynamicEntity> iterator = willDelLst.iterator(); iterator.hasNext();) {
 			DynamicEntity objectAssociationEntity = (DynamicEntity) iterator.next();
-			
+
 			String path = getPath(objectAssociationEntity.getItems());
-			
+
 			boolean success = false;
 			//TODO 内容寻址时 文件的删除问题
-			
+
 //			File f = new File(path), fInfo = new File(path + ".info"), parent = new File(f.getParent());
 //			boolean success = parent.exists() && f.exists() && f.delete();
 //			boolean successInfo = parent.exists() && fInfo.exists() && fInfo.delete();
-			
+
 			if(log.isDebugEnabled()){
-				log.debug(String.format("path=%s, success=[%s]", path, success)); 
+				log.debug(String.format("path=%s, success=[%s]", path, success));
 			}
-			
+
 			allIds.append(String.valueOf(objectAssociationEntity.get("OBJECT_ID")));
-			
+
 			allIds.append(',');
 		}
 		if(allIds.length() > 0 ) {
@@ -308,7 +303,7 @@ public class StorageContext implements IStorageContext {
 		List<Map<String, Object>> result = JsonHelper.toMapList(willDelLst);
 		return result;
 	}
-	
+
 	@Override
 	public List<Map<String,Object>> cpObjects(List<SimpleCondition> sc, Map<String, Object> targetOverItems) {
 		if( null == sc ) {
@@ -325,13 +320,13 @@ public class StorageContext implements IStorageContext {
 		}
 		return  QueryContentFactory.createSimpleQueryContent(rqc).getRows();
 	}
-	
+
 //	public SimpleQueryContent<Map<String, Object>> simpleQuery(String webContentPath, SimpleCondition sc) {
 //		setWebContentPath(webContentPath);
-//		
-//		SimpleQueryContent<Map<String, Object>> result = 
+//
+//		SimpleQueryContent<Map<String, Object>> result =
 //		QueryContentFactory.createSimpleQueryContent(dynamicEntityContext.query(TYPE_ID_OBJECT, QueryContentFactory.createQueryContent(sc)));
-//		
+//
 //		for (Map<String, Object> objectAssociationInfo : result.getRows()) {
 //			updateLocalInfo(objectAssociationInfo);
 //		}
@@ -342,8 +337,8 @@ public class StorageContext implements IStorageContext {
 //	public SimpleQueryContent queryObjects(SimpleCondition sc){
 //		return dynamicEntityContext.simpleQuery(TYPE_ID_OBJECT, sc);
 //	}
-//	
-//	
+//
+//
 //	@Override
 //	public List<File> queryFiles(String webContentPath, SimpleCondition sc) {
 //		List<Map<String, Object>> entityList = this.simpleQuery(webContentPath, sc).getRows();
@@ -360,7 +355,7 @@ public class StorageContext implements IStorageContext {
 //		}
 //		return entityFile;
 //	}
-	
+
 	@Override
 	public Map<String,Object> resizeImgsByResult(List<Map<String, Object>> lstExtItems, String resizeImg) {
 		Map<String, Object> extItems0 = Maps.newHashMap();
@@ -383,7 +378,7 @@ public class StorageContext implements IStorageContext {
 
 		return extItems0;
 	}
-	
+
 	@Override
 	public Map<String,Object> compressByResult(List<Map<String, Object>> lstExtItems, String compressType) {
 		//排序对象
@@ -397,7 +392,7 @@ public class StorageContext implements IStorageContext {
 					key = "";
 				}
 				multimapLstObjectDigests.put(key, (String)input.get(IStorageConstants.ITEM_OBJECT_DIGEST));
-				
+
 				lstFiles.add(new File((String)input.get(IStorageConstants.ITEM_OBJECT_REAL_PATH)));
 
 				return String.format("%s/%s",
@@ -408,23 +403,23 @@ public class StorageContext implements IStorageContext {
 		}));
 		//性能问题
 		String json = JsonHelper.toJson(multimapLstObjectDigests.asMap());
-		String sha1BySortedLstObjectDigests = FileHashUtil.sha1(json);
+		String sha1BySortedLstObjectDigests = FileHashUtil.toSha1(json);
 		//
 		final String outPath = rootPath(StorageRoot.tmpCompressRoot) + File.separator + sha1BySortedLstObjectDigests;
 		File tempFile = IOUtil.createParentDirByFilePath(outPath);
-		
+
 		Map<String, Object> extItems0 = Maps.newHashMap();
 		extItems0.put(IStorageConstants.ITEM_OBJECT_NAME, "file-" + DateUtil.toNowStampString() + ".zip");
 		extItems0.put(IStorageConstants.ITEM_OBJECT_EXT, "zip");
 		extItems0.put(IStorageConstants.ITEM_OBJECT_REAL_PATH, tempFile.getAbsolutePath());
 		extItems0.put(IStorageConstants.ITEM_OBJECT_DIGEST, sha1BySortedLstObjectDigests);
-		
+
 		if(!tempFile.exists()) {
-			tempFile = zipFile(null, lstFiles.toArray(new File[0]), lstFileNames.toArray(new String[0]), tempFile);
-		} 
+			tempFile = Zip.zipFile(null, lstFiles.toArray(new File[0]), lstFileNames.toArray(new String[0]), tempFile);
+		}
 		return extItems0;
 	}
-	
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
@@ -433,7 +428,7 @@ public class StorageContext implements IStorageContext {
 	 */
 	private void updateLocalInfo(Map<String, Object> objectAssociationInfo) {
 		objectAssociationInfo.put(ITEM_OBJECT_REAL_PATH,  getPath(objectAssociationInfo, StoragePathType.autoPath));
-		
+
 		/*
 		objectAssociationInfo.put(ITEM_OBJECT_REAL_PATH0, getPath(objectAssociationInfo, PathType.digestPath));
 		objectAssociationInfo.put(ITEM_OBJECT_REAL_PATH1, getPath(objectAssociationInfo, PathType.virtualPath));
@@ -443,36 +438,46 @@ public class StorageContext implements IStorageContext {
 		objectAssociationInfo.put(ITEM_OBJECT_REAL_PATH2, getPath(objectAssociationInfo, PathType.virtualPath));
 		////////////////////////////////////////////////////////
 		*/
-		
+
 		String ext = "." + JsonHelper.toStr(objectAssociationInfo.get(ITEM_OBJECT_EXT), "");
-		
+
 		String pathKey = JsonHelper.toStr(objectAssociationInfo.get(ITEM_OBJECT_PATH_KEY), "");
-		String formKey = JsonHelper.toStr(objectAssociationInfo.get(ITEM_BIZ_FORM_KEY), ""); 
-		String formId =  JsonHelper.toStr(objectAssociationInfo.get(ITEM_BIZ_FORM_ID), "");  
-		long objectSize =  JsonHelper.toLong(objectAssociationInfo.get(ITEM_OBJECT_SIZE), 0L);  
+		String formKey = JsonHelper.toStr(objectAssociationInfo.get(ITEM_BIZ_FORM_KEY), "");
+		String formId =  JsonHelper.toStr(objectAssociationInfo.get(ITEM_BIZ_FORM_ID), "");
+		long objectSize =  JsonHelper.toLong(objectAssociationInfo.get(ITEM_OBJECT_SIZE), 0L);
 		// 特殊处理
 //		ITEM_OBJECT_PRINT_SIZE
 		objectAssociationInfo.put(ITEM_OBJECT_PRINT_SIZE, JsonHelper.toFilePrintSize(objectSize));
-		
-		objectAssociationInfo.put(ITEM_OBJECT_URL, String.format(WEB_URL_GET_OBJECT_FORMAT_4_ARGS, rootPath(StorageRoot.webRoot), ext, objectAssociationInfo.get(ITEM_OBJECT_ID),""));
-		objectAssociationInfo.put(ITEM_OBJECT_VIEW_URL, String.format(WEB_URL_GET_OBJECT_FORMAT_4_ARGS, rootPath(StorageRoot.webRoot), ext, objectAssociationInfo.get(ITEM_OBJECT_ID), "1"));
-		objectAssociationInfo.put(ITEM_OBJECT_DEL_URL, String.format(WEB_URL_DEL_OBJECT_FORMAT_2_ARGS, rootPath(StorageRoot.webRoot), objectAssociationInfo.get(ITEM_OBJECT_ID)));
-		
-		objectAssociationInfo.put(ITEM_OBJECT_REST_P_URL, String.format(OBJECT_REST_P_URL_FORMAT_5_ARGS, rootPath(StorageRoot.webRoot), pathKey,formKey , formId, ""));
-		objectAssociationInfo.put(ITEM_OBJECT_REST_O_URL, String.format(OBJECT_REST_O_URL_FORMAT_3_ARGS, rootPath(StorageRoot.webRoot), objectAssociationInfo.get(ITEM_OBJECT_ID), ""));
+
+		objectAssociationInfo.put(ITEM_OBJECT_URL, String.format(WEB_URL_GET_OBJECT_FORMAT_4_ARGS,
+				entityEnvContext.envWebRootPath("storage"),
+				ext,
+				objectAssociationInfo.get(ITEM_OBJECT_ID),""));
+		objectAssociationInfo.put(ITEM_OBJECT_VIEW_URL, String.format(WEB_URL_GET_OBJECT_FORMAT_4_ARGS,
+				entityEnvContext.envWebRootPath("storage"),
+				ext,
+				objectAssociationInfo.get(ITEM_OBJECT_ID), "1"));
+		objectAssociationInfo.put(ITEM_OBJECT_DEL_URL, String.format(WEB_URL_DEL_OBJECT_FORMAT_2_ARGS,
+				entityEnvContext.envWebRootPath("storage"),
+				objectAssociationInfo.get(ITEM_OBJECT_ID)));
+
+		objectAssociationInfo.put(ITEM_OBJECT_REST_P_URL, String.format(OBJECT_REST_P_URL_FORMAT_5_ARGS,
+				entityEnvContext.envWebRootPath("storage"), pathKey,formKey , formId, ""));
+		objectAssociationInfo.put(ITEM_OBJECT_REST_O_URL, String.format(OBJECT_REST_O_URL_FORMAT_3_ARGS,
+				entityEnvContext.envWebRootPath("storage"), objectAssociationInfo.get(ITEM_OBJECT_ID), ""));
 	}
-	
-	
+
+
 	private void saveObject(File inputPath, Map<String, Object> objectItems) {
 		if(!inputPath.exists()){
 			return ;
 		}
 		String realPath = getPath(objectItems);
 		File storgeFile = new File(realPath);
-		
+
 		String inputFileSha1 = (String)objectItems.get(ITEM_OBJECT_DIGEST);
-		
-		if(storgeFile.exists() 
+
+		if(storgeFile.exists()
 				&& FileHashUtil.getSHA1Checksum(realPath).equalsIgnoreCase(inputFileSha1)) {
 			return ;
 		} else {
@@ -481,10 +486,10 @@ public class StorageContext implements IStorageContext {
 			}
 			IOUtil.copyByPath(inputPath.getAbsolutePath(), realPath);
 		}
-		
+
 		inputPath.delete();
 	}
-	
+
 	/**
 	 * rootPath
 	 * @param optOneKey 可选
@@ -496,7 +501,7 @@ public class StorageContext implements IStorageContext {
 			StorageRoot key = optOneKey[0];
 		    if (StorageRoot.webRoot.equals(key)) {
 			    result = entityEnvContext.envWebRootPath();
-			    
+
 		    } else if (StorageRoot.storageRoot.equals(key)) {
 			    result = entityEnvContext.envStorageRootPath();
 		    } else if (StorageRoot.objectsDigestRoot.equals(key)) {
@@ -521,44 +526,44 @@ public class StorageContext implements IStorageContext {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * 查找文件路径
 	 * @param objectInfo
-	 * @param pathType PathType  0， 1， auto  摘要路径 INT_0 全虚拟路径 INT_1 
+	 * @param pathType PathType  0， 1， auto  摘要路径 INT_0 全虚拟路径 INT_1
 	 * @return
 	 */
 	private String getPath(Map<String, Object> objectInfo, StoragePathType... pathType) {
 		String path = "";
-		
+
 		StoragePathType localPathType = StoragePathType.autoPath;
 		if (null != pathType && pathType.length >= 1 && null != pathType[0]) {
 			localPathType = pathType[0];
 		}
-		
+
 		if (StoragePathType.autoPath == localPathType) {
 			//判断
 			boolean isDigestPath  = (0 == NumberUtils.toInt(String.valueOf(objectInfo.get(ITEM_OBJECT_PATH_TYPE)), "null", 0));
 			//存在摘要
 			boolean isExistDigest = !JsonHelper.isEmpty(objectInfo.get(ITEM_OBJECT_DIGEST));
-			
+
 			if (isDigestPath && isExistDigest) {
 				localPathType = StoragePathType.digestPath;
 			} else {
 				localPathType = StoragePathType.virtualPath;
 			}
 		}
-		
+
 		if (StoragePathType.digestPath == localPathType) {
 			//=========================================================================================
 			//内容寻址
 			String objectDigest = String.valueOf(objectInfo.get(ITEM_OBJECT_DIGEST));
 			String objectDigestPart1 = objectDigest.substring(0, 2);
 			String objectDigestPart2 = objectDigest.substring(2);
-			
+
 			path = rootPath(StorageRoot.objectsDigestRoot) + objectDigestPart1 + "/" + objectDigestPart2;
-			//=========================================================================================	
-		} 
+			//=========================================================================================
+		}
 
 		if (StoragePathType.virtualPath == localPathType) {
 			//=========================================================================================
@@ -568,59 +573,20 @@ public class StorageContext implements IStorageContext {
 			String objectName = String.valueOf(objectInfo.get(ITEM_OBJECT_NAME));
 			path = rootPath(StorageRoot.objectsVirtualRoot) + "/" + objectBlockName + "/" + objectPathKey + "/" + objectName;
 			//=========================================================================================
-		} 
-		
+		}
+
 		path = path.replaceAll("\\\\\\\\", "/");
 		path = path.replaceAll("\\\\", "/");
 		path = path.replaceAll("//", "/");
-		
+
 		objectInfo.put((StoragePathType.digestPath == localPathType)?ITEM_OBJECT_REAL_PATH0:ITEM_OBJECT_REAL_PATH1, path);
-		
+
 		if (log.isDebugEnabled()) {
 			log.debug(String.format("localPathType=%s, path=%s", localPathType, path));
 		}
-		
+
 		return path;
 	}
-	
- 
-	
-	private File zipFile(String baseName, File[] subs, String[] newNames, File tempFile) { 
-		ZipOutputStream zos = null;
-		try {
-			zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(tempFile)));
-			zipFile( baseName, subs, newNames, zos);
-		} catch (Exception e) {
-		} finally {
-			IOUtil.closeQuietly(zos);
-		}
-		return tempFile;
-	}
-	
-	private void zipFile(String baseName, File[] subs, String[] newNames, ZipOutputStream zos) throws IOException { 
-		if(null == baseName){
-			baseName = "";
-		}
-		for (int i = 0; i < subs.length; i++) {
-			File f = subs[i];
-			String name = f.getName();
-			if(null != newNames && i< newNames.length && !JsonHelper.isEmpty(newNames[i]) ) {
-				name = newNames[i];
-			}
-			if(f.exists()) {
-				String n = String.format("%s/%s", baseName,name).replaceAll("//", "/");
-				while(n.startsWith("/") && n.length() > 0){
-					n = n.substring(1);
-				}
-				zos.putNextEntry(new ZipEntry(n));		
-				FileInputStream fis = new FileInputStream(f);
-				byte[] buffer = new byte[1024];
-				int r = 0;
-				while ((r = fis.read(buffer)) != -1) {
-					zos.write(buffer, 0, r);
-				}
-				fis.close();
-			}
-		}
-	}
+
+
 }

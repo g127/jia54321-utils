@@ -2,25 +2,35 @@ package com.jia54321.utils.entity;
 
 import com.jia54321.utils.JsonHelper;
 import com.jia54321.utils.Kv;
+import com.jia54321.utils.entity.converter.CrudTableConverter;
 import com.jia54321.utils.entity.query.*;
 import org.junit.Test;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class DynamicEntityTest {
 
     @Test
-    public void test() {
+    public void test() throws ExecutionException {
         DynamicEntity entity = newDynamicEntity("10", "{ \"TYPE_ID\":\"1001\"}", null);
 
         SqlBuilder sqlBuilder = new SqlBuilder();
 
-        CrudTableDesc userTable = new CrudTableDesc();
+        entity.setTableDesc(CrudTableDesc.CACHE.get("10"));
+        MetaItem primaryItem = new MetaItem();
+        primaryItem.setItemColName("TYPE_ID");
+        primaryItem.setItemType(MetaItemType.VARCHAR);
+        entity.setMetaItem("TYPE_ID", primaryItem);
+
+        CrudTableDesc userTable = new CrudTableConverter().convert(entity);
+
         userTable.setTableDesc(entity.getTableDesc());
         userTable.setColumnProps(entity.getItems());
+        userTable.setPrimaryValue("1001");
 
-
+        userTable.getTableDesc().toString();
 
         SqlContext test =  sqlBuilder.buildInsertSql(userTable);
         System.out.println(test);

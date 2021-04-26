@@ -1,8 +1,8 @@
 /**
  * MIT License
- * 
+ *
  * Copyright (c) 2009-present GuoGang and other contributors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,11 +25,11 @@
 package com.jia54321.utils;
 
 /**
- * 
+ *
  * @author 郭罡
  */
 public class ByteUtil {
-	
+
 	public static void long2bytes(byte[] bb, long x) {
 		bb[0] = (byte) (x >> 56);
 		bb[1] = (byte) (x >> 48);
@@ -41,18 +41,23 @@ public class ByteUtil {
 		bb[7] = (byte) (x >> 0);
 	}
 
-	public static long bytes2Long(byte[] bb) { 
-	       return ((((long) bb[ 0] & 0xff) << 56) 
-	               | (((long) bb[ 1] & 0xff) << 48) 
-	               | (((long) bb[ 2] & 0xff) << 40) 
-	               | (((long) bb[ 3] & 0xff) << 32) 
-	               | (((long) bb[ 4] & 0xff) << 24) 
-	               | (((long) bb[ 5] & 0xff) << 16) 
+	public static long bytes2Long(byte[] bb) {
+	       return ((((long) bb[ 0] & 0xff) << 56)
+	               | (((long) bb[ 1] & 0xff) << 48)
+	               | (((long) bb[ 2] & 0xff) << 40)
+	               | (((long) bb[ 3] & 0xff) << 32)
+	               | (((long) bb[ 4] & 0xff) << 24)
+	               | (((long) bb[ 5] & 0xff) << 16)
 	               | (((long) bb[ 6] & 0xff) << 8)
-	               | (((long) bb[ 7] & 0xff) << 0)); 
-	} 
- 
-	public static long bytes2long(byte[] b) {
+	               | (((long) bb[ 7] & 0xff) << 0));
+	}
+
+	/**
+	 * 原名称命名，有问题 bytes2long 修改为 bytes2Long2
+	 * @param b
+	 * @return
+	 */
+	public static long bytes2Long2(byte[] b) {
 		long temp = 0;
 		long res = 0;
 		for (int i=0;i<8;i++) {
@@ -62,7 +67,7 @@ public class ByteUtil {
 		}
 		return res;
 	}
-	
+
 	public static byte[] long2bytes(long num) {
 		byte[] b = new byte[8];
 		for (int i=0;i<8;i++) {
@@ -70,16 +75,16 @@ public class ByteUtil {
 		}
 		return b;
 	}
- 
-	public static byte[] intToByteArray1(int i) {   
-	  byte[] result = new byte[4];   
+
+	public static byte[] intToByteArray1(int i) {
+	  byte[] result = new byte[4];
 	  result[0] = (byte)((i >> 24) & 0xFF);
 	  result[1] = (byte)((i >> 16) & 0xFF);
-	  result[2] = (byte)((i >> 8) & 0xFF); 
+	  result[2] = (byte)((i >> 8) & 0xFF);
 	  result[3] = (byte)(i & 0xFF);
 	  return result;
 	}
-// 
+//
 // public static void main(String[] args) {
 //	 byte[] b = new byte[]{84, -3, 118, -65, 29, -16, -43, 16, 68, -77, -42, -84};
 //	 System.out.println(bytes2Long(b));

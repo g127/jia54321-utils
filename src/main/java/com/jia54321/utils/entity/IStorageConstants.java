@@ -201,13 +201,13 @@ public interface IStorageConstants {
 	/** 文件真实路径  全虚拟路径  INT_1 */
 	public static final String ITEM_OBJECT_REAL_PATH2 = "OBJECT_REAL_PATH2";
 	/////////////////////////////////////////////////////////
-	public static final String WEB_URL_GET_OBJECT_FORMAT_4_ARGS = "%s/storage/getObject%s?objectId=%s&view=%s";
-	public static final String WEB_URL_DEL_OBJECT_FORMAT_2_ARGS = "%s/storage/deleteObject?objectId=%s";
+	public static final String WEB_URL_GET_OBJECT_FORMAT_4_ARGS = "%s/getObject%s?objectId=%s&view=%s";
+	public static final String WEB_URL_DEL_OBJECT_FORMAT_2_ARGS = "%s/deleteObject?objectId=%s";
 	/////////////////////////////////////////////////////////
 	/** /storage/rest/p/{pathKey}/{bizFormKey}/{bizFormId} */
-	public static final String OBJECT_REST_P_URL_FORMAT_5_ARGS = "%s/storage/rest/p/%s/%s/%s%s";
+	public static final String OBJECT_REST_P_URL_FORMAT_5_ARGS = "%s/rest/p/%s/%s/%s%s";
 	/** /storage/rest/o/{objectIds} */
-	public static final String OBJECT_REST_O_URL_FORMAT_3_ARGS = "%s/storage/rest/o/%s%s";
+	public static final String OBJECT_REST_O_URL_FORMAT_3_ARGS = "%s/rest/o/%s%s";
 	/////////////////////////////////////////////////////////
 	public static final String WEB_URL_CN_GRAVATAR_IMG_2_ARGS = "https://cn.gravatar.com/avatar/%s?s=%s&d=mm";
 }

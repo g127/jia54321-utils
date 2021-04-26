@@ -9,21 +9,21 @@ import java.security.MessageDigest;
 
 
 /**
- * 
+ *
  * @author G
  *
  */
 public class FileHashUtil {
-	
+
 	public static final String MD5 = "MD5";
 	public static final String SHA1 = "SHA-1";
-	  
+
 	private static byte[] createChecksum(String filename, String algorithm) {
 		InputStream fis = null;
-		
+
 		try {
 			fis = new FileInputStream(filename);
-			 
+
 	        byte[] buffer = new byte[1024];
 	        MessageDigest complete = MessageDigest.getInstance(algorithm);
 	        int numRead;
@@ -34,7 +34,7 @@ public class FileHashUtil {
 	                complete.update(buffer, 0, numRead);
 	            }
 	        } while (numRead != -1);
-	        
+
 	        return complete.digest();
 		} catch (Exception e) {
 			throw new RuntimeException("error", e);
@@ -42,7 +42,7 @@ public class FileHashUtil {
 			IOUtil.closeQuietly(fis);
 		}
     }
- 
+
     public static String getChecksum(String filename, String algorithm) {
          byte[] b = createChecksum(filename, algorithm);
          String result = "";
@@ -66,7 +66,7 @@ public class FileHashUtil {
 		return getMD5Checksum(filename).equalsIgnoreCase(sum);
 	}
 
-	public static String md5(String data) {
+	public static String toMd5(String data) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			md.update(data.getBytes());
@@ -86,9 +86,9 @@ public class FileHashUtil {
 		} catch (Exception e) {
 		}
 		return null;
-	} 
+	}
 
-	public static String sha1(String data) {
+	public static String toSha1(String data) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("SHA1");
 			md.update(data.getBytes());
@@ -109,10 +109,10 @@ public class FileHashUtil {
 		}
 		return null;
 	}
-	    
+
 //
-//    
-//    
+//
+//
 //    public static void main(String args[]) {
 //        try {
 //        	long a = System.currentTimeMillis();
@@ -127,5 +127,5 @@ public class FileHashUtil {
 //            e.printStackTrace();
 //        }
 //    }
- 
+
 }

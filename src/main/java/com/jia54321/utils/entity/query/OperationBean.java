@@ -9,16 +9,16 @@ import java.util.Map.Entry;
 
 
 /**
- * 
+ *
  * @author G
  *
  */
 public class OperationBean implements Cloneable, Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7243937579442329911L;
-	
+
 	protected static class AssembleAndAttirbute{
 		Operator oper;
 		String attribute;
@@ -42,17 +42,17 @@ public class OperationBean implements Cloneable, Serializable {
 				return new AssembleAndAttirbute(pos0, attr);
 			}
 		}
-		
+
 	}
-	
+
 	private static OperationBean conditionOne(Operator cmd, OperationBean con ,String attribute, Object val){
 		OperationBean c = con;
 		if(null == con) {
-			c = new OperationBean(); 
+			c = new OperationBean();
 		}
-		
+
 		c.setLogicalOperator(cmd.toString());
-		
+
 		c.setLeftBracket(Operator.LEFT_BRACKET.toString());
 		c.setRightBracket(Operator.RIGHT_BRACKET.toString());
 
@@ -60,7 +60,7 @@ public class OperationBean implements Cloneable, Serializable {
 		c.setValue(val);
 		return c;
 	}
-	
+
 	private static List<OperationBean> conditionOneMap(Operator cmd, List<OperationBean> opers, Map<String, Object> oneMap){
 		//
 		final List<OperationBean> result = (null == opers)? new ArrayList<OperationBean>(): opers;
@@ -74,7 +74,7 @@ public class OperationBean implements Cloneable, Serializable {
 		}
 		return result;
 	}
-	
+
 	private static List<OperationBean> conditionOneListMap(Operator cmd, List<OperationBean> opers, List<Map<String, Object>> oneListMap){
 		//
 		final List<OperationBean> result = (null == opers)? new ArrayList<OperationBean>(): opers;
@@ -87,44 +87,44 @@ public class OperationBean implements Cloneable, Serializable {
 		}
 		return result;
 	}
-	
+
 	public static List<OperationBean> conditionOneListMapAnd(List<OperationBean> opers, List<Map<String, Object>> oneListMap){
 		return conditionOneListMap(Operator.AND, opers, oneListMap);
 	}
-	
+
 	public static List<OperationBean> conditionOneListMapOr(List<OperationBean> opers, List<Map<String, Object>> oneListMap){
 		return conditionOneListMap(Operator.OR, opers, oneListMap);
 	}
-	
+
 	public static List<OperationBean> conditionOneListMapOrder(List<OperationBean> opers, List<Map<String, Object>> oneListMap){
 		return conditionOneListMap(Operator.AND, opers, oneListMap);
 	}
-	
+
 	public static List<OperationBean> conditionOneMapAnd(List<OperationBean> opers, Map<String, Object> oneMap){
 		return conditionOneMap(Operator.AND, opers, oneMap);
 	}
-	
+
 	public static List<OperationBean> conditionOneMapOr(List<OperationBean> opers, Map<String, Object> oneMap){
 		return conditionOneMap(Operator.OR, opers, oneMap);
 	}
-	
+
 	public static List<OperationBean> sortOneMapOrder(List<OperationBean> opers, Map<String, Object> oneMap){
 		return conditionOneMap(Operator.AND, opers, oneMap);
 	}
-	
+
 	public static OperationBean conditionAnd(OperationBean con ,String attribute, Object val){
 		return conditionOne(Operator.AND, con, attribute, val);
 	}
-	
-	
+
+
 	public static OperationBean conditionOr(OperationBean con ,String attribute, Object val){
 		return conditionOne(Operator.OR, con, attribute, val);
 	}
-	
+
 	public static OperationBean sortOrder(OperationBean con , String attribute, Object val){
 		return conditionOne(Operator.AND, con, attribute, val);
 	}
-	
+
 	private String logicalOperator = "";
 
 	private String leftBracket = "";
@@ -136,7 +136,7 @@ public class OperationBean implements Cloneable, Serializable {
 	private Object value = "";
 
 	private String rightBracket = "";
-	
+
 
 	public OperationBean() {
 	}
@@ -241,13 +241,13 @@ public class OperationBean implements Cloneable, Serializable {
 		return strMessage;
 	}
 
-	@Override
-    public Object clone() throws CloneNotSupportedException {
-		try {
-			OperationBean v = (OperationBean) super.clone();
-			return v;
-		} catch (CloneNotSupportedException e) {
-		}
-		return null;
-	}
+//	@Override
+//    public Object clone() throws CloneNotSupportedException {
+//		try {
+//			OperationBean v = (OperationBean) super.clone();
+//			return v;
+//		} catch (CloneNotSupportedException e) {
+//		}
+//		return null;
+//	}
 }

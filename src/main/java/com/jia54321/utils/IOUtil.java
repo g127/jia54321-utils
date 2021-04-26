@@ -1,8 +1,8 @@
 /**
  * MIT License
- * 
+ *
  * Copyright (c) 2009-present GuoGang and other contributors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -195,7 +195,7 @@ public class IOUtil {
     public static byte[] toByteArrayByPath(final String inputPath) throws IOException {
     	return toByteArrayByPath(inputPath, DEFAULT_BUFFER_SIZE);
     }
-    
+
     /**
      * 以<code>String</code>形式返回从 <code>InputStream</code> 中获取内容.
      */
@@ -215,7 +215,7 @@ public class IOUtil {
 			closeQuietly(input);
 		}
     }
-    
+
     /**
      * 以<code>String</code>形式返回从 <code>InputStream</code> 中获取内容.
      */
@@ -431,7 +431,7 @@ public class IOUtil {
 		//==============================================================================
    		return f;
     }
-    
+
     /**
      * 复制  <code>inputPath</code> 到 <code>outPath</code>.<br/>
      * 如果 inputPath 为 "", 仅仅创建输出路径的父目录
@@ -443,10 +443,12 @@ public class IOUtil {
     		if (null == inputPath  || "".equals(inputPath)  || !(new File(inputPath)).exists()) {
     			return ;
     		}
-    		
+
     		File f2 = createParentDirByFilePath(outPath);
        		if (!f2.exists()) {
-       			f2.createNewFile();
+                if(f2.createNewFile()) {
+                    debug("the named file does not exist and was successfully created");
+                }
     		}
     		input = new FileInputStream(inputPath);
     		output = new FileOutputStream(outPath);
@@ -461,7 +463,7 @@ public class IOUtil {
 		}
     	return ;
     }
-    
+
     /**
      * 复制 <code>inputPath</code> 到 <code>OutputStream</code>.
      */
@@ -483,7 +485,7 @@ public class IOUtil {
 			closeQuietly(input);
 		}
     }
-    
+
     /**
      * 复制 <code>InputStream</code> 到 <code>outPath</code>.
      */
@@ -495,22 +497,26 @@ public class IOUtil {
     			parent2.mkdirs();
     		}
        		if (!f2.exists()) {
-       			f2.createNewFile();
+                if(f2.createNewFile()) {
+                    debug("the named file does not exist and was successfully created");
+                }
     		}
-       		
+
     		output = new FileOutputStream(outPath);
     		copy(input, output, DEFAULT_BUFFER_SIZE);
 //        	} catch(FileNotFoundException e){
 //    		throw new RuntimeException(e);
 		} catch(IOException e){
-			f2.delete();
+			if(f2.delete()) {
+                debug("the file or directory is successfully deleted; false otherwise");
+            }
 			throw new RuntimeException(e);
 		} finally {
 			closeQuietly(input);
 			closeQuietly(output);
 		}
     }
-    
+
     /**
      * 复制 <code>input</code> 到 <code>outPath</code>.
      */
@@ -614,7 +620,7 @@ public class IOUtil {
 		if (null == localOrUrl || "".equals(localOrUrl)) {
 			return false;
 		}
-		
+
 		// 本地文件
 		File localFIle = null;
 		try {
@@ -626,8 +632,8 @@ public class IOUtil {
 				return true;
 			}
 		} catch (Exception e) {
-		} 
-		
+		}
+
 		// 本地文件
 		InputStream netFileInputStream = null;
 		try {
@@ -642,7 +648,7 @@ public class IOUtil {
 		} finally {
 			closeQuietly(netFileInputStream);
 		}
-		
+
 		try {
 			if (null != webroot && webroot.length == 1
 					&& null != webroot[0] && !"".equals(webroot[0])) {
@@ -735,5 +741,9 @@ public class IOUtil {
         } catch (IOException ex) {
             // ignore
         }
+    }
+
+    private static void debug(String msg) {
+
     }
 }
