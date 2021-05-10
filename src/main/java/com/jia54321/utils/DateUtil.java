@@ -219,115 +219,129 @@ public class DateUtil {
         /**
          * 当前时间的最早时间00:00
          *
-         * @param type 取值英文String: 【day 当天， week 当周， month 当月，year 当年， lastWeek 上周， lastMonth 上月， lastYear 上一年】
+         * @param type 取值英文String: 【
+         *             day 当天
+         *             week 当周
+         *             month 当月
+         *             quarter 当季度
+         *             q1 本年1季度
+         *             q2 本年2季度
+         *             q3 本年3季度
+         *             q4 本年4季度
+         *             halfYear 上半年/下半年
+         *             h1 本年上半年
+         *             h2 本年下半年
+         *             year 当年
+         *
+         *             yesterday 昨天
+         *             lastWeek 上周
+         *             lastMonth 上月
+         *             lastQuarter 上季度
+         *             lastHalfYear 前一半年
+         *             lastYear 上一年
+         *             】
          * @param time 可不传，默认当前时间
          * @return Timestamp
          */
-        public static java.sql.Timestamp toMorning(String type, Object... time) {
+        public static java.sql.Timestamp toBegin(String type, Object... time) {
 			if (null == time || time.length == 0) {
                 // 当前时间
                 time = new Date[]{Calendar.getInstance().getTime()};
             }
             Timestamp timestamp = toTimestamp(time[0]);
+            Calendar cal = Calendar.getInstance();
+            cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
+            cal.setTime(timestamp);
+            cal.set(Calendar.MILLISECOND, 0);
             if ("day".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                //
                 return toTimestamp(cal.getTime());
             }
             if ("week".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
                 cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
+                //
                 return toTimestamp(cal.getTime());
             }
             if ("month".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
-                cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), 1, 0, 0, 0);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("quarter".equalsIgnoreCase(type)) {
+                // 实际月份从0开始，除以3取整，然后在乘以3 。
+                // [ 0，1，2，3，4，5，6，7，8，9，10，11 ] =>  [ 0，0，0，3，3，3，6，6，6，9，9，9 ]
+                // 对应 1，4, 7, 10 四个季度起始月份
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) / 3 * 3, 1, 0, 0, 0);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("q1".equalsIgnoreCase(type) || "q2".equalsIgnoreCase(type) || "q3".equalsIgnoreCase(type) || "q4".equalsIgnoreCase(type) ) {
+                // [ 1，2，3，4 ] =>  [ 0，3，6，9 ]
+                cal.set(cal.get(Calendar.YEAR), Integer.parseInt(type.charAt(1) + "") * 3 - 3, 1, 0, 0, 0);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("halfYear".equalsIgnoreCase(type)) {
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) / 6 * 6, 1, 0, 0, 0);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("h1".equalsIgnoreCase(type) || "h2".equalsIgnoreCase(type)) {
+                // [ 1，2 ] =>  [ 0，6 ]
+                cal.set(cal.get(Calendar.YEAR), Integer.parseInt(type.charAt(1) + "") * 6 - 6, 1, 0, 0, 0);
+                //
                 return toTimestamp(cal.getTime());
             }
             if ("year".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), 0, 0, 0, 0, 0);
-                cal.set(Calendar.DAY_OF_YEAR, cal.getActualMinimum(Calendar.DAY_OF_YEAR));
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
+                cal.set(cal.get(Calendar.YEAR), 0, 1, 0, 0, 0);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            //
+            //
+            if ("yesterday".equalsIgnoreCase(type)) {
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                // 减去1天
+                cal.add(Calendar.DATE, -1);
+                //
                 return toTimestamp(cal.getTime());
             }
             if ("lastWeek".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
                 cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-
-                // 减去一周
-                cal.add(Calendar.WEEK_OF_MONTH, -1);
-
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
+                // 减去7天
+                cal.add(Calendar.DATE, -7);
+                //
                 return toTimestamp(cal.getTime());
             }
-
             if ("lastMonth".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
-                cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-
-                // 减去一月
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 1, 0, 0, 0);
+                // 减去1月
                 cal.add(Calendar.MONTH, -1);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
+                //
                 return toTimestamp(cal.getTime());
             }
-
+            if ("lastQuarter".equalsIgnoreCase(type)) {
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) / 3 * 3, 1, 0, 0, 0);
+                // 减去3月
+                cal.add(Calendar.MONTH, -3);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("lastHalfYear".equalsIgnoreCase(type)) {
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) / 6 * 6, 1, 0, 0, 0);
+                // 减去6月
+                cal.add(Calendar.MONTH, -6);
+                //
+                return toTimestamp(cal.getTime());
+            }
             if ("lastYear".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), 0, 0, 0, 0, 0);
-                cal.set(Calendar.DAY_OF_YEAR, cal.getActualMinimum(Calendar.DAY_OF_YEAR));
-
+                cal.set(cal.get(Calendar.YEAR), 0, 1, 0, 0, 0);
                 // 减去一年
                 cal.add(Calendar.YEAR, -1);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
+                //
                 return toTimestamp(cal.getTime());
             }
 
@@ -337,128 +351,161 @@ public class DateUtil {
         /**
          * 当前时间的最后晚上时间24:00(第二天)，如：本周最晚时间，本月最晚时间 Timestamp
          *
-         * @param type 取值英文String: 【day 当天， week 当周， month 当月，year 当年， lastWeek 上周， lastMonth 上月， lastYear 上一年】
+         * @param type 取值英文String: 【
+         *             day 当天
+         *             week 当周
+         *             month 当月
+         *             quarter 当季度
+         *             q1 本年1季度
+         *             q2 本年2季度
+         *             q3 本年3季度
+         *             q4 本年4季度
+         *             halfYear 上半年/下半年
+         *             h1 本年上半年
+         *             h2 本年下半年
+         *             year 当年
+         *
+         *             yesterday 昨天
+         *             lastWeek 上周
+         *             lastMonth 上月
+         *             lastQuarter 上季度
+         *             lastHalfYear 前一半年
+         *             lastYear 上一年
+         *             】
          * @param time 不传值，默认当前时间
          * @return Timestamp
          */
-        public static Timestamp toNight(String type, Object... time) {
+        public static Timestamp toEnd(String type, Object... time) {
 			if (null == time || time.length == 0) {
                 // 当前时间
                 time = new Date[]{Calendar.getInstance().getTime()};
             }
             Timestamp timestamp = toTimestamp(time[0]);
+            Calendar cal = Calendar.getInstance();
+            cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
+            cal.setTime(timestamp);
+            cal.set(Calendar.MILLISECOND, 0);
             if ("day".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(Calendar.HOUR_OF_DAY, 24);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
+                // 重新设定时间
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                // 增加1天
+                cal.add(Calendar.DATE, 1);
+                //
                 return toTimestamp(cal.getTime());
             }
             if ("week".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                // 重新设定时间
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                // 设定周一
                 cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                cal.add(Calendar.DAY_OF_WEEK, 7);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
+                // 增加1周
+                cal.add(Calendar.DATE, 7);
+                //
                 return toTimestamp(cal.getTime());
             }
             if ("month".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
-                cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-                cal.set(Calendar.HOUR_OF_DAY, 24);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 1, 0, 0, 0);
                 cal.set(Calendar.MILLISECOND, 0);
-
+                // 增加1月
+                cal.add(Calendar.MONTH, 1);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("quarter".equalsIgnoreCase(type)) {
+                // 实际月份从0开始，除以3取整，然后在乘以3 。
+                // [0，1，2，3，4，5，6，7，8，9，10，11] => [0，0，0，3，3，3，6，6，6，9，9，9]
+                cal.set(cal.get(Calendar.YEAR),  cal.get(Calendar.MONTH) / 3 * 3 , 1, 0, 0, 0);
+                // 增加3个月
+                cal.add(Calendar.MONTH, 3);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("q1".equalsIgnoreCase(type) || "q2".equalsIgnoreCase(type) || "q3".equalsIgnoreCase(type) || "q4".equalsIgnoreCase(type) ) {
+                // [ 1，2，3，4 ] =>  [ 0，3，6，9 ]
+                cal.set(cal.get(Calendar.YEAR), Integer.parseInt(type.charAt(1) + "") * 3 - 3, 1, 0, 0, 0);
+                // 增加3个月
+                cal.add(Calendar.MONTH, 3);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("halfYear".equalsIgnoreCase(type)) {
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) / 6 * 6, 1, 0, 0, 0);
+                // 增加6个月
+                cal.add(Calendar.MONTH, 6);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("h1".equalsIgnoreCase(type) || "h2".equalsIgnoreCase(type)) {
+                // [ 1，2 ] =>  [ 0，6 ]
+                cal.set(cal.get(Calendar.YEAR), Integer.parseInt(type.charAt(1) + "") * 6 - 6, 1, 0, 0, 0);
+                // 增加6个月
+                cal.add(Calendar.MONTH, 6);
+                //
                 return toTimestamp(cal.getTime());
             }
             if ("year".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), 0, 0, 0, 0, 0);
-                cal.set(Calendar.DAY_OF_YEAR, cal.getActualMaximum(Calendar.DAY_OF_YEAR));
-                nextDay(cal, Calendar.HOUR_OF_DAY, 24);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
+                cal.set(cal.get(Calendar.YEAR), 0, 1, 0, 0, 0);
                 cal.set(Calendar.MILLISECOND, 0);
-
+                // 增加1年
+                cal.add(Calendar.YEAR, 1);
+                //
+                return toTimestamp(cal.getTime());
+            }
+            //
+            //
+            if ("yesterday".equalsIgnoreCase(type)) {
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                // 昨天结束时间 同时也为 今天开始时间
+                //
                 return toTimestamp(cal.getTime());
             }
             if ("lastWeek".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
-                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                cal.add(Calendar.DAY_OF_WEEK, 7);
-
-                // 减去一周
-                cal.add(Calendar.WEEK_OF_MONTH, -1);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
                 cal.set(Calendar.MILLISECOND, 0);
-
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY); // 设定周一
+                // 上周结束时间 同时也为 本周开始时间
+                //
                 return toTimestamp(cal.getTime());
             }
             if ("lastMonth".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
-                cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-                cal.set(Calendar.HOUR_OF_DAY, 24);
-
-                // 减去一月
-                cal.add(Calendar.MONTH, -1);
-
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 1, 0, 0, 0);
+                // 上月结束时间 同时也为 本月开始时间
+                //
                 return toTimestamp(cal.getTime());
             }
-
+            if ("lastQuarter".equalsIgnoreCase(type)) {
+                // 实际月份从0开始，除以3取整，然后在乘以3 。
+                // [0，1，2，3，4，5，6，7，8，9，10，11] =>  [0，0，0，3，3，3，6，6，6，9，9，9]
+                // 对应 1，4, 7, 10 四个季度起始月份
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) / 3 * 3, 1, 0, 0, 0);
+                // 上季度结束时间 同时也为 本季度开始时间
+                //
+                return toTimestamp(cal.getTime());
+            }
+            if ("lastHalfYear".equalsIgnoreCase(type)) {
+                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) / 6 * 6, 1, 0, 0, 0);
+                // 前半年度结束时间 同时也为 本半年度开始时间
+                //
+                return toTimestamp(cal.getTime());
+            }
             if ("lastYear".equalsIgnoreCase(type)) {
-                Calendar cal = Calendar.getInstance();
-                cal.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-                cal.setTime(timestamp);
-                cal.set(cal.get(Calendar.YEAR), 0, 0, 0, 0, 0);
-                cal.set(Calendar.DAY_OF_YEAR, cal.getActualMaximum(Calendar.DAY_OF_YEAR));
-
-                // 减去一年
-                cal.add(Calendar.YEAR, -1);
-
-                cal.set(Calendar.HOUR_OF_DAY, 24);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
+                cal.set(cal.get(Calendar.YEAR), 0, 1, 0, 0, 0);
+                // 去年结束时间 同时也为 本年开始时间
+                //
                 return toTimestamp(cal.getTime());
             }
             return toTimestamp(Calendar.getInstance().getTime());
         }
 
-        private static void nextDay(Calendar cal, int hourOfDay, int i) {
-            cal.set(hourOfDay, i);
+
+
+        public static java.sql.Timestamp toMorning(String type, Object... time) {
+            return toBegin(type, time);
         }
 
+        public static Timestamp toNight(String type, Object... time) {
+            return toEnd(type, time);
+        }
 
     }
 
