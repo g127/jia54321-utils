@@ -34,10 +34,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +63,8 @@ public class DateUtil {
                 || obj instanceof java.sql.Date
                 || obj instanceof java.sql.Timestamp) {
             time = (Date) obj;
+        } else if (obj instanceof Calendar) {
+            time = ( (Calendar) obj ).getTime();
         } else if (obj instanceof String) {
             String srcTime = ((String) obj).trim();
             try {
@@ -144,7 +143,7 @@ public class DateUtil {
      *
      * @return String
      */
-    public static String toNowDataString() {
+    public static String toNowDateString() {
         return toTimeString(Calendar.getInstance().getTime(), Formatter.YYYY_MM_DD.pattern);
     }
 
@@ -172,7 +171,7 @@ public class DateUtil {
      * @param time 时间
      * @return String
      */
-    public static String toDataString(Object time) {
+    public static String toDateString(Object time) {
         return toTimeString(time, Formatter.YYYY_MM_DD.pattern);
     }
 
@@ -210,11 +209,94 @@ public class DateUtil {
     }
 
 
-
+    /**
+     * 时间常用表达
+     */
+    public static class ExpressingTime {
+        public final String type;
+        public final String stepType;
+        public long beginTime;
+        public long endTime;
+        public ExpressingTime(String type, String stepType) {
+            this.type = type;
+            this.stepType = stepType;
+        }
+    }
     /**
      * 时间常用表达
      */
     public static class Expressing {
+
+        /**
+         * 按年，月，日，小时，季度，周的步长，计算xxxx年内的最早时间00:00列表
+         * @param stepType 步长类型
+         * @param type  类型
+         * @param time  时间
+         * @return 列表
+         */
+        public static List<DateUtil.ExpressingTime> toList(String stepType, String type,  Object... time) {
+            List<DateUtil.ExpressingTime> result = null;
+            Calendar begin = Calendar.getInstance();
+            begin.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
+            begin.setTime(DateUtil.Expressing.toBegin(type, time));
+            begin.set(Calendar.MILLISECOND, 0);
+            begin.set(Calendar.SECOND, 0);
+            begin.set(Calendar.MINUTE, 0);
+
+            Calendar end = Calendar.getInstance();
+            end.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
+            end.setTime(DateUtil.Expressing.toEnd(type, time));
+            end.set(Calendar.MILLISECOND, 0);
+            end.set(Calendar.SECOND, 0);
+            end.set(Calendar.MINUTE, 0);
+
+            String key = toTimeString(begin) + " ~ " + toTimeString(end) + " " + stepType;
+
+            int[] step = new int[]{ Calendar.DAY_OF_YEAR, 1 };
+            switch (stepType) {
+                case "year":
+                    step = new int[]{ Calendar.MONTH, 12 };
+                    break;
+                case "month":
+                    step = new int[]{ Calendar.MONTH, 1 };
+                    break;
+                case "day":
+                    step = new int[]{ Calendar.DAY_OF_YEAR, 1 };
+                    break;
+                case "hour":
+                    step = new int[]{ Calendar.HOUR_OF_DAY, 1 };
+                    break;
+                case "halfYear":
+                    step = new int[]{ Calendar.MONTH, 6 };
+                    break;
+                case "quarter":
+                    step = new int[]{ Calendar.MONTH, 3 };
+                    break;
+                case "week":
+                    // 设定为周一
+                    if(begin.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
+                        begin.add(Calendar.DAY_OF_WEEK, 7); // 下周
+                        begin.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY); // 设定为下周一
+                    }
+                    step = new int[]{ Calendar.DAY_OF_YEAR, 7 };
+                    break;
+                default:
+                    Assert.isTrue(false, "stepType 取值有误");
+                    break;
+            }
+
+            result = new ArrayList<>();
+            DateUtil.ExpressingTime expressingTime = null;
+            Calendar i = (Calendar)begin.clone();
+            while ( i.before(end) ) {
+                expressingTime = new DateUtil.ExpressingTime(type, stepType);
+                expressingTime.beginTime = i.getTimeInMillis();
+                i.add(step[0], step[1]);
+                expressingTime.endTime = i.getTimeInMillis();
+                result.add(expressingTime);
+            }
+            return result;
+        }
 
         /**
          * 当前时间的最早时间00:00
@@ -649,11 +731,6 @@ public class DateUtil {
          * @return Formatter
          */
         public static Formatter valueOfSourceLength(String source) {
-//
-//			if (data.indexOf('年') > 0 && data.indexOf('月') > 0 && data.indexOf('日') > 0) {
-//				return YYYY_MM_DD_3;
-//			}
-
             // 4位
             if (YYYY.pattern.length() == source.length()) {
                 return YYYY;

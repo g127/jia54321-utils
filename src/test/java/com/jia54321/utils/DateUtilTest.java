@@ -527,6 +527,40 @@ public class DateUtilTest {
     }
 
     @Test
+    public void toList() {
+        Object[] testArray = new Object[] {
+                DateUtil.Expressing.toList("year", "year"),
+                DateUtil.Expressing.toList("halfYear", "year"),
+                DateUtil.Expressing.toList("quarter", "year"),
+                DateUtil.Expressing.toList("quarter", "quarter"),
+                DateUtil.Expressing.toList("month", "quarter"),
+                DateUtil.Expressing.toList("month", "month"),
+                DateUtil.Expressing.toList("day", "month"),
+                DateUtil.Expressing.toList("day", "day"),
+                DateUtil.Expressing.toList("hour", "day"),
+                DateUtil.Expressing.toList("week", "year"),
+                DateUtil.Expressing.toList("week", "month"),
+                DateUtil.Expressing.toList("week", "week"),
+                DateUtil.Expressing.toList("day", "week"),
+        };
+        for (Object test: testArray) {
+            List<DateUtil.ExpressingTime> expressingTimeList = (List<DateUtil.ExpressingTime>)test;
+            int i = 1;
+            System.out.println("" //
+               + expressingTimeList.get(0).stepType + " in this " + expressingTimeList.get(0).type
+            );
+            for (DateUtil.ExpressingTime expressingTime: expressingTimeList ) {
+                System.out.println("" //
+                        + i++ + ". "
+                        + "range: [ " + DateUtil.toTimeString(expressingTime.beginTime) + ", " + DateUtil.toTimeString(expressingTime.endTime) + " )"
+                        + ", statisticId: " + IdGeneration.getStatisticId(expressingTime.stepType, expressingTime.beginTime)
+                );
+            }
+            System.out.println();
+        }
+    }
+
+    @Test
     public void toTimeChinaWeekOfYear() {
     }
 

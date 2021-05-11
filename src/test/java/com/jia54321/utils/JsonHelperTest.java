@@ -1,7 +1,6 @@
 package com.jia54321.utils;
 
 import junit.framework.Assert;
-import org.checkerframework.checker.units.qual.A;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
