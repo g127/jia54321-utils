@@ -546,6 +546,27 @@ public class JsonHelper extends DateUtil {
 	}
 
 	/**
+	 * 切分总数量
+	 * @param splitNum  切分数量
+	 * @param list      总列表
+	 * @param <T>       实体类型
+	 * @return          子列表
+	 */
+	public static <T> List<List<T>> toSplitList(int splitNum, List<T> list) {
+		List<List<T>> splitList = new LinkedList<>();
+		// groupFlag >= 1
+		int groupFlag = list.size() % splitNum == 0 ? (list.size() / splitNum) : (list.size() / splitNum + 1);
+		for (int j = 1; j <= groupFlag; j++) {
+			if ((j * splitNum) <= list.size()) {
+				splitList.add(list.subList(j * splitNum - splitNum, j * splitNum));
+			} else if ((j * splitNum) > list.size()) {
+				splitList.add(list.subList(j * splitNum - splitNum, list.size()));
+			}
+		}
+		return splitList;
+	}
+
+	/**
 	 * 覆盖数据属性
 	 * @param jsonStrOrMap 待更新的数据
 	 * @param old 旧数据

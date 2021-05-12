@@ -118,7 +118,7 @@ public class DateUtil {
         }
         Date time = new Date(timeMillis);
 
-		if (null == dateFormat || 0 == dateFormat.length) {
+		if (null == dateFormat || 0 == dateFormat.length || null == dateFormat[0] ||  "".equals(dateFormat[0])) {
 			dateFormat = new String[] { Formatter.YYYY_MM_DD.pattern };
 		}
 
@@ -132,7 +132,7 @@ public class DateUtil {
      * @return string
      */
     public static String toNow(String... dateFormat) {
-    	if (null == dateFormat || 0 == dateFormat.length) {
+    	if (null == dateFormat || 0 == dateFormat.length || null == dateFormat[0] ||  "".equals(dateFormat[0]) ) {
             dateFormat = new String[]{Formatter.YYYY_MM_DD_HH_MM_SS.pattern};
         }
         return toTimeString(Calendar.getInstance().getTime(), dateFormat[0]);
@@ -210,15 +210,19 @@ public class DateUtil {
 
 
     /**
-     * 时间常用表达
+     * 时间区间内的步长时间
      */
     public static class ExpressingTime {
-        public final String type;
+        /** 时间区间类型 */
+        public final String rangeType;
+        /** 时间步长类型 */
         public final String stepType;
+        /** 步长开始时间 */
         public long beginTime;
+        /** 步长结束时间 */
         public long endTime;
-        public ExpressingTime(String type, String stepType) {
-            this.type = type;
+        public ExpressingTime(String rangeType, String stepType) {
+            this.rangeType = rangeType;
             this.stepType = stepType;
         }
     }
@@ -230,22 +234,22 @@ public class DateUtil {
         /**
          * 按年，月，日，小时，季度，周的步长，计算xxxx年内的最早时间00:00列表
          * @param stepType 步长类型
-         * @param type  类型
-         * @param time  时间
+         * @param rangeType 范围类型
+         * @param timePoint 时间点（某范围内的时间点）
          * @return 列表
          */
-        public static List<DateUtil.ExpressingTime> toList(String stepType, String type,  Object... time) {
+        public static List<DateUtil.ExpressingTime> toList(String stepType, String rangeType, Object... timePoint) {
             List<DateUtil.ExpressingTime> result = null;
             Calendar begin = Calendar.getInstance();
             begin.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-            begin.setTime(DateUtil.Expressing.toBegin(type, time));
+            begin.setTime(DateUtil.Expressing.toBegin(rangeType, timePoint));
             begin.set(Calendar.MILLISECOND, 0);
             begin.set(Calendar.SECOND, 0);
             begin.set(Calendar.MINUTE, 0);
 
             Calendar end = Calendar.getInstance();
             end.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-            end.setTime(DateUtil.Expressing.toEnd(type, time));
+            end.setTime(DateUtil.Expressing.toEnd(rangeType, timePoint));
             end.set(Calendar.MILLISECOND, 0);
             end.set(Calendar.SECOND, 0);
             end.set(Calendar.MINUTE, 0);
@@ -289,7 +293,7 @@ public class DateUtil {
             DateUtil.ExpressingTime expressingTime = null;
             Calendar i = (Calendar)begin.clone();
             while ( i.before(end) ) {
-                expressingTime = new DateUtil.ExpressingTime(type, stepType);
+                expressingTime = new DateUtil.ExpressingTime(rangeType, stepType);
                 expressingTime.beginTime = i.getTimeInMillis();
                 i.add(step[0], step[1]);
                 expressingTime.endTime = i.getTimeInMillis();
@@ -326,7 +330,7 @@ public class DateUtil {
          * @return Timestamp
          */
         public static java.sql.Timestamp toBegin(String type, Object... time) {
-			if (null == time || time.length == 0) {
+			if ( null == time || time.length == 0 || null == time[0] ||  "".equals(time[0])) {
                 // 当前时间
                 time = new Date[]{Calendar.getInstance().getTime()};
             }
@@ -458,7 +462,7 @@ public class DateUtil {
          * @return Timestamp
          */
         public static Timestamp toEnd(String type, Object... time) {
-			if (null == time || time.length == 0) {
+            if ( null == time || time.length == 0 || null == time[0] ||  "".equals(time[0])) {
                 // 当前时间
                 time = new Date[]{Calendar.getInstance().getTime()};
             }

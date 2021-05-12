@@ -542,12 +542,26 @@ public class DateUtilTest {
                 DateUtil.Expressing.toList("week", "month"),
                 DateUtil.Expressing.toList("week", "week"),
                 DateUtil.Expressing.toList("day", "week"),
+
+                DateUtil.Expressing.toList("year", "year", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("halfYear", "year", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("quarter", "year", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("quarter", "quarter", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("month", "quarter", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("month", "month", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("day", "month", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("day", "day", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("hour", "day", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("week", "year", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("week", "month", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("week", "week", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("day", "week", "2019-01-01 00:00:00"),
         };
         for (Object test: testArray) {
             List<DateUtil.ExpressingTime> expressingTimeList = (List<DateUtil.ExpressingTime>)test;
             int i = 1;
             System.out.println("" //
-               + expressingTimeList.get(0).stepType + " in this " + expressingTimeList.get(0).type
+               + expressingTimeList.get(0).stepType + " in " + expressingTimeList.get(0).rangeType
             );
             for (DateUtil.ExpressingTime expressingTime: expressingTimeList ) {
                 System.out.println("" //
@@ -558,6 +572,16 @@ public class DateUtilTest {
             }
             System.out.println();
         }
+
+    }
+
+    @Test
+    public void toListNull() {
+        DateUtil.Expressing.toList("day", "year");
+        Object statTimePoint = "";
+        DateUtil.Expressing.toList("day", "year", statTimePoint);
+        statTimePoint = null;
+        DateUtil.Expressing.toList("day", "year", statTimePoint);
     }
 
     @Test
@@ -566,15 +590,21 @@ public class DateUtilTest {
 
     @Test
     public void toTimeString() {
-
+        DateUtil.toTimeString("2021-01");
+        DateUtil.toTimeString("2021-01", null);
+        DateUtil.toTimeString("2021-01", "");
     }
 
     @Test
     public void toNow() {
+        DateUtil.toNow();
+        DateUtil.toNow(null);
+        DateUtil.toNow("");
     }
 
     @Test
-    public void toNowDataString() {
+    public void toNowDateString() {
+        DateUtil.toNowDateString();
     }
 
     @Test

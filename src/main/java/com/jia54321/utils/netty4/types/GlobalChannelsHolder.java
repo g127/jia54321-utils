@@ -466,6 +466,7 @@ public class GlobalChannelsHolder {
         // 如果remoteAddress为空，则默认为 "UNKNOWN:"
         String remoteAddress = getRemoteAddress(c);
         String[]   remote  = remoteAddress.split(":");
+        remote = remote.length <= 1 ? new String[]{ remote[0], "-1"} : remote;
         //
         String     actName          = (null == action) ? "" : action;
         ChannelCtx ctx              = c.attr(G_CHANNEL_CTX).get();
