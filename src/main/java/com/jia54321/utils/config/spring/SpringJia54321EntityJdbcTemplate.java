@@ -1,4 +1,4 @@
-package com.jia54321.utils.config;
+package com.jia54321.utils.config.spring;
 
 import com.google.common.base.Joiner;
 import com.jia54321.utils.Assert;
@@ -14,7 +14,9 @@ import com.jia54321.utils.entity.rowmapper.DynamicEntityRowMapper;
 import com.jia54321.utils.entity.rowmapper.MetaItemMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.*;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
@@ -26,10 +28,12 @@ import java.util.Map;
 import static com.jia54321.utils.IOUtil.closeQuietly;
 import static com.jia54321.utils.entity.dao.EntityTypeDaoConst.*;
 
+/**
+ * JdbcTemplate 实现 IEntityTemplate
+ */
+public class SpringJia54321EntityJdbcTemplate extends JdbcTemplate implements IEntityTemplate {
 
-public class EntityTemplate extends JdbcTemplate implements IEntityTemplate {
-
-    private static Logger log = LoggerFactory.getLogger(EntityTemplate.class);
+    private static Logger log = LoggerFactory.getLogger(SpringJia54321EntityJdbcTemplate.class);
 
     private Database database = null;
     /** crudSqlBuilder */
@@ -45,7 +49,7 @@ public class EntityTemplate extends JdbcTemplate implements IEntityTemplate {
 
     protected MetaItemMapper metaItemMapper  = new MetaItemMapper();
 
-    public EntityTemplate(DataSource dataSource) {
+    public SpringJia54321EntityJdbcTemplate(DataSource dataSource) {
         super(dataSource, true);
         this.database = Database.fromDataSource(dataSource);
         this.crudSqlBuilder = new SqlBuilder();
@@ -118,8 +122,9 @@ public class EntityTemplate extends JdbcTemplate implements IEntityTemplate {
     }
 
     /**
-     * @param typeId
-     * @return
+     * 获取实体的属性名称集合
+     * @param typeId 类型ID值
+     * @return List<MetaItem>
      */
     @Override
     public List<MetaItem> getEntityItems(final String typeId) {
