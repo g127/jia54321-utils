@@ -45,7 +45,7 @@ public class QueryContentFactory {
 	 * @param sc
 	 * @return
 	 */
-	public static QueryContent<DynamicEntity> createQueryContent(SimpleCondition sc){
+	public static QueryContent<DynamicEntity> createQueryContent(SimpleCondition sc) {
 		QueryContent<DynamicEntity> queryContent = new QueryContent();
 		if (sc != null) {
 			queryContent.setKey(sc.getKey());
@@ -57,9 +57,20 @@ public class QueryContentFactory {
 			queryContent.setIds(sc.getIds());
 
 			List<OperationBean> conditions = new ArrayList<OperationBean>();
-			conditions = OperationBean.conditionOneMapAnd(conditions, sc.getSearch());
-			conditions = OperationBean.conditionOneListMapAnd(conditions, sc.getAnd());
-			conditions = OperationBean.conditionOneListMapOr(conditions, sc.getOr());
+			if(null !=  sc.getSearch() &&  sc.getSearch().size() > 0) {
+				conditions = OperationBean.conditionOneMapAnd(conditions, sc.getSearch());
+			}
+
+			if(null !=  sc.getAnd() &&  sc.getAnd().size() > 0) {
+				conditions = OperationBean.conditionOneListMapAnd(conditions, sc.getAnd());
+			}
+
+			if(null !=  sc.getOr() &&  sc.getOr().size() > 0) {
+				List<OperationBean> orConditions = new ArrayList<OperationBean>();
+				orConditions = OperationBean.conditionOneListMapOr(orConditions, sc.getOr());
+				conditions.add(OperationBean.conditionAnd(new OperationBean(), "", orConditions));
+			}
+
 			queryContent.setConditions(conditions);
 
 			List<OperationBean> sort = new ArrayList<OperationBean>();

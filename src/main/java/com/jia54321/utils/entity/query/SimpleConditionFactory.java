@@ -19,13 +19,13 @@ import com.jia54321.utils.entity.IStorageConstants;
  *
  */
 public class SimpleConditionFactory {
-	
+
 	private static final String CREATE_IN_ARG_2 = "%s IN ( %s )";
 	/**. */
 	private static final String[] SEARCH_FIXED_REGEX_AND_REPLACE = new String[]{"\"search\"[ ]*:[ ]*([,:}]+)", "\"search\" : {} $1"};
 	/**. */
 	private static final String SIMPLE_CONDITION_KEY_IDS_SEARCH_ARG_5 = "{ \"key\": \"%s\", \"ids\": \"%s\", \"search\": %s,  \"page\": { \"pageNo\": %s , \"pageSize\": %s } }";
-	
+
 	/**
 	 * 创建条件
 	 * @param w  where 语句
@@ -38,7 +38,7 @@ public class SimpleConditionFactory {
 		sc.setP(p);
 		return sc;
 	}
-	
+
 	/**
 	 * 创建条件
 	 * @param w
@@ -48,7 +48,7 @@ public class SimpleConditionFactory {
 	public static SimpleCondition create(final String w, final String commaDelimitedVals){
 		return create(w, Lists.newArrayList(commaDelimitedVals.split(",")));
 	}
-	
+
 	/**
 	 * 创建特殊的In条件
 	 * @param fieldName 字段名
@@ -64,7 +64,7 @@ public class SimpleConditionFactory {
 		sc.setPage(new Page(Integer.MAX_VALUE));
 		return sc;
 	}
-	
+
 	/**
 	 * 创建Page查询
 	 * @param pageNo
@@ -77,7 +77,7 @@ public class SimpleConditionFactory {
 		sc.getPage().setPageSize(pageSize);
 		return sc;
 	}
-	
+
 	/**
 	 * 创建Ids查询
 	 * @param ids  多个逗号分隔的参数值。 例如：参数值,参数值, ... 参数值
@@ -88,7 +88,7 @@ public class SimpleConditionFactory {
 		sc.setIds(ids);
 		return sc;
 	}
-	
+
 	/**
 	 * 创建SimpleCondition
 	 * @param search   之一：search查询条件
@@ -99,10 +99,10 @@ public class SimpleConditionFactory {
 		sc.setSearch(Maps.newHashMap(search));
 		return sc;
 	}
-	
+
 	/**
 	 * 创建SimpleCondition search条件
-	 * 
+	 *
 	 * @param keyAndValPairs
 	 * @return SimpleCondition
 	 */
@@ -119,34 +119,48 @@ public class SimpleConditionFactory {
 		}
 		return sc;
 	}
-	
-	
-	
-	
+
+
+
+
 	/**
 	 * 创建SimpleCondition
 	 * @param and and
 	 * @return
 	 */
-	public static SimpleCondition createByAnd(Map<String, Object> and, int pageNo, int pageSize){
+	public static SimpleCondition createByAnd(Map<String, Object> and, int pageNo, int pageSize) {
 		SimpleCondition sc = new SimpleCondition();
 		sc.setAnd(Lists.newArrayList(and));
 		sc.setPage(new Page(pageNo, pageSize));
 		return sc;
 	}
-	
+
 	/**
 	 * 创建SimpleCondition
 	 * @param or or
 	 * @return
 	 */
-	public static SimpleCondition createByOr(Map<String, Object> or, int pageNo, int pageSize){
+	public static SimpleCondition createByOr(Map<String, Object> or, int pageNo, int pageSize) {
 		SimpleCondition sc = new SimpleCondition();
 		sc.setOr(Lists.newArrayList(or));
 		sc.setPage(new Page(pageNo, pageSize));
 		return sc;
 	}
-	
+
+	/**
+	 * 创建SimpleCondition
+	 * @param and and
+	 * @return
+	 */
+	public static SimpleCondition createByAndWithOr(Map<String, Object> and, Map<String, Object> or, Map<String, Object> sort, int pageNo, int pageSize) {
+		SimpleCondition sc = new SimpleCondition();
+		sc.setAnd(Lists.newArrayList(and));
+		sc.setOr(Lists.newArrayList(or));
+		sc.setSorts(Lists.newArrayList(sort));
+		sc.setPage(new Page(pageNo, pageSize));
+		return sc;
+	}
+
 	/**
 	 * 创建 storage object 实体 SimpleCondition
 	 * @param formId
@@ -159,7 +173,7 @@ public class SimpleConditionFactory {
 		sc.setPage(new Page(pageNo, pageSize));
 		return sc;
 	}
-	
+
 	/**
 	 * 创建 storage object 实体 SimpleCondition
 	 * @param formKey
@@ -173,7 +187,7 @@ public class SimpleConditionFactory {
 		sc.setPage(new Page(pageNo, pageSize));
 		return sc;
 	}
-	
+
 	/**
 	 * 创建 storage object 实体 SimpleCondition
 	 * @param formKey
@@ -188,7 +202,7 @@ public class SimpleConditionFactory {
 		sc.setPage(new Page(pageNo, pageSize));
 		return sc;
 	}
-	
+
 	/**
 	 * 创建SimpleCondition
 	 * @param key      描述用
@@ -210,7 +224,7 @@ public class SimpleConditionFactory {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 创建SimpleCondition仅仅根据SimpleConditionGroup 来解析 json
 	 * @param json
@@ -223,7 +237,7 @@ public class SimpleConditionFactory {
 		}
 		return result.get(0);
 	}
-	
+
 	/**
 	 * 创建List<SimpleCondition> 根据 json
 	 * @param sc  {} == SimpleCondition 或者  [{}] == List<SimpleCondition> json 形式
@@ -234,7 +248,7 @@ public class SimpleConditionFactory {
 		//FIXED
 		//一定程度上避免 "{ \"ids\": \"11\",\"search\" :  },{ \"search\" : ，\"ids\": \"11\" }"
 		String scList = json.replaceAll(SEARCH_FIXED_REGEX_AND_REPLACE[0], SEARCH_FIXED_REGEX_AND_REPLACE[1]);
-		
+
 		try {
 			SimpleCondition one = JsonHelper.parseObject(scList, SimpleCondition.class);
 			result = Lists.newArrayList(one);

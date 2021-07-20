@@ -239,17 +239,30 @@ public class DateUtil {
          * @return 列表
          */
         public static List<DateUtil.ExpressingTime> toList(String stepType, String rangeType, Object... timePoint) {
+            Timestamp beginRangeTime = DateUtil.Expressing.toBegin(rangeType, timePoint);
+            Timestamp endRangeTime = DateUtil.Expressing.toEnd(rangeType, timePoint);
+            return toList(stepType, beginRangeTime, endRangeTime);
+        }
+
+        /**
+         * 按年，月，日，小时，季度，周的步长，计算xxxx年内的最早时间00:00列表
+         * @param stepType 步长类型
+         * @param beginRangeTime 开始时间点（某范围内的时间点）
+         * @param endRangeTime   结束时间点（某范围内的时间点）
+         * @return 列表
+         */
+        public static List<DateUtil.ExpressingTime> toList(String stepType, Timestamp beginRangeTime, Timestamp endRangeTime) {
             List<DateUtil.ExpressingTime> result = null;
             Calendar begin = Calendar.getInstance();
             begin.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-            begin.setTime(DateUtil.Expressing.toBegin(rangeType, timePoint));
+            begin.setTime(beginRangeTime);
             begin.set(Calendar.MILLISECOND, 0);
             begin.set(Calendar.SECOND, 0);
             begin.set(Calendar.MINUTE, 0);
 
             Calendar end = Calendar.getInstance();
             end.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
-            end.setTime(DateUtil.Expressing.toEnd(rangeType, timePoint));
+            end.setTime(endRangeTime);
             end.set(Calendar.MILLISECOND, 0);
             end.set(Calendar.SECOND, 0);
             end.set(Calendar.MINUTE, 0);
@@ -293,7 +306,7 @@ public class DateUtil {
             DateUtil.ExpressingTime expressingTime = null;
             Calendar i = (Calendar)begin.clone();
             while ( i.before(end) ) {
-                expressingTime = new DateUtil.ExpressingTime(rangeType, stepType);
+                expressingTime = new DateUtil.ExpressingTime("", stepType);
                 expressingTime.beginTime = i.getTimeInMillis();
                 i.add(step[0], step[1]);
                 expressingTime.endTime = i.getTimeInMillis();

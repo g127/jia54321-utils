@@ -1,6 +1,7 @@
 package com.jia54321.utils.jfinal.activerecord.generator;
 
 import com.jfinal.plugin.activerecord.generator.*;
+import com.jia54321.utils.CamelNameUtil;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 
 public class Generator extends com.jfinal.plugin.activerecord.generator.Generator {
 
+    protected BaseModelGenerator baseModelGeneratorExt;
     protected ServiceGenerator serviceGenerator;
     protected ServiceImplGenerator serviceImplGenerator;
 
@@ -20,8 +22,8 @@ public class Generator extends com.jfinal.plugin.activerecord.generator.Generato
         super(dataSource, baseModelPackageName, baseModelOutputDir, modelPackageName, modelOutputDir);
 
         this.metaBuilder = new MetaBuilder(dataSource);
-        this.baseModelGenerator = baseModelGenerator;
-        this.baseModelGenerator.setTemplate("/com/jia54321/utils/jfinal/activerecord/generator/base_model_template.jf");
+        this.baseModelGeneratorExt = new BaseModelGenerator(baseModelPackageName, baseModelOutputDir);
+        this.baseModelGeneratorExt.setTemplate("/com/jia54321/utils/jfinal/activerecord/generator/base_model_template.jf");
         this.modelGenerator = modelGenerator;
         this.modelGenerator.setTemplate("/com/jia54321/utils/jfinal/activerecord/generator/model_template.jf");
         this.mappingKitGenerator = new MappingKitGenerator(modelPackageName, modelOutputDir);
@@ -72,6 +74,8 @@ public class Generator extends com.jfinal.plugin.activerecord.generator.Generato
             newObj.colDefaultValueMaxLen = old.colDefaultValueMaxLen;	// 字段默认值最大宽度，用于辅助生成字典文件样式
 
             // ---------
+            newObj.namePrefixes          = old.name.replace(CamelNameUtil.camelToUnderline(old.modelName),"");
+
             newObj.serviceName          = old.modelName + "Service";
 
             newObj.serviceImplName      = old.modelName + "ServiceImpl";
@@ -79,8 +83,7 @@ public class Generator extends com.jfinal.plugin.activerecord.generator.Generato
             tableMetasExtendExtend.add(newObj);
         }
 
-
-        baseModelGenerator.generate(tableMetas);
+        baseModelGeneratorExt.generate(tableMetasExtendExtend);
 
         if (modelGenerator != null) {
             modelGenerator.generate(tableMetas);

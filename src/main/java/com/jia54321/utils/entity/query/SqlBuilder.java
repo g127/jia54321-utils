@@ -1,9 +1,6 @@
 package com.jia54321.utils.entity.query;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import com.jia54321.utils.IdGeneration;
@@ -264,6 +261,7 @@ public class SqlBuilder {
         }
         StringBuilder sql = new StringBuilder();
         StringBuilder totalElementsSql = new StringBuilder();
+        StringBuilder sqlExceptSelect = new StringBuilder();
 
         String tableName = table.getTableDesc().getTableName();
         String primaryName = table.getTableDesc().getTypePkName();
@@ -278,7 +276,7 @@ public class SqlBuilder {
 				sql.append(" WHERE ").append(whereSql.trim().replaceAll("WHERE", ""));
 			}
 		}
-           
+
 
         List<Object> filterParams = new ArrayList<Object>();
         for (Object p : params) {
@@ -290,6 +288,17 @@ public class SqlBuilder {
         }
         SqlContext returnObj = new SqlContext(sql, primaryName, filterParams);
 
+        sqlExceptSelect.append("FROM ").append(tableName);
+        if (whereSql.length() > 0 && whereSql.trim().length() > 0) {
+            // 只有ORDER，直接拼接
+            if (whereSql.trim().indexOf("ORDER") == 0) {
+                sqlExceptSelect.append(" ").append(whereSql.trim().replaceAll("WHERE", ""));
+            } else {
+                sqlExceptSelect.append(" WHERE ").append(whereSql.trim().replaceAll("WHERE", ""));
+            }
+        }
+        returnObj.setSqlExceptSelect(sqlExceptSelect);
+
         if (isNeedTotalElements) {
             totalElementsSql.append("SELECT COUNT(*) FROM ").append(tableName);
             if (whereSql.length() > 0 && whereSql.trim().length() > 0 ) {
@@ -299,7 +308,7 @@ public class SqlBuilder {
     			} else {
     				totalElementsSql.append(" WHERE ").append(whereSql.replaceAll("WHERE", ""));
     			}
-               
+
             }
             returnObj.setTotalElementsSql(totalElementsSql);
         }
@@ -321,15 +330,12 @@ public class SqlBuilder {
             throw new IllegalArgumentException("not null.");
         }
 //        StringBuilder sql = new StringBuilder();
-        StringBuilder where = new StringBuilder(" ");
+        StringBuilder where = new StringBuilder();
+        StringBuilder conds = new StringBuilder();
         StringBuilder group = new StringBuilder();
         StringBuilder order = new StringBuilder();
 
         List<Object> params = new ArrayList<Object>();
-//        String tableName = table.getTableName();
-//        String primaryName = table.getPrimaryName();
-        //String[] columnNames = table.getColumnName();
-        //Object[] columnValues = table.getColumnValue();
 
         OperationBean condition = null;
         boolean isAddOrderBy = false;
@@ -379,112 +385,136 @@ public class SqlBuilder {
 
         for (int i = 0; i < whereOperations.size(); i++) {
             condition = whereOperations.get(i);
-            String strLogicalOperator = condition.getLogicalOperator();
             if (i == 0) {
-                where.append(" WHERE ");
-                strLogicalOperator = "";
+                condition.setLogicalOperator(" ");
             }
-            String strLeftBracket = condition.getLeftBracket();
-            String strRightBracket = condition.getRightBracket();
-            String strAttribute = condition.getAttribute();
-            String strOperator = condition.getOperator();
-            Object objValue = condition.getValue();
-
-            if ("IN".equalsIgnoreCase(strOperator)) {
-                where.append(" ");
-                where.append(strLogicalOperator);
-                where.append(" ");
-                where.append(strLeftBracket);
-                where.append(" ");
-                where.append(strAttribute);
-                where.append(" ");
-                where.append(strOperator);
-                where.append(" ");
-				if (String.valueOf(objValue).indexOf('(') == -1) {
-					objValue = '(' + String.valueOf(objValue);
-				}
-				if (String.valueOf(objValue).indexOf(')') == -1) {
-					objValue = String.valueOf(objValue) + ')';
-				}
-                where.append(objValue);
-                where.append(strRightBracket);
-            } else if ("INSTR".equalsIgnoreCase(strOperator)) {
-                where.append(" ");
-                where.append(strLogicalOperator);
-                where.append(" ");
-                where.append(strLeftBracket);
-                where.append(" ");
-                where.append(strAttribute);
-                where.append(" LIKE ");
-                where.append("'%");
-                where.append(objValue);
-                where.append("%'");
-                where.append(" ");
-                where.append(strRightBracket);
-            } else if ("ISNULL".equalsIgnoreCase(strOperator)) {
-                where.append(" ");
-                where.append(strLogicalOperator);
-                where.append(" ");
-                where.append(strLeftBracket);
-                where.append(" ");
-                where.append(strAttribute);
-                where.append(" IS ");
-                where.append(" NULL ");
-                where.append(" ");
-                where.append(strRightBracket);
-            } else if ("EMPTY".equalsIgnoreCase(strOperator)) {
-                where.append(" ");
-                where.append(strLogicalOperator);
-                where.append(" ");
-                where.append(strLeftBracket);
-                where.append(" (");
-                where.append(strAttribute);
-                where.append(" IS ");
-                where.append(" NULL ");
-                where.append("  or ");
-                where.append(strAttribute);
-                where.append(" ='' )");
-                where.append(strRightBracket);
-            } else {
-                if ("LIKE".equalsIgnoreCase(strOperator)) {
-                    String strTemp = (String) objValue;
-                    if ((strTemp == null) || ("".equals(strTemp))) {
-                        objValue = "%";
-                    } else if (strTemp.indexOf('%') == -1) {
-                        objValue = "%" + strTemp + "%";
-                    }
-                }
-                if (objValue == null) {
-                    where.append(" ");
-                    where.append(strLogicalOperator);
-                    where.append(" ");
-                    where.append(strLeftBracket);
-                    where.append(" ");
-                    where.append(strAttribute);
-                    where.append(" ");
-                    where.append(strOperator);
-                    where.append(" ");
-                    where.append("NULL");
-                    where.append(strRightBracket);
-                } else {
-                    where.append(" ");
-                    where.append(strLogicalOperator);
-                    where.append(" ");
-                    where.append(strLeftBracket);
-                    where.append(" ");
-                    where.append(strAttribute);
-                    where.append(" ");
-                    where.append(strOperator);
-                    where.append(" ");
-                    where.append("?");
-                    where.append(" ");
-                    where.append(strRightBracket);
-                    params.add(objValue);
-                }
-            }
+            buildOperationBean(conds, params, condition);
         }
 
-        return buildQuerySQL(table, where.append(group).append(order).toString(), params, isNeedTotalElements);
+        return buildQuerySQL(table, where.append(" WHERE ").append(conds).append(group).append(order).toString(), params, isNeedTotalElements);
+    }
+
+    private void buildOperationBean(StringBuilder conds, List<Object> params, OperationBean condition) {
+        String strLogicalOperator = condition.getLogicalOperator();
+//        if (i == 0) {
+//            where.append(" WHERE ");
+//            strLogicalOperator = "";
+//        }
+        String strLeftBracket = condition.getLeftBracket();
+        String strRightBracket = condition.getRightBracket();
+        String strAttribute = condition.getAttribute();
+        String strOperator = condition.getOperator();
+        Object objValue = condition.getValue();
+
+        if(!strLogicalOperator.equalsIgnoreCase(" ")) {
+            strLogicalOperator = " " + strLogicalOperator + " ";
+        }
+
+        if(condition.getValue() instanceof List) {
+            conds.append(strLogicalOperator);
+
+            conds.append(Operator.LEFT_BRACKET.toString());
+            List<OperationBean> subOperations = (List<OperationBean>)condition.getValue();
+            for (int j = 0; j < subOperations.size(); j++) {
+                if (j == 0) {
+                    subOperations.get(0).setLogicalOperator(" ");
+                }
+                buildOperationBean(conds, params, subOperations.get(j));
+            }
+            conds.append(Operator.RIGHT_BRACKET.toString());
+        } else if (Operator.IN.toString().equalsIgnoreCase(strOperator) || Operator.NOTIN.toString().equalsIgnoreCase(strOperator)) {
+            conds.append(strLogicalOperator);
+            conds.append(strLeftBracket);
+            conds.append(" ");
+            conds.append(strAttribute);
+            conds.append(" ");
+            conds.append(strOperator);
+            conds.append(" ");
+
+            Object[] inObjValue = new Object[]{};
+            // 数组
+            if (objValue.getClass().isArray()) {
+                inObjValue = (Object[]) objValue;
+                // 集合
+            } else if (objValue instanceof Collection) {
+                inObjValue = (Object[]) ((Collection) objValue).toArray();
+                // 字符串分隔的数据
+            } else if (objValue instanceof String /*&& ((String) filter.value).indexOf(',') > 0 */) { // 单个In 参数无法查询
+                inObjValue = (Object[]) (String.valueOf(objValue).split(","));
+            }
+
+            conds.append('(');
+            for (Object inValue : inObjValue) {
+                conds.append('?').append(',');
+                params.add(inValue);
+            }
+            conds.deleteCharAt(conds.length()-1);
+            conds.append(')');
+            conds.append(strRightBracket);
+        } else if ("INSTR".equalsIgnoreCase(strOperator)) {
+            conds.append(strLogicalOperator);
+            conds.append(strLeftBracket);
+            conds.append(" ");
+            conds.append(strAttribute);
+            conds.append(" LIKE ");
+            conds.append("'%");
+            conds.append(objValue);
+            conds.append("%'");
+            conds.append(" ");
+            conds.append(strRightBracket);
+        } else if ("ISNULL".equalsIgnoreCase(strOperator)) {
+            conds.append(strLogicalOperator);
+            conds.append(strLeftBracket);
+            conds.append(" ");
+            conds.append(strAttribute);
+            conds.append(" IS ");
+            conds.append(" NULL ");
+            conds.append(" ");
+            conds.append(strRightBracket);
+        } else if ("EMPTY".equalsIgnoreCase(strOperator)) {
+            conds.append(strLogicalOperator);
+            conds.append(strLeftBracket);
+            conds.append(" (");
+            conds.append(strAttribute);
+            conds.append(" IS ");
+            conds.append(" NULL ");
+            conds.append("  or ");
+            conds.append(strAttribute);
+            conds.append(" ='' )");
+            conds.append(strRightBracket);
+        } else {
+            if ("LIKE".equalsIgnoreCase(strOperator)) {
+                String strTemp = (String) objValue;
+                if ((strTemp == null) || ("".equals(strTemp))) {
+                    objValue = "%";
+                } else if (strTemp.indexOf('%') == -1) {
+                    objValue = "%" + strTemp + "%";
+                }
+            }
+            if (objValue == null) {
+                conds.append(strLogicalOperator);
+                conds.append(strLeftBracket);
+                conds.append(" ");
+                conds.append(strAttribute);
+                conds.append(" ");
+                conds.append(strOperator);
+                conds.append(" ");
+                conds.append("NULL");
+                conds.append(strRightBracket);
+            } else {
+                conds.append(strLogicalOperator);
+                conds.append(strLeftBracket);
+                conds.append(" ");
+                conds.append(strAttribute);
+                conds.append(" ");
+                conds.append(strOperator);
+                conds.append(" ");
+                conds.append("?");
+                conds.append(" ");
+                conds.append(strRightBracket);
+                params.add(objValue);
+            }
+        }
     }
 
     private Object getIgnoreCaseKey(Map<String, Object> m, String key) {

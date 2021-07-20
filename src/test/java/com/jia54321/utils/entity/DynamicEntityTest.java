@@ -1,7 +1,9 @@
 package com.jia54321.utils.entity;
 
+import com.google.common.collect.Lists;
 import com.jia54321.utils.JsonHelper;
 import com.jia54321.utils.Kv;
+import com.jia54321.utils.clock.SystemTimer;
 import com.jia54321.utils.entity.converter.CrudTableConverter;
 import com.jia54321.utils.entity.query.*;
 import org.junit.Test;
@@ -47,16 +49,22 @@ public class DynamicEntityTest {
 
         System.out.println(test);
 
+        long beginTime = SystemTimer.currTime;
         // 查询
-        SimpleCondition sc = SimpleConditionFactory.createByAnd(Kv.init().set("EQ_TYPE_MK","SYS").set("EQ_TYPE_ENTITY_NAME","USER"), 1, 20);
+        SimpleCondition sc = SimpleConditionFactory.createByAndWithOr(
+                Kv.init().set("EQ_TYPE_MK","SYS").set("LIKE_TYPE_ENTITY_NAME","USER"),
+                Kv.init().set("EQ_TYPE_MK","SYS1").set("IN_TYPE_ENTITY_NAME","USER1,USER2"),
+                Kv.init().set("ORDER_TYPE_MK","DESC").set("ORDER_TYPE_ENTITY_NAME","DESC"),
+                1, 20);
         QueryContent qc = QueryContentFactory.createQueryContent(sc);
         // 构造查询 buildQueryCondition
         SqlContext querySqlContext = sqlBuilder.buildQueryCondition(userTable, qc.getConditions(), qc.getSorts());
 
         test = querySqlContext;
 
-        System.out.println(test);
-
+        System.out.println(test.getSql());
+        long endTime = SystemTimer.currTime;
+        System.out.println(endTime - beginTime);
         System.out.println(JsonHelper.toJson(entity));
     }
 

@@ -19,6 +19,9 @@ public class SqlContext {
 	/** 总数量sql,类似 select count(*) from xxx */
 	private StringBuilder totalElementsSql;
 
+	/** sqlExceptSelect */
+	private StringBuilder sqlExceptSelect;
+
     public SqlContext(StringBuilder sql, String primaryKey, List<Object> params) {
         this.sql = sql;
         this.primaryKey = primaryKey;
@@ -55,6 +58,14 @@ public class SqlContext {
 
 	public void setTotalElementsSql(StringBuilder totalElementsSql) {
 		this.totalElementsSql = totalElementsSql;
+	}
+
+	public StringBuilder getSqlExceptSelect() {
+		return sqlExceptSelect;
+	}
+
+	public void setSqlExceptSelect(StringBuilder sqlExceptSelect) {
+		this.sqlExceptSelect = sqlExceptSelect;
 	}
 
 	@Override

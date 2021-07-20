@@ -2,38 +2,38 @@ package com.jia54321.utils.entity.query;
 
 
 /**
- * 
+ *
  * @author G
  */
 public enum Operator {
 	// Logical Operator
 	AND("AND", "AND"), OR("OR", "OR"),
-	
+
 	// Condition Operator
-	EQ("EQ", "="), LIKE("LIKE", "LIKE"), GT("GT", ">"), LT("LT","<"), GTE("GTE", ">="), LTE("LTE","<="), IN("IN","IN"), EXISTS("EXISTS","EXISTS"),
-	
+	EQ("EQ", "="), LIKE("LIKE", "LIKE"), GT("GT", ">"), LT("LT","<"), GTE("GTE", ">="), LTE("LTE","<="), IN("IN","IN"), NOTIN("NOT IN","NOT IN"), EXISTS("EXISTS","EXISTS"),
+
 	NOTEQ("NOTEQ", "<>"), ISNULL("ISNULL", "ISNULL"), EMPTY("EMPTY", "EMPTY"),
-	
+
 	// Bracket Operator
 	LEFT_BRACKET("LB", "("),RIGHT_BRACKET("RB", ")"),
-	
+
 	// Sort Operator
 	ORDER("ORDER","ORDER"),
-	
+
 	// Sort Operator
 	GROUP("GROUP","GROUP"),
-	
+
 	BLANK("BLANK", " "),
-	
+
 	ERROR("ERROR", " ERROR ");
-	
+
 	private String logicVal;
 	private String sqlVal;
 	Operator(String logicVal, String sqlVal){
 		this.logicVal = logicVal;
 		this.sqlVal = sqlVal;
 	}
-	
+
 	protected static Operator logicValueOf(String logicVal, Operator defaultVal) {
 		if(null == logicVal || "".equals(logicVal)){
 			return defaultVal;
@@ -77,7 +77,7 @@ public enum Operator {
         if(EXISTS.tologicVal().equals(logicVal.trim())){
         	return EXISTS;
         }
-        
+
         if(LEFT_BRACKET.tologicVal().equals(logicVal.trim())){
         	return LEFT_BRACKET;
         }
@@ -89,7 +89,7 @@ public enum Operator {
         }
         return defaultVal;
     }
-	
+
 	protected static Operator sqlValueOf(String sqlVal, Operator defaultVal) {
 		if(null == sqlVal || "".equals(sqlVal)){
 			return defaultVal;
@@ -133,7 +133,7 @@ public enum Operator {
         if(EXISTS.sqlVal.equals(sqlVal.trim())){
         	return EXISTS;
         }
-        
+
         if(LEFT_BRACKET.sqlVal.equals(sqlVal.trim())){
         	return LEFT_BRACKET;
         }
@@ -145,8 +145,8 @@ public enum Operator {
         }
         return defaultVal;
     }
-	
-	public static boolean isConditionOper(String sqlVal){
+
+	public static boolean isConditionOper(String sqlVal) {
 		if (AND.sqlVal.equals(sqlVal.trim())) {
 			return true;
 		}
@@ -190,8 +190,9 @@ public enum Operator {
 	public String toString() {
 		return this.sqlVal;
 	}
-	
+
 	public String tologicVal() {
 		return this.logicVal;
 	}
+
 }

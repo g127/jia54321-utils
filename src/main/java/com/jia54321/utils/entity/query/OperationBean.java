@@ -53,8 +53,8 @@ public class OperationBean implements Cloneable, Serializable {
 
 		c.setLogicalOperator(cmd.toString());
 
-		c.setLeftBracket(Operator.LEFT_BRACKET.toString());
-		c.setRightBracket(Operator.RIGHT_BRACKET.toString());
+//		c.setLeftBracket(Operator.LEFT_BRACKET.toString());
+//		c.setRightBracket(Operator.RIGHT_BRACKET.toString());
 
 		c.setAttribute(attribute);
 		c.setValue(val);
@@ -145,7 +145,7 @@ public class OperationBean implements Cloneable, Serializable {
 	 * @return the logicalOper
 	 */
 	public String getLogicalOperator() {
-		return Operator.sqlValueOf(logicalOperator, Operator.AND).toString();
+		return Operator.sqlValueOf(logicalOperator, Operator.BLANK).toString();
 	}
 
 	/**
