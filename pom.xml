@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jia54321</groupId>
     <artifactId>jia54321-utils</artifactId>
-    <version>0.0.18.v20210713</version>
+    <version>0.0.19.v20210720</version>
 
     <name>jia54321-utils</name>
     <description>Official Java SDK for jia54321-utils. https://github.com/g127/jia54321-utils</description>
