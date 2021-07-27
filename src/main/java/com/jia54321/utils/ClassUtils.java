@@ -1,5 +1,10 @@
 package com.jia54321.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.lang.Nullable;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -8,44 +13,53 @@ import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-import java.beans.Introspector;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * ClassUtils
  */
 public class ClassUtils {
+	static final Logger log = LoggerFactory.getLogger(ClassUtils.class);
+
 	/** Is javax.servlet.ServletRequest available */
 	static protected boolean servletRequestIsAvailable = false;
+    /** Is org.springframework.core.LocalVariableTableParameterNameDiscoverer available */
+    static protected boolean springCoreIsAvailable = false;
+
+    static protected Object parameterNameDiscoverer;
 	static {
 
-		// Is Log4J Available?
+		// Is ServletRequest Available?
 		try {
-			servletRequestIsAvailable = null != Class.forName("javax.servlet.ServletRequest");
+			servletRequestIsAvailable = null != resolveClassName("javax.servlet.ServletRequest", null);
 		} catch (Throwable t) {
 			servletRequestIsAvailable = false;
 		}
+
+        // Is org.springframework.core Available?
+		Class localVariableTableParameterNameDiscoverer = null;
+        try {
+			localVariableTableParameterNameDiscoverer = resolveClassName("org.springframework.core.LocalVariableTableParameterNameDiscoverer", null);
+            springCoreIsAvailable = null != localVariableTableParameterNameDiscoverer;
+        } catch (Throwable t) {
+            springCoreIsAvailable = false;
+        }
+
+        if(springCoreIsAvailable) {
+            try {
+                parameterNameDiscoverer = localVariableTableParameterNameDiscoverer.newInstance();
+            } catch (Throwable e) {
+            }
+        }
 	}
 	/** The package separator character: '.' */
 	private static final char PACKAGE_SEPARATOR = '.';
 
 	/** The inner class separator character: '$' */
 	private static final char INNER_CLASS_SEPARATOR = '$';
+
+	private static final Map<String, Method> METHOD_MAP = new ConcurrentHashMap<>();
 
 	/**
 	 * 标识 “当前Class 是否是给定的 Class 的超类或者超接口”。是 返回true，否则返回false。
@@ -85,9 +99,8 @@ public class ClassUtils {
 			return method.invoke(target, args);
 		}
 		catch (Exception ex) {
-			ex.printStackTrace();
+			throw new RuntimeException("方法调用失败", ex.getCause());
 		}
-		throw new IllegalStateException("Should never get here");
 	}
 
 //
@@ -392,25 +405,69 @@ public class ClassUtils {
 	}
 
 	/**
+	 *
+	 * 限制：
+	 * 1 在JDK 8之后，可以通过在编译时指定-parameters选项，将方法的参数名记入class文件，并在运行时通过反射机制获取相关信息。
+	 *   Java8以前，读取Class中的LocalVariableTable属性表，需要编译时加入参数-g或者-g:vars 获取方法局部变量调试信息；
+	 *   Java8及其以后，通过java.lang.reflect.Parameter#getName即可获取，但需要编译时加入参数-parameters参数。
+	 * 2 方法名必须在类中唯一
+	 * @param target
+	 * @param methodName
+	 * @param parameters
+	 * @return
+	 */
+	public static Object invokeMethodWithParameters(final Object target, final String methodName, final Map<String, Object> parameters)
+	{
+        if(!springCoreIsAvailable) {
+            return null;
+        }
+
+		Object       returnObj  = null;
+		Method       method     = getMethodIfAvailable(target, methodName);
+		Assert.notNull(method, "it must not be null");
+		//
+		String[] paraNames = null;
+		try {
+			Method getParameterNames = parameterNameDiscoverer.getClass().getMethod("getParameterNames", Method.class);
+			paraNames = (String[]) getParameterNames.invoke(parameterNameDiscoverer , method);
+		} catch (NoSuchMethodException e) {
+		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
+		}
+		Map<String, Object> input = new HashMap<>();
+		if(parameters != null) {
+			input.putAll(parameters);
+		}
+		final Object[] vals = new Object[paraNames.length];
+		for (int i = 0; i < paraNames.length; i++) {
+			Object val = input.get(paraNames[i]);
+			vals[i] = val;
+		}
+		return invokeMethodIfAvailable(target, methodName, vals);
+	}
+
+	/**
 	 * 方法调用
 	 * @param target
 	 * @param methodName
 	 * @param vals
 	 * @return Object
 	 */
-	public static Object invokeMethodIfAvailable(final Object target, final String methodName, final Object... vals){
+	public static Object invokeMethodIfAvailable(final Object target, final String methodName, final Object... vals) {
 		Object returnObj = null;
 		Method method = getMethodIfAvailable(target, methodName);
 		if (method != null) {
-			if (vals.length > 0 && method.getParameterTypes().length > 0) {
+			// parameterTypes
+			Class<?>[] parameterTypes = method.getParameterTypes();
+			if (vals.length > 0 && parameterTypes.length > 0) {
 				Object[] newVals = new Object[vals.length];
-				for (int i = 0; i < method.getParameterTypes().length; i++) {
+				for (int i = 0; i < parameterTypes.length; i++) {
 					if( null == vals[i] ) {
 						newVals[i] = vals[i];
 					}
 					// 两个字段类型不一致
-					else if( null != vals[i]  && ! vals[i].getClass().equals(method.getParameterTypes()[i].getClass()) ) {
-						Class<?> propType = method.getParameterTypes()[i];
+					else if( null != vals[i]  && ! vals[i].getClass().equals(parameterTypes[i].getClass()) ) {
+						Class<?> propType = parameterTypes[i];
 						Object val = vals[i];
 						Object newVal = val;
 						// 待设置的值为字符串。两个字段类型不一致
@@ -437,7 +494,10 @@ public class ClassUtils {
 							newVals[i] = vals[i];
 						}
 					}
-
+					// 两个字段类型一致
+					else if( vals[i].getClass().equals(parameterTypes[i].getClass()) ) {
+						newVals[i] = vals[i];
+					}
 				}
 				returnObj = invokeMethod(method, target, newVals);
 			} else {
@@ -447,17 +507,39 @@ public class ClassUtils {
 		return returnObj;
 	}
 
-	public static Method getMethodIfAvailable(final Object target, final String methodName){
-		 Set<Method> candidates = new HashSet<Method>(1);
-		 Method[] methods = target.getClass().getMethods();
-		 for (Method method : methods) {
-		   if (methodName.equals(method.getName())) {
-		     candidates.add(method);
-		   }
-		 }
-		 if (candidates.size() == 1) {
-		   return (Method)candidates.iterator().next();
-		 }
+	/**
+	 * getMethodIfAvailable
+	 * @param target 对象
+	 * @param methodName 唯一方法名
+	 * @return
+	 */
+	public static Method getMethodIfAvailable(final Object target, final String methodName) {
+		// key
+		String key = target.getClass().getName() + "." + methodName;
+		if(METHOD_MAP.get(key) != null){
+			return METHOD_MAP.get(key);
+		}
+		//
+		Set<Method> candidates = new HashSet<Method>(1);
+		Method[]    methods    = target.getClass().getMethods();
+		for (Method method : methods) {
+			Parameter[] parameters = method.getParameters();
+			if (methodName.equals(method.getName())) {
+				candidates.add(method);
+			}
+		}
+		if (candidates.size() == 1) {
+			Method m = (Method)candidates.iterator().next();
+			METHOD_MAP.put(key, m);
+			return m;
+		}
+		if (candidates.size() > 1) {
+			log.error(key + " 不唯一");
+		}
+		if (candidates.size() == 0 ) {
+			log.error(key + "不存在");
+		}
+
 		return null;
 	}
 
@@ -594,6 +676,24 @@ public class ClassUtils {
 		}
 	}
 
+	public static Class<?> resolveClassName(String className, ClassLoader classLoader)
+			throws IllegalArgumentException {
+
+		try {
+			return forName(className, classLoader);
+		}
+		catch (IllegalAccessError err) {
+			throw new IllegalStateException("Readability mismatch in inheritance hierarchy of class [" +
+					className + "]: " + err.getMessage(), err);
+		}
+		catch (LinkageError err) {
+			throw new IllegalArgumentException("Unresolvable class definition for class [" + className + "]", err);
+		}
+		catch (ClassNotFoundException ex) {
+			throw new IllegalArgumentException("Could not find class [" + className + "]", ex);
+		}
+	}
+
 	/**
 	 * 获取类名和方法名.
 	 *
@@ -602,7 +702,9 @@ public class ClassUtils {
 	 * @return [0] 类名 [1] 方法名
 	 */
 	public static String[] getServiceNameAndMethodName(final String serviceName) {
+		Assert.hasLength(serviceName, "The serviceName must not be null or empty");
 		final int index = serviceName.lastIndexOf('.');
+		Assert.isTrue( index > 0, String.format("The serviceName[%s] lastIndexOf('.') must be greater than zero", serviceName));
 		final String className = serviceName.substring(0, index);
 		final String methodName = serviceName.substring(index + 1);
 		return new String[] { className, methodName };

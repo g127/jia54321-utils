@@ -4,7 +4,11 @@ import com.jia54321.utils.entity.query.QueryContent;
 import com.jia54321.utils.entity.query.SimpleQueryContent;
 import junit.framework.Assert;
 import org.junit.Test;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.math.BigInteger;
 
 import static org.junit.Assert.*;
@@ -44,5 +48,13 @@ public class ClassUtilsTest {
         //
         Assert.assertFalse("isTimePropType", ClassUtils.isTimePropType(new Long("1").getClass()));
     }
+
+    @Test
+    public void invokeMethodWithParameters() {
+        Object target = new ClassUtils();
+        Object value = ClassUtils.invokeMethodWithParameters(target, "createNumbericPropTypeByVal", Kv.init().set("propType", Double.class).set("val", "1"));
+        System.out.println(value);
+    }
+
 
 }

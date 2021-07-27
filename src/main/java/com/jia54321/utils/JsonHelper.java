@@ -80,7 +80,10 @@ import com.jia54321.utils.fastjson.ComplexPropertyPreFilter;
  * @author 郭罡
  */
 public class JsonHelper extends DateUtil {
-	static final Logger log = LoggerFactory.getLogger(JsonHelper.class);
+	/** log */
+	static final Logger        log          = LoggerFactory.getLogger(JsonHelper.class);
+	/** 空字符串 "" */
+	public static final String STRING_EMPTY = "";
 
 	static class EntityTimestampSerializer implements ObjectSerializer {
 		private static final char SEPERATOR = ',';
@@ -636,7 +639,7 @@ public class JsonHelper extends DateUtil {
      * @return true or false
      */
     public static boolean isEmpty(Object o) {
-		if(null == o || "".equals(o)) {
+		if(null == o || STRING_EMPTY.equals(o)) {
 			return true;
 		}
 		if("null".equals(o)  || "(null)".equals(o) || "undefined".equals(o) ) {
@@ -877,9 +880,9 @@ public class JsonHelper extends DateUtil {
 	 */
 	public static LinkedHashSet<String> toSplitAsLinkedHashSet(Object o, String separator) {
 		LinkedHashSet<String> result = new LinkedHashSet<String>();
-		String[] values = toStr(o, "").split(separator);
+		String[] values = toStr(o, STRING_EMPTY).split(separator);
 		for (String v: values ) {
-			result.add(toStr(v, "").trim());
+			result.add(toStr(v, STRING_EMPTY).trim());
         }
 		return result;
 //		return  Sets.newLinkedHashSet(Splitter.on(separator).trimResults().splitToList(toStr(o, "")));
@@ -953,19 +956,19 @@ public class JsonHelper extends DateUtil {
 	public static Map<String, Object> getParametersStartingWith(Object jsonStringOrMap, String prefix) {
 		Map<String, Object> params = new TreeMap<String, Object>();
 		if (prefix == null) {
-			prefix = "";
+			prefix = STRING_EMPTY;
 		}
 		if(jsonStringOrMap instanceof String) {
 			LinkedHashMap<String, Object> orignMap = fromJsonAsLinkedHashMap((String) jsonStringOrMap);
 			for (Map.Entry<String,Object> param : orignMap.entrySet()) {
-				if ("".equals(prefix) || param.getKey().startsWith(prefix)) {
+				if (STRING_EMPTY.equals(prefix) || param.getKey().startsWith(prefix)) {
 					String unprefixed = param.getKey().substring(prefix.length());
 					params.put(unprefixed, param.getValue());
 				}
 			}
 		} else if(jsonStringOrMap instanceof Map) {
 			for (Map.Entry<String,Object> param : ((Map<String, Object>)jsonStringOrMap).entrySet()) {
-				if ("".equals(prefix) || param.getKey().startsWith(prefix)) {
+				if (STRING_EMPTY.equals(prefix) || param.getKey().startsWith(prefix)) {
 					String unprefixed = param.getKey().substring(prefix.length());
 					params.put(unprefixed, param.getValue());
 				}
@@ -1004,7 +1007,7 @@ public class JsonHelper extends DateUtil {
 				//
 				if( null!= parameterMap && parameterMap.size() > 0) {
 					for ( Map.Entry<String, String[]> param: parameterMap.entrySet() ) {
-						if ("".equals(prefix) || param.getKey().startsWith(prefix)) {
+						if (STRING_EMPTY.equals(prefix) || param.getKey().startsWith(prefix)) {
 							String unprefixed = param.getKey().substring(prefix.length());
 							String[] values = param.getValue();
 							if (values == null || values.length == 0) {
@@ -1032,11 +1035,11 @@ public class JsonHelper extends DateUtil {
 	 */
 	public static String encodeParameterStringWithPrefix(Map<String, Object> params, String prefix) {
 		if (isEmpty(params)) {
-			return "";
+			return STRING_EMPTY;
 		}
 
 		if (prefix == null) {
-			prefix = "";
+			prefix = STRING_EMPTY;
 		}
 
 		StringBuilder queryStringBuilder = new StringBuilder();

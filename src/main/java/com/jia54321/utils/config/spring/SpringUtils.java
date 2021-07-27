@@ -1,6 +1,11 @@
 package com.jia54321.utils.config.spring;
 
+import com.jia54321.utils.ClassUtils;
+import com.jia54321.utils.EnvHelper;
 import com.jia54321.utils.JsonHelper;
+import com.jia54321.utils.clock.SystemTimer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -10,13 +15,18 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
  * spring工具类 方便在非spring管理环境中获取bean
  */
 public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware
 {
+    static final Logger log = LoggerFactory.getLogger(SpringUtils.class);
+
     /** Spring应用上下文环境 */
-    private static ConfigurableListableBeanFactory beanFactory;
+    private static   ConfigurableListableBeanFactory beanFactory;
 
     private static ApplicationContext applicationContext;
 
@@ -139,5 +149,53 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     {
         final String[] activeProfiles = getActiveProfiles();
         return JsonHelper.isNotEmpty(activeProfiles) ? activeProfiles[0] : null;
+    }
+
+    /**
+     * callBean 神奇方法
+     * @param callFuncPrefix
+     * @param callFuncKey
+     * @param parameters
+     * @return 结果
+     */
+    public static Object callBean(final String callFuncPrefix, final String callFuncKey, final Map<String, Object> parameters) {
+        String callString = null;
+        String funcName = null;
+        String methodName = null;
+        String callFullName = null;
+        Object result = null;
+        try {
+            // now
+            final long now = SystemTimer.currTime;
+            // callString = parameters.get(callFuncKey)
+            callString = JsonHelper.toStr(parameters.get(callFuncKey), "");
+            final String[] funcNameAndMethodName = ClassUtils.getServiceNameAndMethodName(callString);
+            funcName = funcNameAndMethodName[0];
+            methodName = funcNameAndMethodName[1];
+
+            String fullFuncName = funcName;
+            if(null != callFuncPrefix && !"".equals(callFuncPrefix)){
+                fullFuncName = callFuncPrefix + '.' + funcName;
+            }
+
+            String parametersAsStr = parameters.keySet().stream().filter( key -> !key.equals(callFuncKey))
+                    .map(key -> key + "=" + JsonHelper.toJson(parameters.get(key))).collect(Collectors.joining(", ", "(", ")"));
+            callFullName = fullFuncName + '.' + methodName + parametersAsStr;
+
+            final Class<?> serviceClass = ClassUtils.resolveClassName(fullFuncName,null);
+            final Object target = getBean(serviceClass);
+            //
+            result = ClassUtils.invokeMethodWithParameters(target, methodName, parameters);
+
+            //
+            long cost = SystemTimer.currTime - now;
+            if( cost > 1 * 1000) {
+                log.warn(String.format("调用 %s 耗费 %.4fs, %s", callString, cost/1000d, callFullName));
+            }
+        } catch (Throwable e) {
+//            log.error(String.format("调用 %s 失败, %s", callString, callFullName), e);
+            throw new IllegalArgumentException(String.format("%s 有误，请检查", callString), e.getCause());
+        }
+        return result;
     }
 }
