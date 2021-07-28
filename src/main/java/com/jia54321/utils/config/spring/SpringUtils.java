@@ -1,7 +1,6 @@
 package com.jia54321.utils.config.spring;
 
 import com.jia54321.utils.ClassUtils;
-import com.jia54321.utils.EnvHelper;
 import com.jia54321.utils.JsonHelper;
 import com.jia54321.utils.clock.SystemTimer;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -169,20 +167,22 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
             final long now = SystemTimer.currTime;
             // callString = parameters.get(callFuncKey)
             callString = JsonHelper.toStr(parameters.get(callFuncKey), "");
-            final String[] funcNameAndMethodName = ClassUtils.getServiceNameAndMethodName(callString);
+
+            String fullFuncName = callString;
+            if(null != callFuncPrefix && !"".equals(callFuncPrefix)){
+                fullFuncName = callFuncPrefix + '.' + callString;
+            }
+
+            final String[] funcNameAndMethodName = ClassUtils.getServiceNameAndMethodName(fullFuncName);
             funcName = funcNameAndMethodName[0];
             methodName = funcNameAndMethodName[1];
 
-            String fullFuncName = funcName;
-            if(null != callFuncPrefix && !"".equals(callFuncPrefix)){
-                fullFuncName = callFuncPrefix + '.' + funcName;
-            }
 
             String parametersAsStr = parameters.keySet().stream().filter( key -> !key.equals(callFuncKey))
                     .map(key -> key + "=" + JsonHelper.toJson(parameters.get(key))).collect(Collectors.joining(", ", "(", ")"));
-            callFullName = fullFuncName + '.' + methodName + parametersAsStr;
+            callFullName = funcName + '.' + methodName + parametersAsStr;
 
-            final Class<?> serviceClass = ClassUtils.resolveClassName(fullFuncName,null);
+            final Class<?> serviceClass = ClassUtils.resolveClassName(funcName,null);
             final Object target = getBean(serviceClass);
             //
             result = ClassUtils.invokeMethodWithParameters(target, methodName, parameters);
