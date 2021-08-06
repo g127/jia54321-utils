@@ -184,6 +184,9 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
 
             final Class<?> serviceClass = ClassUtils.resolveClassName(funcName,null);
             final Object target = getBean(serviceClass);
+            if(target == null) {
+                throw new IllegalArgumentException(String.format("未找到 %s", funcName));
+            }
             //
             result = ClassUtils.invokeMethodWithParameters(target, methodName, parameters);
 
@@ -194,7 +197,8 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
             }
         } catch (Throwable e) {
 //            log.error(String.format("调用 %s 失败, %s", callString, callFullName), e);
-            throw new IllegalArgumentException(String.format("%s 有误，请检查", callString), e.getCause());
+            Throwable ee = e.getCause() != null ? e.getCause() : e;
+            throw new IllegalArgumentException(String.format("%s 有误, 请稍后再试. cause by: %s", callString, ee.getMessage()), ee);
         }
         return result;
     }

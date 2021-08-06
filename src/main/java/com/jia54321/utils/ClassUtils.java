@@ -424,7 +424,8 @@ public class ClassUtils {
 
 		Object       returnObj  = null;
 		Method       method     = getMethodIfAvailable(target, methodName);
-		Assert.notNull(method, "it must not be null");
+		Assert.notNull(target, "target not found !");
+		Assert.notNull(method, String.format("%s not found in %s !", methodName, target.getClass().getSimpleName()));
 		//
 		String[] paraNames = null;
 		try {
