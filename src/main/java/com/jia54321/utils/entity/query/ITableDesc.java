@@ -1,5 +1,6 @@
 package com.jia54321.utils.entity.query;
 
+import com.jia54321.utils.CamelNameUtil;
 import com.jia54321.utils.JsonHelper;
 
 import java.io.Serializable;
@@ -162,7 +163,7 @@ public class ITableDesc implements Serializable {
 
 			if( is( 2, value ) &&  is( 4, value ) ) {
 				// 模块名TypeMk + 类型实体名称TypeEntityName
-				return typeMk + typeEntityName ;
+				return (typeMk + CamelNameUtil.camelToUnderline(typeEntityName)).toLowerCase();
 			}
 			if( !is( 2, value ) &&  is( 4, value ) ) {
 				// 模块名TypeMk + 唯一类型IDTypeId
@@ -170,7 +171,7 @@ public class ITableDesc implements Serializable {
 			}
 
 			// 默认
-			return typeMk + typeEntityName ;
+			return (typeMk + CamelNameUtil.camelToUnderline(typeEntityName)).toLowerCase();
 		}
 		// 默认
 		return null;

@@ -1,8 +1,8 @@
 /**
  * MIT License
- * 
+ *
  * Copyright (c) 2009-present GuoGang and other contributors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -38,17 +38,18 @@ import com.alibaba.fastjson.util.FieldInfo;
 import com.alibaba.fastjson.util.JavaBeanInfo;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.google.common.collect.Maps;
+import com.jia54321.utils.JsonCastUtil;
 import com.jia54321.utils.JsonHelper;
 
 /**
  * 比较慢
  * @author 郭罡
  */
-@SuppressWarnings("unchecked") 
+@SuppressWarnings("unchecked")
 public class EntityJsonAttrs implements JSONSerializable, ExtraProcessable {
    /** */
 	private Map<String, Object> attrs = Maps.newLinkedHashMap();
-	
+
 	public Map<String, Object> attrs(Map<String, Object>... attrsArrays) {
     	if (null != attrsArrays && attrsArrays.length >= 1) {
 			this.attrs.putAll(attrsArrays[0]);
@@ -75,7 +76,7 @@ public class EntityJsonAttrs implements JSONSerializable, ExtraProcessable {
 		for (FieldInfo field : setFieldInfos) {
 			if(field.name.equals(key)){
 				try {
-					field.method.invoke(this, TypeUtils.cast(value, field.fieldClass, JsonHelper.PARSER_CONFIG));
+					field.method.invoke(this, TypeUtils.cast(value, field.fieldClass, JsonCastUtil.PARSER_CONFIG));
 					isJavaBeanPropWrote = true;
 					break;
 				} catch (IllegalAccessException e) {
@@ -106,9 +107,9 @@ public class EntityJsonAttrs implements JSONSerializable, ExtraProcessable {
 			}
 
 		}
-		
+
 		Map<String, Object> newAttrs = Maps.newLinkedHashMap(attrs);
-		
+
 		for (FieldInfo field : getFieldInfos) {
 			try {
 				Object val = field.method.invoke(this);

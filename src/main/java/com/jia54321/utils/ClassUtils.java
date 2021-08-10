@@ -470,15 +470,15 @@ public class ClassUtils {
 					else if( null != vals[i]  && ! vals[i].getClass().equals(parameterTypes[i].getClass()) ) {
 						Class<?> propType = parameterTypes[i];
 						Object val = vals[i];
-						Object newVal = val;
+						Object newVal = null;
 						// 待设置的值为字符串。两个字段类型不一致
-						if(vals[i] instanceof String ) {
+						if(val instanceof String ) {
 							if(isTimePropType(propType)) {
 								newVal = createTimePropTypeByVal(propType, String.valueOf(val));
 							} else if(isNumbericPropType(propType)){
 								newVal = createNumbericPropTypeByVal(propType,  String.valueOf(val));
 							} else if(Object.class.isAssignableFrom(propType)) {
-								newVal = val;
+								newVal = JsonCastUtil.cast((String) val, propType);
 							}
 							newVals[i] = newVal;
 						}

@@ -17,10 +17,22 @@ public class SqlContext {
     private List<?>  params;
 
 	/** 总数量sql,类似 select count(*) from xxx */
-	private StringBuilder totalElementsSql;
+	private StringBuilder countSql;
 
-	/** sqlExceptSelect */
+	/** sqlExceptSelect 例如： FROM ims_renren_shop_member_session WHERE     session_id = ?   ORDER BY create_time DESC */
 	private StringBuilder sqlExceptSelect;
+
+	/** sqlTableName 表名，例如： ims_renren_shop_member_session  */
+	private String tableName;
+
+	/** sqlWhereConditions 查询条件，例如： session_id = ? and ... */
+	private String sqlWhereConditions;
+
+	/** sqlGroupConditions 查询条件，例如： session_id, ...  */
+	private String sqlGroupConditions;
+
+	/** sqlOrderConditions 排序条件，例如： create_time DESC, ...  */
+	private String sqlOrderConditions;
 
     public SqlContext(StringBuilder sql, String primaryKey, List<Object> params) {
         this.sql = sql;
@@ -52,12 +64,12 @@ public class SqlContext {
 		this.params = params;
 	}
 
-	public StringBuilder getTotalElementsSql() {
-		return totalElementsSql;
+	public StringBuilder getCountSql() {
+		return countSql;
 	}
 
-	public void setTotalElementsSql(StringBuilder totalElementsSql) {
-		this.totalElementsSql = totalElementsSql;
+	public void setCountSql(StringBuilder countSql) {
+		this.countSql = countSql;
 	}
 
 	public StringBuilder getSqlExceptSelect() {
@@ -68,13 +80,50 @@ public class SqlContext {
 		this.sqlExceptSelect = sqlExceptSelect;
 	}
 
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+
+	public String getSqlWhereConditions() {
+		return sqlWhereConditions;
+	}
+
+	public void setSqlWhereConditions(String sqlWhereConditions) {
+		this.sqlWhereConditions = sqlWhereConditions;
+	}
+
+	public String getSqlGroupConditions() {
+		return sqlGroupConditions;
+	}
+
+	public void setSqlGroupConditions(String sqlGroupConditions) {
+		this.sqlGroupConditions = sqlGroupConditions;
+	}
+
+	public String getSqlOrderConditions() {
+		return sqlOrderConditions;
+	}
+
+	public void setSqlOrderConditions(String sqlOrderConditions) {
+		this.sqlOrderConditions = sqlOrderConditions;
+	}
+
 	@Override
 	public String toString() {
 		return new StringJoiner(", ", SqlContext.class.getSimpleName() + "[", "]")
 				.add("sql=" + sql)
 				.add("primaryKey='" + primaryKey + "'")
 				.add("params=" + params)
-				.add("totalElementsSql=" + totalElementsSql)
+				.add("countSql=" + countSql)
+				.add("sqlExceptSelect=" + sqlExceptSelect)
+				.add("tableName='" + tableName + "'")
+				.add("sqlWhereConditions='" + sqlWhereConditions + "'")
+				.add("sqlGroupConditions='" + sqlGroupConditions + "'")
+				.add("sqlOrderConditions='" + sqlOrderConditions + "'")
 				.toString();
 	}
 }

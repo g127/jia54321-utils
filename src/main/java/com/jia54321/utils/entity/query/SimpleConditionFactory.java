@@ -154,9 +154,15 @@ public class SimpleConditionFactory {
 	 */
 	public static SimpleCondition createByAndWithOr(Map<String, Object> and, Map<String, Object> or, Map<String, Object> sort, int pageNo, int pageSize) {
 		SimpleCondition sc = new SimpleCondition();
-		sc.setAnd(Lists.newArrayList(and));
-		sc.setOr(Lists.newArrayList(or));
-		sc.setSorts(Lists.newArrayList(sort));
+		if(and != null && and.size() > 0) {
+			sc.setAnd(Lists.newArrayList(and));
+		}
+		if(or != null && or.size() > 0) {
+			sc.setOr(Lists.newArrayList(or));
+		}
+		if(sort != null && sort.size() > 0) {
+			sc.setSorts(Lists.newArrayList(sort));
+		}
 		sc.setPage(new Page(pageNo, pageSize));
 		return sc;
 	}

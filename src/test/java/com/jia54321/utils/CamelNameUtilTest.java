@@ -10,12 +10,18 @@ public class CamelNameUtilTest {
     @Test
     public void camelToUnderline() {
         String[][] tests = new String[][]{
+                // expected       input
                 { "create_time", "createTime" },
+                { "create_time", "CreateTime" },
+                { "create_time", "Create_Time" },
+                { "create_time", "CREATE_TIME" },
+                { "create_time", "CREATE_TIME" },
+                { "create_time", "CrEaTe_TiMe" },
                 { "", "" },
         };
 
         for (int i = 0; i < tests.length; i++) {
-            Assert.assertEquals(tests[i][0], CamelNameUtil.camelToUnderline(tests[i][1]));
+            Assert.assertEquals("" + i, tests[i][0], CamelNameUtil.camelToUnderline(tests[i][1]));
         }
 
     }

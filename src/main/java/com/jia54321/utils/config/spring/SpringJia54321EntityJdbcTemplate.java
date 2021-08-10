@@ -311,7 +311,7 @@ public class SpringJia54321EntityJdbcTemplate extends JdbcTemplate implements IE
 
     @Override
     public Long count(final String typeId, final SqlContext sqlContext) {
-        String sqlTotal = sqlContext.getTotalElementsSql().toString();
+        String sqlTotal = sqlContext.getCountSql().toString();
         Long totalElements = queryForObject(sqlTotal, sqlContext.getParams().toArray(), Long.class);
         return totalElements;
     }

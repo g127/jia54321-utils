@@ -81,16 +81,28 @@ public class CamelNameUtil {
         if (param == null || "".equals(param.trim())) {
             return "";
         }
+        // 存在 xx符号，不做处理，仅处理大小写转换
+        boolean existXX = param.indexOf(xx) > 0;
         int           len = param.length();
         StringBuilder sb  = new StringBuilder(len);
         for (int i = 0; i < len; i++) {
             char c = param.charAt(i);
-            // 首字母大写转小写
-            if (i == 0 && Character.isUpperCase(param.charAt(0))) {
+            char before = i > 0 ? param.charAt(i - 1) : xx;
+            // 大写转小写： 首字母 或者  字符前一个为"分隔符号"
+            if (  i == 0 || before == xx ) {
                 c = Character.toLowerCase(c);
             }
-            if (Character.isUpperCase(c)) {
-                sb.append(xx);
+            // 大写转小写： 连续两个为大写
+            if( i > 0 &&  Character.isUpperCase(before) && Character.isUpperCase(c) ) {
+                c = Character.toLowerCase(c);
+            }
+            // 大写字符时
+            if (Character.isUpperCase(c) ) {
+                // 仅在整个字符串中不含有分隔符时，才进行分隔符添加
+                if(!existXX) {
+                    sb.append(xx);
+                }
+                // 拼接原小写字符串
                 sb.append(Character.toLowerCase(c));
             } else {
                 sb.append(c);

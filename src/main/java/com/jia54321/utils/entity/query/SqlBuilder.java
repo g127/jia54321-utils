@@ -3,6 +3,7 @@ package com.jia54321.utils.entity.query;
 import java.util.*;
 import java.util.Map.Entry;
 
+import com.jia54321.utils.CamelNameUtil;
 import com.jia54321.utils.IdGeneration;
 import com.jia54321.utils.JsonHelper;
 import org.slf4j.Logger;
@@ -15,6 +16,10 @@ import org.slf4j.LoggerFactory;
  */
 public class SqlBuilder {
     static final Logger log = LoggerFactory.getLogger(JsonHelper.class);
+    public static final String WHERE = "WHERE";
+    public static final String GROUP_BY = "GROUP BY";
+    public static final String ORDER_BY = "ORDER BY";
+
     /**
      * 构建insert语句
      *
@@ -133,7 +138,7 @@ public class SqlBuilder {
             params.add(value);
         }
         sql.deleteCharAt(sql.length() - 1);
-        sql.append(" WHERE ").append(primaryName).append(" = ?");
+        sql.append(' ').append(WHERE).append(' ').append(primaryName).append(" = ?");
         params.add(primaryValue);
         if (null == primaryValue) {
             throw new RuntimeException("更新操作需要明确主键。");
@@ -157,7 +162,7 @@ public class SqlBuilder {
         String primaryName = table.getTableDesc().getTypePkName();
 
         sql.append("DELETE FROM ").append(tableName);
-        sql.append(" WHERE 1=1 ");
+        sql.append(' ').append(WHERE).append(' ').append(" 1=1 ");
         for (Iterator<Entry<String, Object>> iterator = table.iteratorColumnProps(); iterator.hasNext(); ) {
             Entry<String, Object> e = iterator.next();
             String columnName = e.getKey();
@@ -206,7 +211,7 @@ public class SqlBuilder {
             }
         }
         sql.append("SELECT * FROM ").append(tableName);
-        sql.append(" WHERE ").append(primaryName).append(" = ?");
+        sql.append(' ').append(WHERE).append(' ').append(primaryName).append(" = ?");
         params.add(primaryValue);
 
         return new SqlContext(sql, primaryName, params);
@@ -267,16 +272,8 @@ public class SqlBuilder {
         String primaryName = table.getTableDesc().getTypePkName();
 
         sql.append("SELECT * FROM ").append(tableName);
-
-		if (whereSql.length() > 0 && whereSql.trim().length() > 0) {
-			// 只有ORDER，直接拼接
-			if (whereSql.trim().indexOf("ORDER") == 0) {
-				sql.append(" ").append(whereSql.trim().replaceAll("WHERE", ""));
-			} else {
-				sql.append(" WHERE ").append(whereSql.trim().replaceAll("WHERE", ""));
-			}
-		}
-
+        totalElementsSql.append("SELECT COUNT(*) FROM ").append(tableName);
+        sqlExceptSelect.append("FROM ").append(tableName);
 
         List<Object> filterParams = new ArrayList<Object>();
         for (Object p : params) {
@@ -286,32 +283,45 @@ public class SqlBuilder {
                 filterParams.add(p);
             }
         }
+
+        if ( whereSql == null || whereSql.length() == 0 || whereSql.trim().length() == 0) {
+            SqlContext returnObj = new SqlContext(sql, primaryName, filterParams);
+            returnObj.setTableName(tableName);
+            returnObj.setCountSql(totalElementsSql);
+            returnObj.setSqlExceptSelect(sqlExceptSelect);
+            return returnObj;
+        }
+        whereSql = whereSql.trim();
+
+        // [where ,group, order]
+        int idxGroup = whereSql.indexOf(GROUP_BY);
+        int idxOrder = whereSql.indexOf(ORDER_BY);
+        //
+        String wSql = whereSql;
+        // order
+        final String order = wSql.substring( idxOrder >= 0 ? idxOrder: wSql.length() , wSql.length() );
+        wSql = wSql.replaceAll(order, "");
+        // group
+        final String group = wSql.substring( idxGroup >= 0 ? idxGroup: wSql.length() , wSql.length() );
+        wSql = wSql.replaceAll(group, "");
+        // where
+        final String where = wSql;
+
+        //
+        sql.append(' ').append(where).append(group).append(order);
+        //
+        totalElementsSql.append(' ').append(where).append(group).append(order);
+        //
+        sqlExceptSelect.append(' ').append(where).append(group).append(order);
+
+
         SqlContext returnObj = new SqlContext(sql, primaryName, filterParams);
-
-        sqlExceptSelect.append("FROM ").append(tableName);
-        if (whereSql.length() > 0 && whereSql.trim().length() > 0) {
-            // 只有ORDER，直接拼接
-            if (whereSql.trim().indexOf("ORDER") == 0) {
-                sqlExceptSelect.append(" ").append(whereSql.trim().replaceAll("WHERE", ""));
-            } else {
-                sqlExceptSelect.append(" WHERE ").append(whereSql.trim().replaceAll("WHERE", ""));
-            }
-        }
+        returnObj.setTableName(tableName);
+        returnObj.setSqlWhereConditions(where.replaceAll(WHERE, " "));
+        returnObj.setSqlGroupConditions(where.replaceAll(GROUP_BY, " "));
+        returnObj.setSqlOrderConditions(where.replaceAll(ORDER_BY, " "));
+        returnObj.setCountSql(totalElementsSql);
         returnObj.setSqlExceptSelect(sqlExceptSelect);
-
-        if (isNeedTotalElements) {
-            totalElementsSql.append("SELECT COUNT(*) FROM ").append(tableName);
-            if (whereSql.length() > 0 && whereSql.trim().length() > 0 ) {
-    			// 只有ORDER，直接拼接
-    			if (whereSql.trim().indexOf("ORDER") == 0) {
-    				totalElementsSql.append(" ").append(whereSql.trim().replaceAll("WHERE", ""));
-    			} else {
-    				totalElementsSql.append(" WHERE ").append(whereSql.replaceAll("WHERE", ""));
-    			}
-
-            }
-            returnObj.setTotalElementsSql(totalElementsSql);
-        }
 
         return returnObj;
     }
@@ -354,7 +364,7 @@ public class SqlBuilder {
         for (int i = 0; i < otherOperations.size(); i++) {
             condition = otherOperations.get(i);
 
-            String strAttribute = condition.getAttribute();
+            String strAttribute = CamelNameUtil.camelToUnderline(condition.getAttribute()); // 属性名转下划线
             String strOperator = condition.getOperator();
             Object objValue = condition.getValue();
 
@@ -362,7 +372,7 @@ public class SqlBuilder {
                 if (isAddOrderBy) {
                     order.append(",");
                 } else {
-                    order.append(" ORDER BY ");
+                    order.append(' ').append(ORDER_BY).append(' ');
                     isAddOrderBy = true;
                 }
                 order.append(strAttribute);
@@ -376,7 +386,7 @@ public class SqlBuilder {
                 if (isAddGroupBy) {
                     group.append(",");
                 } else {
-                    group.append(" GROUP BY ");
+                    group.append(' ').append(GROUP_BY).append(' ');
                     isAddGroupBy = true;
                 }
                 group.append(strAttribute);
@@ -391,9 +401,16 @@ public class SqlBuilder {
             buildOperationBean(conds, params, condition);
         }
 
-        return buildQuerySQL(table, where.append(" WHERE ").append(conds).append(group).append(order).toString(), params, isNeedTotalElements);
+        if(conds.length() > 0 ) {
+            conds = new StringBuilder(conds.toString().trim()).insert(0, ' ' + WHERE + ' ');
+        }
+
+        return buildQuerySQL(table, where.append(conds).append(group).append(order).toString(), params, isNeedTotalElements);
     }
 
+    /*
+     * 构造单个操作符
+     */
     private void buildOperationBean(StringBuilder conds, List<Object> params, OperationBean condition) {
         String strLogicalOperator = condition.getLogicalOperator();
 //        if (i == 0) {
@@ -402,7 +419,7 @@ public class SqlBuilder {
 //        }
         String strLeftBracket = condition.getLeftBracket();
         String strRightBracket = condition.getRightBracket();
-        String strAttribute = condition.getAttribute();
+        String strAttribute = CamelNameUtil.camelToUnderline(condition.getAttribute()); // 属性名转下划线
         String strOperator = condition.getOperator();
         Object objValue = condition.getValue();
 
@@ -410,6 +427,7 @@ public class SqlBuilder {
             strLogicalOperator = " " + strLogicalOperator + " ";
         }
 
+        // 如果value为列表
         if(condition.getValue() instanceof List) {
             conds.append(strLogicalOperator);
 
@@ -422,7 +440,10 @@ public class SqlBuilder {
                 buildOperationBean(conds, params, subOperations.get(j));
             }
             conds.append(Operator.RIGHT_BRACKET.toString());
-        } else if (Operator.IN.toString().equalsIgnoreCase(strOperator) || Operator.NOTIN.toString().equalsIgnoreCase(strOperator)) {
+
+        }
+        // 如果操作符为 IN， NOTIN
+        else if (Operator.IN.toString().equalsIgnoreCase(strOperator) || Operator.NOTIN.toString().equalsIgnoreCase(strOperator)) {
             conds.append(strLogicalOperator);
             conds.append(strLeftBracket);
             conds.append(" ");
@@ -451,7 +472,9 @@ public class SqlBuilder {
             conds.deleteCharAt(conds.length()-1);
             conds.append(')');
             conds.append(strRightBracket);
-        } else if ("INSTR".equalsIgnoreCase(strOperator)) {
+        }
+        // 如果操作符为 INSTR
+        else if ("INSTR".equalsIgnoreCase(strOperator)) {
             conds.append(strLogicalOperator);
             conds.append(strLeftBracket);
             conds.append(" ");
@@ -462,7 +485,9 @@ public class SqlBuilder {
             conds.append("%'");
             conds.append(" ");
             conds.append(strRightBracket);
-        } else if ("ISNULL".equalsIgnoreCase(strOperator)) {
+        }
+        // 如果操作符为 ISNULL
+        else if ("ISNULL".equalsIgnoreCase(strOperator)) {
             conds.append(strLogicalOperator);
             conds.append(strLeftBracket);
             conds.append(" ");
@@ -471,7 +496,9 @@ public class SqlBuilder {
             conds.append(" NULL ");
             conds.append(" ");
             conds.append(strRightBracket);
-        } else if ("EMPTY".equalsIgnoreCase(strOperator)) {
+        }
+        // 如果操作符为 EMPTY
+        else if ("EMPTY".equalsIgnoreCase(strOperator)) {
             conds.append(strLogicalOperator);
             conds.append(strLeftBracket);
             conds.append(" (");

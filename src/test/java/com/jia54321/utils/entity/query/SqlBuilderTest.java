@@ -80,9 +80,24 @@ public class SqlBuilderTest {
         CrudTableDesc table = new CrudTableDesc();
         table.setTableDesc(tableDesc);
 
-        SqlContext test =  sqlBuilder.buildQuerySQL(table, "", new ArrayList<>(0), true);
-
+        SqlContext test =  sqlBuilder.buildQuerySQL(table, " WHERE     session_id = ?   ", new ArrayList<>(0), true);
         System.out.println(test);
+
+        test =  sqlBuilder.buildQuerySQL(table, " ORDER BY  create_time desc ", new ArrayList<>(0), true);
+        System.out.println(test);
+
+        test =  sqlBuilder.buildQuerySQL(table, " GROUP BY  create_time  ", new ArrayList<>(0), true);
+        System.out.println(test);
+
+        test =  sqlBuilder.buildQuerySQL(table, "WHERE  session_id = ?  ORDER BY  create_time desc ", new ArrayList<>(0), true);
+        System.out.println(test);
+
+        test =  sqlBuilder.buildQuerySQL(table, "GROUP BY  create_time  ORDER BY  create_time desc ", new ArrayList<>(0), true);
+        System.out.println(test);
+
+        test =  sqlBuilder.buildQuerySQL(table, "WHERE     session_id = ?  GROUP BY  create_time  ORDER BY  create_time desc ", new ArrayList<>(0), true);
+        System.out.println(test);
+
 
         CrudTableDesc table2 = new CrudTableDesc();
         table2.setTableDesc(CrudTableDesc.SYS_ENTITY_TYPE);
