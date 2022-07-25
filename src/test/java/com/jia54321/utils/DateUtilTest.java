@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -15,10 +16,13 @@ import java.util.TimeZone;
 
 import static org.junit.Assert.*;
 
+/**
+ * 日志功能测试用例
+ */
 public class DateUtilTest {
-//    static final Logger log = LoggerFactory.getLogger(DateUtilTest.class);
+    static final Logger log = LoggerFactory.getLogger(DateUtilTest.class);
 
-    List<TestTime> testTimeList = new ArrayList<>();
+    private List<TestTime> testTimeList = new ArrayList<>();
 
     class TestTime {
         String inputTime;
@@ -258,48 +262,48 @@ public class DateUtilTest {
         //
         testTimeList.add(new TestTime()
                 //
-                .setInputTime("2018-08-12 08:01:12")
+                .setInputTime("2021-08-12 08:01:12")
                 //
-                .setExpectedBeginDay("2018-08-12 00:00:00.0")
-                .setExpectedBeginWeek("2018-08-06 00:00:00.0")
-                .setExpectedBeginMonth("2018-08-01 00:00:00.0")
-                .setExpectedBeginQuarter("2018-07-01 00:00:00.0")
-                .setExpectedBeginQ1("2018-01-01 00:00:00.0")
-                .setExpectedBeginQ2("2018-04-01 00:00:00.0")
-                .setExpectedBeginQ3("2018-07-01 00:00:00.0")
-                .setExpectedBeginQ4("2018-10-01 00:00:00.0")
-                .setExpectedBeginHalfYear("2018-07-01 00:00:00.0")
-                .setExpectedBeginH1("2018-01-01 00:00:00.0")
-                .setExpectedBeginH2("2018-07-01 00:00:00.0")
-                .setExpectedBeginYear("2018-01-01 00:00:00.0")
+                .setExpectedBeginDay("2021-08-12 00:00:00.0")
+                .setExpectedBeginWeek("2021-08-09 00:00:00.0")
+                .setExpectedBeginMonth("2021-08-01 00:00:00.0")
+                .setExpectedBeginQuarter("2021-07-01 00:00:00.0")
+                .setExpectedBeginQ1("2021-01-01 00:00:00.0")
+                .setExpectedBeginQ2("2021-04-01 00:00:00.0")
+                .setExpectedBeginQ3("2021-07-01 00:00:00.0")
+                .setExpectedBeginQ4("2021-10-01 00:00:00.0")
+                .setExpectedBeginHalfYear("2021-07-01 00:00:00.0")
+                .setExpectedBeginH1("2021-01-01 00:00:00.0")
+                .setExpectedBeginH2("2021-07-01 00:00:00.0")
+                .setExpectedBeginYear("2021-01-01 00:00:00.0")
                 //
-                .setExpectedBeginYesterday("2018-08-11 00:00:00.0")
-                .setExpectedBeginLastWeek("2018-07-30 00:00:00.0")
-                .setExpectedBeginLastMonth("2018-07-01 00:00:00.0")
-                .setExpectedBeginLastQuarter("2018-04-01 00:00:00.0")
-                .setExpectedBeginLastHalfYear("2018-01-01 00:00:00.0")
-                .setExpectedBeginLastYear("2017-01-01 00:00:00.0")
+                .setExpectedBeginYesterday("2021-08-11 00:00:00.0")
+                .setExpectedBeginLastWeek("2021-08-02 00:00:00.0")
+                .setExpectedBeginLastMonth("2021-07-01 00:00:00.0")
+                .setExpectedBeginLastQuarter("2021-04-01 00:00:00.0")
+                .setExpectedBeginLastHalfYear("2021-01-01 00:00:00.0")
+                .setExpectedBeginLastYear("2020-01-01 00:00:00.0")
                 //
                 //
-                .setExpectedEndDay("2018-08-13 00:00:00.0")
-                .setExpectedEndWeek("2018-08-13 00:00:00.0")
-                .setExpectedEndMonth("2018-09-01 00:00:00.0")
-                .setExpectedEndQuarter("2018-10-01 00:00:00.0")
-                .setExpectedEndQ1("2018-04-01 00:00:00.0")
-                .setExpectedEndQ2("2018-07-01 00:00:00.0")
-                .setExpectedEndQ3("2018-10-01 00:00:00.0")
-                .setExpectedEndQ4("2019-01-01 00:00:00.0")
-                .setExpectedEndHalfYear("2019-01-01 00:00:00.0")
-                .setExpectedEndH1("2018-07-01 00:00:00.0")
-                .setExpectedEndH2("2019-01-01 00:00:00.0")
-                .setExpectedEndYear("2019-01-01 00:00:00.0")
+                .setExpectedEndDay("2021-08-13 00:00:00.0")
+                .setExpectedEndWeek("2021-08-16 00:00:00.0")
+                .setExpectedEndMonth("2021-09-01 00:00:00.0")
+                .setExpectedEndQuarter("2021-10-01 00:00:00.0")
+                .setExpectedEndQ1("2021-04-01 00:00:00.0")
+                .setExpectedEndQ2("2021-07-01 00:00:00.0")
+                .setExpectedEndQ3("2021-10-01 00:00:00.0")
+                .setExpectedEndQ4("2022-01-01 00:00:00.0")
+                .setExpectedEndHalfYear("2022-01-01 00:00:00.0")
+                .setExpectedEndH1("2021-07-01 00:00:00.0")
+                .setExpectedEndH2("2022-01-01 00:00:00.0")
+                .setExpectedEndYear("2022-01-01 00:00:00.0")
                 //
-                .setExpectedEndYesterday("2018-08-12 00:00:00.0")
-                .setExpectedEndLastWeek("2018-08-06 00:00:00.0")
-                .setExpectedEndLastMonth("2018-08-01 00:00:00.0")
-                .setExpectedEndLastQuarter("2018-07-01 00:00:00.0")
-                .setExpectedEndLastHalfYear("2018-07-01 00:00:00.0")
-                .setExpectedEndLastYear("2018-01-01 00:00:00.0")
+                .setExpectedEndYesterday("2021-08-12 00:00:00.0")
+                .setExpectedEndLastWeek("2021-08-09 00:00:00.0")
+                .setExpectedEndLastMonth("2021-08-01 00:00:00.0")
+                .setExpectedEndLastQuarter("2021-07-01 00:00:00.0")
+                .setExpectedEndLastHalfYear("2021-07-01 00:00:00.0")
+                .setExpectedEndLastYear("2021-01-01 00:00:00.0")
         );
 
         testTimeList.add(new TestTime()
@@ -447,13 +451,13 @@ public class DateUtilTest {
         // ===================================================================================================================
 
         // 0 点
-        assertEquals("2018-08-02 00:00:00.0", DateUtil.Expressing.toNight("day","2018-08").toString());
+        assertEquals("2021-08-02 00:00:00.0", DateUtil.Expressing.toNight("day","2021-08").toString());
         // 周一
-        assertEquals("2018-08-06 00:00:00.0", DateUtil.Expressing.toNight("week","2018-08").toString());
+        assertEquals("2021-08-02 00:00:00.0", DateUtil.Expressing.toNight("week","2021-08").toString());
         // 1号
-        assertEquals("2018-09-01 00:00:00.0", DateUtil.Expressing.toNight("month","2018-08").toString());
+        assertEquals("2021-09-01 00:00:00.0", DateUtil.Expressing.toNight("month","2021-08").toString());
         // 1号
-        assertEquals("2019-01-01 00:00:00.0", DateUtil.Expressing.toNight("year","2018-08").toString());
+        assertEquals("2022-01-01 00:00:00.0", DateUtil.Expressing.toNight("year","2021-08").toString());
         // ===================================================================================================================
 
         // 未传入时间时，避免空指针
@@ -467,50 +471,54 @@ public class DateUtilTest {
     @Test
     public void toTimeMillis() {
         // 23
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("2019-01-01 00:00:00.000"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("2022-01-01 00:00:00.000"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
         // 22
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("2019-01-01 00:00:00.00"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("2022-01-01 00:00:00.00"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
         // 21
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("2019-01-01 00:00:00.0"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("2022-01-01 00:00:00.0"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
         // 19
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("2019-01-01 00:00:00"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("2022-01-01 00:00:00"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
         // 16
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("2019-01-01 00:00"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("2022-01-01 00:00"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
         // 14
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("20190101000000"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("20220101000000"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
         // 12
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("190101000000"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("220101000000"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
 
         // 10
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("2019-01-01"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("2022-01-01"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
 
         // 8
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("19-01-01"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("22-01-01"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+
+        // 8
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("20220101"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
 
         // 7
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("2019-01"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("2022-01"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
 
         // 6
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("201901"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("202201"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
 
         // 5
         assertEquals("1970-01-01 00:00:00.000",
                 DateUtil.toTimeString(DateUtil.toTimeMillis("00:00"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
 
         // 4
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis("2019"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis("2022"), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
 
 
         // 东8区时间
@@ -521,8 +529,15 @@ public class DateUtilTest {
         }
 
         // TimestampDateUtil
-        assertEquals("2019-01-01 00:00:00.000",
-                DateUtil.toTimeString(DateUtil.toTimeMillis(Timestamp.valueOf("2019-01-01 00:00:00.000")), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+        assertEquals("2022-01-01 00:00:00.000",
+                DateUtil.toTimeString(DateUtil.toTimeMillis(Timestamp.valueOf("2022-01-01 00:00:00.000")), DateUtil.Formatter.PATTERN_YYYY_MM_DD_HH_MM_SS_SSS));
+
+
+        // LocalDate
+        LocalDate date = LocalDate.of(2022, 1, 2);
+        String settleDate = DateUtil.toTimeString(date, DateUtil.Formatter.PATTERN_YYYY_MM_DD_PURE);
+
+         log.info("{}", settleDate);
 
     }
 
@@ -543,34 +558,34 @@ public class DateUtilTest {
                 DateUtil.Expressing.toList("week", "week"),
                 DateUtil.Expressing.toList("day", "week"),
 
-                DateUtil.Expressing.toList("year", "year", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("halfYear", "year", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("quarter", "year", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("quarter", "quarter", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("month", "quarter", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("month", "month", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("day", "month", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("day", "day", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("hour", "day", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("week", "year", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("week", "month", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("week", "week", "2019-01-01 00:00:00"),
-                DateUtil.Expressing.toList("day", "week", "2019-01-01 00:00:00"),
+                DateUtil.Expressing.toList("year", "year", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("halfYear", "year", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("quarter", "year", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("quarter", "quarter", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("month", "quarter", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("month", "month", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("day", "month", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("day", "day", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("hour", "day", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("week", "year", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("week", "month", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("week", "week", "2022-01-01 00:00:00"),
+                DateUtil.Expressing.toList("day", "week", "2022-01-01 00:00:00"),
         };
         for (Object test: testArray) {
             List<DateUtil.ExpressingTime> expressingTimeList = (List<DateUtil.ExpressingTime>)test;
             int i = 1;
-            System.out.println("" //
+            log.info("" //
                + expressingTimeList.get(0).stepType + " in " + expressingTimeList.get(0).rangeType
             );
             for (DateUtil.ExpressingTime expressingTime: expressingTimeList ) {
-                System.out.println("" //
+                log.info("" //
                         + i++ + ". "
                         + "range: [ " + DateUtil.toTimeString(expressingTime.beginTime) + ", " + DateUtil.toTimeString(expressingTime.endTime) + " )"
                         + ", statisticId: " + IdGeneration.getStatisticId(expressingTime.stepType, expressingTime.beginTime)
                 );
             }
-            System.out.println();
+            log.info("");
         }
 
     }
@@ -590,16 +605,23 @@ public class DateUtilTest {
 
     @Test
     public void toTimeString() {
-        DateUtil.toTimeString("2021-01");
-        DateUtil.toTimeString("2021-01", null);
-        DateUtil.toTimeString("2021-01", "");
+        assertEquals("2021-01-01 00:00:00", DateUtil.toTimeString("2021"));
+        assertEquals("2021-01-01 00:00:00", DateUtil.toTimeString("2021-01"));
+        assertEquals("2021-01-01 00:00:00", DateUtil.toTimeString("2021-01", null));
+        assertEquals("2021-01-01 00:00:00", DateUtil.toTimeString("2021-01", ""));
+        assertEquals("2021-01-01 00:00:00", DateUtil.toTimeString("20210101", ""));
+        assertEquals("2021-01", DateUtil.toTimeString("2021-01", "yyyy-MM"));
+
+
+        assertEquals("2021-01-01", DateUtil.toDateString("2021-01"));
     }
 
     @Test
     public void toNow() {
         DateUtil.toNow();
         DateUtil.toNow(null);
-        DateUtil.toNow("");
+        DateUtil.toNow("HH");
+        log.info(String.valueOf(JsonHelper.toInt(DateUtil.toNow("HH"), 0)));
     }
 
     @Test

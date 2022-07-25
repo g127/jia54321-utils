@@ -28,11 +28,10 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.util.*;
 
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @create 2019-07-31
  */
 public class DateUtil {
-	static final Logger log = LoggerFactory.getLogger(DateUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(DateUtil.class);
     /**
      * <p>将  java.util.Date java.sql.Date , java.sql.Timestamp , Number(毫秒)，或 String 格式的时间  转换为 字符串显示</p>
      *
@@ -69,8 +68,7 @@ public class DateUtil {
             String srcTime = ((String) obj).trim();
             try {
                 time = Formatter.valueOfSourceLength(srcTime).parse2(srcTime, TimeZone.getDefault());
-
-            } catch (ParseException e) {
+            } catch (DateTimeException e) {
                 //log
                 if (log.isDebugEnabled()) {
                     log.debug("解析时间字符串失败", e);
@@ -78,6 +76,10 @@ public class DateUtil {
             }
         } else if (obj instanceof Number) {
             return ((Number) obj).longValue();
+        } else if (obj instanceof LocalDateTime) {
+            return  ((LocalDateTime) obj).toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        } else if (obj instanceof LocalDate) {
+            return  ((LocalDate) obj).atStartOfDay().atZone(ZoneOffset.of("+8")).toInstant().toEpochMilli();
         }
 
         if (null == time) {
@@ -119,7 +121,7 @@ public class DateUtil {
         Date time = new Date(timeMillis);
 
 		if (null == dateFormat || 0 == dateFormat.length || null == dateFormat[0] ||  "".equals(dateFormat[0])) {
-			dateFormat = new String[] { Formatter.YYYY_MM_DD.pattern };
+			dateFormat = new String[] { Formatter.YYYY_MM_DD_HH_MM_SS.pattern };
 		}
 
         return Formatter.valueOf(dateFormat[0]).print(time, Locale.CHINESE);
@@ -251,8 +253,8 @@ public class DateUtil {
          * @param endRangeTime   结束时间点（某范围内的时间点）
          * @return 列表
          */
-        public static List<DateUtil.ExpressingTime> toList(String stepType, Timestamp beginRangeTime, Timestamp endRangeTime) {
-            List<DateUtil.ExpressingTime> result = null;
+        public static List<ExpressingTime> toList(String stepType, Timestamp beginRangeTime, Timestamp endRangeTime) {
+            List<ExpressingTime> result = null;
             Calendar begin = Calendar.getInstance();
             begin.setFirstDayOfWeek(Calendar.MONDAY);// 中国一周第一天为周一
             begin.setTime(beginRangeTime);
@@ -303,10 +305,10 @@ public class DateUtil {
             }
 
             result = new ArrayList<>();
-            DateUtil.ExpressingTime expressingTime = null;
+            ExpressingTime expressingTime = null;
             Calendar i = (Calendar)begin.clone();
             while ( i.before(end) ) {
-                expressingTime = new DateUtil.ExpressingTime("", stepType);
+                expressingTime = new ExpressingTime("", stepType);
                 expressingTime.beginTime = i.getTimeInMillis();
                 i.add(step[0], step[1]);
                 expressingTime.endTime = i.getTimeInMillis();
@@ -642,8 +644,18 @@ public class DateUtil {
         /**
          * 常量 日期格式 "yy-MM-dd"         8位长度
          */
-        public static final String PATTERN_YY_MM_DD = "yy-MM-dd";
-        public static final Formatter YY_MM_DD = new Formatter(PATTERN_YY_MM_DD);
+        public static final String PATTERN_YY_MM_DD_NORM = "yy-MM-dd";
+        public static final Formatter YY_MM_DD_NORM = new Formatter(PATTERN_YY_MM_DD_NORM);
+        /**
+         * 常量 日期格式 "yy-MM-dd"         8位长度
+         */
+        public static final String PATTERN_YY_MM_DD = PATTERN_YY_MM_DD_NORM;
+        public static final Formatter YY_MM_DD = YY_MM_DD_NORM;
+        /**
+         * 常量 日期格式 "yyyyMMdd"         8位长度
+         */
+        public static final String PATTERN_YYYY_MM_DD_PURE = "yyyyMMdd";
+        public static final Formatter YYYY_MM_DD_PURE = new Formatter(PATTERN_YYYY_MM_DD_PURE);
         /**
          * 常量 日期格式 "yyyy-MM-dd"            10位长度
          */
@@ -719,8 +731,10 @@ public class DateUtil {
                 return YYYYMM;
             } else if (YYYY_MM.pattern.equalsIgnoreCase(pattern)) {
                 return YYYY_MM;
-            } else if (YY_MM_DD.pattern.equalsIgnoreCase(pattern)) {
-                return YY_MM_DD;
+            } else if (YY_MM_DD_NORM.pattern.equalsIgnoreCase(pattern)) {
+                return YY_MM_DD_NORM;
+            } else if (YYYY_MM_DD_PURE.pattern.equalsIgnoreCase(pattern)) {
+                return YYYY_MM_DD_PURE;
             } else if (YYYY_MM_DD.pattern.equalsIgnoreCase(pattern)) {
                 return YYYY_MM_DD;
             } else if (YYMMDDHHMMSS.pattern.equalsIgnoreCase(pattern)) {
@@ -763,8 +777,14 @@ public class DateUtil {
             } else if (YYYY_MM.pattern.length() == source.length()) {
                 return YYYY_MM;
                 // 8位
-            } else if (YY_MM_DD.pattern.length() == source.length()) {
-                return YY_MM_DD;
+            } else if (YY_MM_DD_NORM.pattern.length() == source.length()) {
+                if(source.indexOf("-") == -1) {
+                    return YYYY_MM_DD_PURE;
+                }
+                if(source.indexOf("-") == 2 && source.indexOf("-") == 5) {
+                    return YY_MM_DD_NORM;
+                }
+                return YY_MM_DD_NORM;
                 // 10位
             } else if (YYYY_MM_DD.pattern.length() == source.length()) {
                 if (source.indexOf('-') > 0) {
@@ -815,14 +835,15 @@ public class DateUtil {
         private DateFormat getDateFormat(Locale locale) {
             return new SimpleDateFormat(this.pattern, locale);
         }
+
         /**
-         *
-         * @param source
-         * @param zoneId
-         * @return
-         * @throws ParseException
+         * The text is parsed using the formatter, returning a date-time.
+         * @param source A <code>String</code> whose beginning should be parsed.
+         * @param timeZone
+         * @return A <code>Date</code> parsed from the string.
+         * @throws DateTimeException
          */
-        public Date parse2(String source, TimeZone timeZone) throws ParseException {
+        public Date parse2(String source, TimeZone timeZone) throws DateTimeException {
             LocalDateTime localDateTime = LocalDateTime.parse(source, dateTimeFmt);
             return Date.from(localDateTime.atZone(timeZone.toZoneId()).toInstant());
         }

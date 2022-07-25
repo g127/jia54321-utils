@@ -28,7 +28,8 @@
         <netty.version>4.1.54.Final</netty.version>
 
         <!-- okhttp -->
-        <okhttp.version>3.14.2</okhttp.version>
+        <okhttp.version>3.14.9</okhttp.version>
+        <okhttp.logging-interceptor.version>3.14.9</okhttp.logging-interceptor.version>
 
 
         <!-- json -->
@@ -56,7 +57,7 @@
         <!--  -->
         <!-- log 日志 1.7.7-->
         <slf4j.version>1.7.25</slf4j.version>
-        <!--        <logback.version>1.1.7</logback.version>-->
+        <logback.version>1.1.7</logback.version>
         <!--  -->
         <!-- junit 测试 4.12 => -->
         <junit.version>4.8.1</junit.version>
@@ -113,6 +114,13 @@
             <artifactId>okhttp</artifactId>
             <version>${okhttp.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>logging-interceptor</artifactId>
+            <version>${okhttp.logging-interceptor.version}</version>
+        </dependency>
+
         <!-- http client end -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -195,13 +203,13 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>ch.qos.logback</groupId>-->
-<!--            <artifactId>logback-classic</artifactId>-->
-<!--            <version>${logback.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--            &lt;!&ndash; <scope>runtime</scope> &ndash;&gt;-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>test</scope>
+            <!-- <scope>runtime</scope> -->
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -209,6 +217,23 @@
             <optional>true</optional>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+<!--            <version>8.0.21</version>-->
+            <version>5.1.46</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.2.8</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/org.easymock/easymock -->
         <dependency>
@@ -365,6 +390,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
+                        <version>3.2.1</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -378,6 +404,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.2.0</version>
                         <configuration>
                             <failOnError>false</failOnError>
                             <doclint>none</doclint>
@@ -395,6 +422,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
                         <configuration>
                             <!-- 这个configuration必须配置，用于gpg非交互式密码输入 -->
                             <gpgArguments>

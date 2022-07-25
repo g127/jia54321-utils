@@ -1,10 +1,11 @@
 package com.jia54321.utils;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 
 /**
- * java集合diff算法
+ * java diff算法
  */
 public class DiffUtil {
 
