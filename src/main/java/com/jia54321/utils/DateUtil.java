@@ -614,7 +614,10 @@ public class DateUtil {
      * 农历
      */
     public static class ChinaeseLunar {
-
+        /** * 實用於公曆 1901 年至 2100 年之間的 200 年 *  * See also:
+         *  1. http://www.herongyang.com/year_big5/
+         * 2. http://www.herongyang.com/year_big5/calendar.html
+         * 3. http://www.herongyang.com/year_big5/program.html */
     }
 
     /**
@@ -625,89 +628,115 @@ public class DateUtil {
          * 常量 日期格式 "yyyy"             4位长度
          */
         public static final String PATTERN_YYYY = "yyyy";
+        /** 常量 日期格式 "yyyy"             4位长度 */
         public static final Formatter YYYY = new Formatter(PATTERN_YYYY);
         /**
          * 常量 日期格式 "HH:mm"            5位长度
          */
         public static final String PATTERN_HH_MM = "HH:mm";
+        /** 常量 日期格式 "HH:mm"            5位长度 */
         public static final Formatter HH_MM = new Formatter(PATTERN_HH_MM);
         /**
          * 常量 日期格式 "yyyyMM"           6位长度
          */
         public static final String PATTERN_YYYYMM = "yyyyMM";
+        /** 常量 日期格式 "yyyyMM"           6位长度 */
         public static final Formatter YYYYMM = new Formatter(PATTERN_YYYYMM);
         /**
          * 常量 日期格式 "yyyy-MM"          7位长度
          */
         public static final String PATTERN_YYYY_MM = "yyyy-MM";
+        /** 常量 日期格式 "yyyy-MM"          7位长度 */
         public static final Formatter YYYY_MM = new Formatter(PATTERN_YYYY_MM);
         /**
          * 常量 日期格式 "yy-MM-dd"         8位长度
          */
         public static final String PATTERN_YY_MM_DD_NORM = "yy-MM-dd";
+        /** 常量 日期格式 "yy-MM-dd"         8位长度 */
         public static final Formatter YY_MM_DD_NORM = new Formatter(PATTERN_YY_MM_DD_NORM);
+
         /**
          * 常量 日期格式 "yy-MM-dd"         8位长度
          */
         public static final String PATTERN_YY_MM_DD = PATTERN_YY_MM_DD_NORM;
+        /** 常量 日期格式 "yy-MM-dd"         8位长度 */
         public static final Formatter YY_MM_DD = YY_MM_DD_NORM;
         /**
          * 常量 日期格式 "yyyyMMdd"         8位长度
          */
         public static final String PATTERN_YYYY_MM_DD_PURE = "yyyyMMdd";
+        /** 常量 日期格式 "yyyyMMdd"         8位长度 */
         public static final Formatter YYYY_MM_DD_PURE = new Formatter(PATTERN_YYYY_MM_DD_PURE);
+
         /**
          * 常量 日期格式 "yyyy-MM-dd"            10位长度
          */
         public static final String PATTERN_YYYY_MM_DD = "yyyy-MM-dd";
+        /** 常量 日期格式 "yyyy-MM-dd"            10位长度 */
         public static final Formatter YYYY_MM_DD = new Formatter(PATTERN_YYYY_MM_DD);
+
         /**
          * 常量 日期格式 "yyMMddHHmmss"          12位长度
          */
         public static final String PATTERN_YYMMDDHHMMSS = "yyMMddHHmmss";
+        /** 常量 日期格式 "yyMMddHHmmss"          12位长度 */
         public static final Formatter YYMMDDHHMMSS = new Formatter(PATTERN_YYMMDDHHMMSS);
+
         /**
          * 常量 日期格式 "yyyyMMddHHmm"          12位长度
          */
         public static final String PATTERN_YYYYMMDDHHMM = "yyyyMMddHHmm";
+        /** 常量 日期格式 "yyyyMMddHHmm"          12位长度 */
         public static final Formatter YYYYMMDDHHMM = new Formatter(PATTERN_YYYYMMDDHHMM);
+
         /**
          * 常量 日期格式 "yyyyMMddHHmmss"        14位长度
          */
         public static final String PATTERN_YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
+        /** 常量 日期格式 "yyyyMMddHHmmss"        14位长度 */
         public static final Formatter YYYYMMDDHHMMSS = new Formatter(PATTERN_YYYYMMDDHHMMSS);
+
         /**
          * 常量 日期格式 "yyyy-MM-dd HH:mm"      16位长度
          */
         public static final String PATTERN_YYYY_MM_DD_HH_MM = "yyyy-MM-dd HH:mm";
+        /** 常量 日期格式 "yyyy-MM-dd HH:mm"      16位长度 */
         public static final Formatter YYYY_MM_DD_HH_MM = new Formatter(PATTERN_YYYY_MM_DD_HH_MM);
+
         /**
          * 常量 日期格式 "yyyy-MM-dd HH:mm:ss"   19位长度
          */
         public static final String PATTERN_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+        /** 常量 日期格式 "yyyy-MM-dd HH:mm"      16位长度 */
         public static final Formatter YYYY_MM_DD_HH_MM_SS = new Formatter(PATTERN_YYYY_MM_DD_HH_MM_SS);
 
         /**
          * 常量 日期格式 "yyyy-MM-dd HH:mm:ss.SSS"  21位长度
          */
         public static final String PATTERN_YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
+        /** 常量 日期格式 "yyyy-MM-dd HH:mm"      16位长度 */
         public static final Formatter YYYY_MM_DD_HH_MM_SS_S = new Formatter(PATTERN_YYYY_MM_DD_HH_MM_SS_S);
 
         /**
          * 常量 日期格式 "yyyy-MM-dd HH:mm:ss.SS"  22位长度
          */
         public static final String PATTERN_YYYY_MM_DD_HH_MM_SS_SS = "yyyy-MM-dd HH:mm:ss.SS";
+        /** 常量 日期格式 "yyyy-MM-dd HH:mm"      22位长度 */
         public static final Formatter YYYY_MM_DD_HH_MM_SS_SS = new Formatter(PATTERN_YYYY_MM_DD_HH_MM_SS_SS);
 
         /**
          * 常量 日期格式 "yyyy-MM-dd HH:mm:ss.SSS"  23位长度
          */
         public static final String PATTERN_YYYY_MM_DD_HH_MM_SS_SSS = "yyyy-MM-dd HH:mm:ss.SSS";
+        /** 常量 日期格式 "yyyy-MM-dd HH:mm:ss.SSS"  23位长度 */
         public static final Formatter YYYY_MM_DD_HH_MM_SS_SSS = new Formatter(PATTERN_YYYY_MM_DD_HH_MM_SS_SSS);
 
+        /** 模式配置 */
         final public String pattern;
+        /** DateTimeFormatter格式字符串 */
         final private DateTimeFormatter dateTimeFmt;
 
+        /** */
         private Formatter(String pattern) {
             this.pattern = pattern;
 //            this.dateTimeFmt = DateTimeFormatter.ofPattern(this.pattern);
