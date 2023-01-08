@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @create 2019-07-31
  */
 public class DateUtil {
-	private static final Logger log = LoggerFactory.getLogger(DateUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(DateUtil.class);
     /**
      * <p>将  java.util.Date java.sql.Date , java.sql.Timestamp , Number(毫秒)，或 String 格式的时间  转换为 字符串显示</p>
      *
@@ -120,9 +120,9 @@ public class DateUtil {
         }
         Date time = new Date(timeMillis);
 
-		if (null == dateFormat || 0 == dateFormat.length || null == dateFormat[0] ||  "".equals(dateFormat[0])) {
-			dateFormat = new String[] { Formatter.YYYY_MM_DD_HH_MM_SS.pattern };
-		}
+        if (null == dateFormat || 0 == dateFormat.length || null == dateFormat[0] ||  "".equals(dateFormat[0])) {
+            dateFormat = new String[] { Formatter.YYYY_MM_DD_HH_MM_SS.pattern };
+        }
 
         return Formatter.valueOf(dateFormat[0]).print(time, Locale.CHINESE);
     }
@@ -134,7 +134,7 @@ public class DateUtil {
      * @return string
      */
     public static String toNow(String... dateFormat) {
-    	if (null == dateFormat || 0 == dateFormat.length || null == dateFormat[0] ||  "".equals(dateFormat[0]) ) {
+        if (null == dateFormat || 0 == dateFormat.length || null == dateFormat[0] ||  "".equals(dateFormat[0]) ) {
             dateFormat = new String[]{Formatter.YYYY_MM_DD_HH_MM_SS.pattern};
         }
         return toTimeString(Calendar.getInstance().getTime(), dateFormat[0]);
@@ -199,6 +199,34 @@ public class DateUtil {
             return null;
         }
         return new java.sql.Timestamp(currTime);
+    }
+
+    /**
+     * 对象转化为时间  java.time.LocalDateTime
+     *
+     * @param time 时间
+     * @return LocalDateTime
+     */
+    public static java.time.LocalDateTime toLocalDateTime(Object time) {
+        Long currTime = toTimeMillis(time);
+        if (null == currTime) {
+            return null;
+        }
+        return new java.sql.Timestamp(currTime).toLocalDateTime();
+    }
+
+    /**
+     * 对象转化为时间  java.time.LocalDate
+     *
+     * @param time 时间
+     * @return LocalDate
+     */
+    public static java.time.LocalDate toLocalDate(Object time) {
+        Long currTime = toTimeMillis(time);
+        if (null == currTime) {
+            return null;
+        }
+        return new java.sql.Timestamp(currTime).toLocalDateTime().toLocalDate();
     }
 
     /**
@@ -345,7 +373,7 @@ public class DateUtil {
          * @return Timestamp
          */
         public static java.sql.Timestamp toBegin(String type, Object... time) {
-			if ( null == time || time.length == 0 || null == time[0] ||  "".equals(time[0])) {
+            if ( null == time || time.length == 0 || null == time[0] ||  "".equals(time[0])) {
                 // 当前时间
                 time = new Date[]{Calendar.getInstance().getTime()};
             }
@@ -741,7 +769,7 @@ public class DateUtil {
             this.pattern = pattern;
 //            this.dateTimeFmt = DateTimeFormatter.ofPattern(this.pattern);
             this.dateTimeFmt = new DateTimeFormatterBuilder().appendPattern(this.pattern)
-                               .parseDefaulting(ChronoField.YEAR_OF_ERA, 1970)
+                    .parseDefaulting(ChronoField.YEAR_OF_ERA, 1970)
                     .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
                     .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
                     .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
