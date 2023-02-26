@@ -9,7 +9,10 @@ import java.util.List;
 
 public class Generator extends com.jfinal.plugin.activerecord.generator.Generator {
 
+    protected String basePackageName;
+    protected String baseOutputDir;
     protected BaseModelGenerator baseModelGeneratorExt;
+    protected MappingKitGenerator mappingKitGeneratorExt;
     protected ServiceGenerator serviceGenerator;
     protected ServiceImplGenerator serviceImplGenerator;
 
@@ -17,23 +20,53 @@ public class Generator extends com.jfinal.plugin.activerecord.generator.Generato
     protected boolean generateServiceImplDictionary = false;
 
     public Generator(DataSource dataSource,
-                     String baseModelPackageName, String baseModelOutputDir, String modelPackageName, String modelOutputDir,
-                     String servicePackageName, String serviceOutputDir, String serviceImplPackageName, String serviceImplOutputDir) {
+                     String basePackageName, String baseOutputDir,
+                     String baseModelPackageName, String baseModelOutputDir,
+                     String modelPackageName, String modelOutputDir,
+                     String mappingKitPackageName, String mappingKitOutputDir,
+                     String servicePackageName, String serviceOutputDir,
+                     String serviceImplPackageName, String serviceImplOutputDir) {
         super(dataSource, baseModelPackageName, baseModelOutputDir, modelPackageName, modelOutputDir);
 
         this.metaBuilder = new MetaBuilder(dataSource);
+        this.basePackageName = basePackageName;
+        this.baseOutputDir = baseOutputDir;
         this.baseModelGeneratorExt = new BaseModelGenerator(baseModelPackageName, baseModelOutputDir);
         this.baseModelGeneratorExt.setTemplate("/com/jia54321/utils/jfinal/activerecord/generator/base_model_template.jf");
         this.modelGenerator = modelGenerator;
         this.modelGenerator.setTemplate("/com/jia54321/utils/jfinal/activerecord/generator/model_template.jf");
-        this.mappingKitGenerator = new MappingKitGenerator(modelPackageName, modelOutputDir);
-        this.mappingKitGenerator.setTemplate("/com/jia54321/utils/jfinal/activerecord/generator/mapping_kit_template.jf");
+        this.mappingKitGeneratorExt = new MappingKitGenerator(mappingKitPackageName, mappingKitOutputDir);
+        this.mappingKitGeneratorExt.setTemplate("/com/jia54321/utils/jfinal/activerecord/generator/mapping_kit_template.jf");
         this.dataDictionaryGenerator = new DataDictionaryGenerator(dataSource, modelOutputDir);
 
         this.serviceGenerator = new ServiceGenerator(modelPackageName, servicePackageName, serviceOutputDir);
         this.serviceGenerator.setTemplate("/com/jia54321/utils/jfinal/activerecord/generator/service_template.jf");
         this.serviceImplGenerator = new ServiceImplGenerator(modelPackageName, servicePackageName, serviceImplPackageName, serviceImplOutputDir);
         this.serviceImplGenerator.setTemplate("/com/jia54321/utils/jfinal/activerecord/generator/service_impl_template.jf");
+    }
+
+    public BaseModelGenerator getBaseModelGeneratorExt() {
+        return baseModelGeneratorExt;
+    }
+
+    public void setBaseModelGeneratorExt(BaseModelGenerator baseModelGeneratorExt) {
+        this.baseModelGeneratorExt = baseModelGeneratorExt;
+    }
+
+    public ServiceGenerator getServiceGenerator() {
+        return serviceGenerator;
+    }
+
+    public void setServiceGenerator(ServiceGenerator serviceGenerator) {
+        this.serviceGenerator = serviceGenerator;
+    }
+
+    public ServiceImplGenerator getServiceImplGenerator() {
+        return serviceImplGenerator;
+    }
+
+    public void setServiceImplGenerator(ServiceImplGenerator serviceImplGenerator) {
+        this.serviceImplGenerator = serviceImplGenerator;
     }
 
     @Override
@@ -60,7 +93,7 @@ public class Generator extends com.jfinal.plugin.activerecord.generator.Generato
             newObj.columnMetas      = old.columnMetas; // 字段 meta
 
             // ---------
-
+            newObj.basePackageName  = basePackageName;
             newObj.baseModelName    = old.baseModelName;		// 生成的 base model 名
             newObj.baseModelContent = old.baseModelContent;	// 生成的 base model 内容
 
@@ -89,8 +122,8 @@ public class Generator extends com.jfinal.plugin.activerecord.generator.Generato
             modelGenerator.generate(tableMetas);
         }
 
-        if (mappingKitGenerator != null) {
-            mappingKitGenerator.generate(tableMetas);
+        if (mappingKitGeneratorExt != null) {
+            mappingKitGeneratorExt.generate(tableMetasExtendExtend);
         }
 
         if (dataDictionaryGenerator != null && generateDataDictionary) {

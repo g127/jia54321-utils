@@ -1,5 +1,6 @@
 package #(servicePackageName);
 
+import com.jia54321.utils.entity.query.*;
 import #(modelPackageName).#(tableMetaExtend.modelName);
 
 import java.util.List;
@@ -20,8 +21,8 @@ public interface #(tableMetaExtend.serviceName) {
      * @param pageSize   页数
      * @return 实体列表
      */
-    public List<#(tableMetaExtend.modelName)> findPageList(
-        Map<String, Object> and, Map<String, Object> or, Map<String, Object> sort, int pageNumber, int pageSize);
+    public QueryContent<#(tableMetaExtend.modelName)> findPageList(
+        Map<String, Object> and, Map<String, Object> or, Map<String, Object> sort, Integer pageNumber, Integer pageSize);
 
     /**
      * 查询主键

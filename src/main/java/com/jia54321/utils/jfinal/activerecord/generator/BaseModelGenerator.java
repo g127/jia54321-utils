@@ -92,8 +92,9 @@ public class BaseModelGenerator {
 	/**
 	 * 使用自定义模板生成 base model
 	 */
-	public void setTemplate(String template) {
+	public BaseModelGenerator setTemplate(String template) {
 		this.template = template;
+		return this;
 	}
 
 	public void setGenerateChainSetter(boolean generateChainSetter) {
