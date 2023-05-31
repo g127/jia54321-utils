@@ -1,17 +1,24 @@
 package com.jia54321.utils.jfinal.activerecord.generator;
 
+import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.dialect.Dialect;
 import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.activerecord.generator.TableMeta;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jia54321.utils.CamelNameUtil;
 import com.jia54321.utils.IOUtil;
+import com.jia54321.utils.LdapUtil;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.junit.Assert.*;
 
@@ -20,28 +27,30 @@ import static org.junit.Assert.*;
  */
 public class GeneratorTest {
 
+    static final Logger log = LoggerFactory.getLogger(GeneratorTest.class);
+
     /**
-     * 定义数据源
+     * 会员 定义数据源
      * @return
      */
     public static DataSource getDataSource() {
         DruidPlugin druidPlugin = new DruidPlugin(
-                "jdbc:mysql://47.100.45.53:3306/msf_member?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
+                "jdbc:mysql://106.14.150.97:31529/msf_member?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
                 "park",
-                "park123");
+                "g&!BKilp$Mrl4k#h");
         druidPlugin.start();
         return druidPlugin.getDataSource();
     }
 
     /**
-     * 定义数据源
+     * 对账 定义数据源
      * @return
      */
     public static DataSource getDataSource2() {
         DruidPlugin druidPlugin = new DruidPlugin(
-                "jdbc:mysql://47.100.45.53:3306/msf_check_bill?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
+                "jdbc:mysql://106.14.150.97:31529/msf_check_bill?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
                 "park",
-                "park123");
+                "g&!BKilp$Mrl4k#h");
         druidPlugin.start();
         return druidPlugin.getDataSource();
     }
@@ -71,20 +80,39 @@ public class GeneratorTest {
      */
     public static DataSource getDataSource4() {
         DruidPlugin druidPlugin = new DruidPlugin(
-                "jdbc:mysql://47.100.45.53:3306/msf_invoice?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
+                "jdbc:mysql://106.14.150.97:31529/msf_invoice?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
                 "park",
-                "park123");
+                "g&!BKilp$Mrl4k#h");
         druidPlugin.start();
         return druidPlugin.getDataSource();
     }
 
+    /**
+     * 生成代码
+     */
+    public String getMavenProjectDir() {
+        //获取当前文件所在的路径
+        String localClassPath = this.getClass().getResource("/").getPath();
+        File targetFile = new File(localClassPath).getParentFile();
+        String projectDir = targetFile.getParent();
+        ////
+        ////        "generator/java"
+        return projectDir;
+    }
+
+    /**
+     * 生成代码
+     * @param packageName
+     * @param includeName
+     */
     public static void gen(final String packageName, final String includeName) {
-        String projectDir = System.getProperty("user.dir") + "/generator";
+        // 项目目录
+        String projectDir = System.getProperty("user.dir");
 
         IOUtil.createDirPath(projectDir);
 
         String basePackageName = packageName;
-        String baseOutputDir = projectDir + "/src/main/java/"  + basePackageName.replace('.', '/');
+        String baseOutputDir = projectDir + "/src/generator/java/"  + basePackageName.replace('.', '/');
         // model 所使用的包名 (MappingKit 默认使用的包名)
         String modelPackageName = basePackageName + ".domain";
 
@@ -92,7 +120,7 @@ public class GeneratorTest {
         String baseModelPackageName = modelPackageName + ".base";
 
         // base model 文件保存路径
-        String baseModelOutputDir = projectDir + "/src/main/java/" + baseModelPackageName.replace('.', '/');
+        String baseModelOutputDir = projectDir + "/src/generator/java/" + baseModelPackageName.replace('.', '/');
 
         System.out.println("输出路径：" + baseModelOutputDir);
 
@@ -100,13 +128,13 @@ public class GeneratorTest {
         String modelOutputDir = baseModelOutputDir + "/..";
 
         String mappingKitPackageName = basePackageName;
-        String mappingKitOutputDir = projectDir + "/src/main/java/" + basePackageName.replace('.', '/');
+        String mappingKitOutputDir = projectDir + "/src/generator/java/" + basePackageName.replace('.', '/');
         ;
 
         // service 所使用的包名
         String servicePackageName = basePackageName + ".service";
         // service 文件保存路径
-        String serviceOutputDir = projectDir + "/src/main/java/" + servicePackageName.replace('.', '/');
+        String serviceOutputDir = projectDir + "/src/generator/java/" + servicePackageName.replace('.', '/');
 
 
         // serviceImpl 所使用的包名
@@ -164,14 +192,13 @@ public class GeneratorTest {
      * @param packageName
      * @param includeName
      */
-    public void generate(DataSource ds , String projectDir, String packageName, final String includeName) {
+    public void generate(DataSource ds , String projectDir, String packageName, final String includeName, Consumer<List<TableMetaExtend>> consumer) {
         // =====================================================================================================================
         // 定义输出目录位置
         // =====================================================================================================================
-//        String projectDir = System.getProperty("user.dir") + "/target/generated-domain/msf_member_test/";
-
         String basePackageName = packageName;
-        String baseOutputDir = projectDir + "/src/main/java/"  + basePackageName.replace('.', '/');
+        String srcJavaPath = "/src/main/java/";
+        String baseOutputDir = projectDir + srcJavaPath + basePackageName.replace('.', '/');
         IOUtil.createDirPath(baseOutputDir);
         System.out.println("Generate path in " + projectDir );
         // =====================================================================================================================
@@ -182,12 +209,19 @@ public class GeneratorTest {
         // model 所使用的包名 (MappingKit 默认使用的包名)
         String modelPackageName = basePackageName + ".domain";
         // model 文件保存路径
-        String modelOutputDir = projectDir + "/src/main/java/" + modelPackageName.replace('.', '/');
+        String modelOutputDir = projectDir + srcJavaPath + modelPackageName.replace('.', '/');
         // model 模板
         String modelTemplateClassPath = "/generatorCodeTest/model_template.jf";
         // model 生成器
         BaseModelGenerator modelGenerator = new BaseModelGenerator(modelPackageName, modelOutputDir).setTemplate(modelTemplateClassPath);
 
+        // model doc 所使用的包名 (MappingKit 默认使用的包名)
+        String modelDocPackageName = basePackageName + ".doc";
+        // model doc 文件保存路径
+        String modelDocOutputDir = projectDir + srcJavaPath + modelPackageName.replace('.', '/');
+        // model doc 模板
+        String modelDocTemplateClassPath = "/generatorCodeTest/model_doc_template_test.jf";
+        ModelDocGenerator modelDocGenerator = new ModelDocGenerator(modelDocPackageName, modelDocOutputDir).setTemplate(modelDocTemplateClassPath);
         // =====================================================================================================================
 
         // =====================================================================================================================
@@ -244,7 +278,12 @@ public class GeneratorTest {
             tableMetasExtendExtend.add(newObj);
         }
 
-        modelGenerator.generate(tableMetasExtendExtend);
+        if(null != consumer) {
+            consumer.accept(tableMetasExtendExtend);
+        } else {
+            modelGenerator.generate(tableMetasExtendExtend);
+            modelDocGenerator.generate(tableMetasExtendExtend);
+        }
 
         long usedTime = (System.currentTimeMillis() - start) / 1000;
         System.out.println("Generate complete in " + usedTime + " seconds.");
@@ -272,8 +311,13 @@ public class GeneratorTest {
 
 
         DataSource ds4 = getDataSource4();
-        String projectDir4 = System.getProperty("user.dir") + "/target/generated-domain/msf_invoice/";
-        generate(ds4, projectDir4, "invoice", "t_invoice");
+        String projectDir4 = System.getProperty("user.dir") + "/src/generated-domain/msf_invoice/";
+        generate(ds4, projectDir4, "invoice", "t_invoice" , null);
+
+    }
+
+    @Test
+    public void testGenDbDoc() {
 
     }
 }

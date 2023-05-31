@@ -1,0 +1,7 @@
+#for(tableMetaItem : tableMetas)
+    #(tableMetaItem.remarks + " " + tableMetaItem.name)
+    参数名	类型	是否必需	参数中文名	取值说明
+    #for(cm : tableMetaItem.columnMetas)
+      #(cm.attrName)  #(cm.type)     #(cm.isNullable)   #(cm.remarks)
+    #end
+#end
