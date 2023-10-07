@@ -1,6 +1,5 @@
 package com.jia54321.utils;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 
@@ -10,6 +9,16 @@ import java.util.function.Function;
 public class DiffUtil {
 
     public static class DiffResult<T> {
+        /**
+         * 基础对象列表
+         */
+        private List<T> baseList;
+
+        /**
+         * 目标对象列表
+         */
+        private List<T> targetList;
+
         /**
          * 新增对象列表
          */
@@ -22,6 +31,24 @@ public class DiffUtil {
          * 已删除对象列表
          */
         private List<T> deletedList;
+
+        public List<T> getBaseList() {
+            return baseList;
+        }
+
+        public  DiffResult<T>  setBaseList(List<T> baseList) {
+            this.baseList = baseList;
+            return this;
+        }
+
+        public List<T> getTargetList() {
+            return targetList;
+        }
+
+        public  DiffResult<T>  setTargetList(List<T> targetList) {
+            this.targetList = targetList;
+            return this;
+        }
 
         public List<T> getAddedList() {
             return addedList;
@@ -103,13 +130,15 @@ public class DiffUtil {
 
         //剩余的就是需要删除的
         Set<Map.Entry<Object, T>> entrySet = baseMap.entrySet();
-        if(JsonHelper.isNotEmpty(entrySet)){
+        if(Helper.isNotEmpty(entrySet)){
             for(Map.Entry<Object, T> entry:entrySet){
                 deletedList.add(entry.getValue());
             }
         }
 
         return new DiffResult<T>()
+                .setBaseList(baseList)
+                .setTargetList(targetList)
                 .setAddedList(addedList)
                 .setChangedList(changedList)
                 .setDeletedList(deletedList);
@@ -124,24 +153,30 @@ public class DiffUtil {
      */
     private static <T> DiffResult<T> checkEmptyAndReturn(List<T> baseList, List<T> targetList) {
 
-        if (JsonHelper.isEmpty(baseList) && JsonHelper.isEmpty(targetList)) {
+        if (Helper.isEmpty(baseList) && Helper.isEmpty(targetList)) {
             return new DiffResult<T>()
-                    .setAddedList(null)
-                    .setChangedList(null)
-                    .setDeletedList(null);
+                    .setBaseList(new ArrayList<>())
+                    .setTargetList(new ArrayList<>())
+                    .setAddedList(new ArrayList<>())
+                    .setChangedList(new ArrayList<>())
+                    .setDeletedList(new ArrayList<>());
         }
 
-        if (JsonHelper.isEmpty(baseList) && JsonHelper.isNotEmpty(targetList)) {
+        if (Helper.isEmpty(baseList) && Helper.isNotEmpty(targetList)) {
             return new DiffResult<T>()
+                    .setBaseList(new ArrayList<>())
+                    .setTargetList(targetList)
                     .setAddedList(targetList)
-                    .setChangedList(null)
-                    .setDeletedList(null);
+                    .setChangedList(new ArrayList<>())
+                    .setDeletedList(new ArrayList<>());
         }
 
-        if (JsonHelper.isNotEmpty(baseList) && JsonHelper.isEmpty(targetList)) {
+        if (Helper.isNotEmpty(baseList) && Helper.isEmpty(targetList)) {
             return new DiffResult<T>()
-                    .setAddedList(null)
-                    .setChangedList(null)
+                    .setBaseList(baseList)
+                    .setTargetList(new ArrayList<>())
+                    .setAddedList(new ArrayList<>())
+                    .setChangedList(new ArrayList<>())
                     .setDeletedList(baseList);
         }
         return null;

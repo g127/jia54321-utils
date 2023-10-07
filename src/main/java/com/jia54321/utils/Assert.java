@@ -149,6 +149,17 @@ public abstract class Assert {
 	}
 
 	/**
+	 * 断言这个 boolean 为 false
+	 * <p>为 true 则抛出异常</p>
+	 *
+	 * @param expression boolean 值
+	 * @param message    消息
+	 */
+	public static void isFalse(boolean expression, String message) {
+		isTrue(!expression, message);
+	}
+
+	/**
 	 * Assert that an object is {@code null}.
 	 * <pre class="code">Assert.isNull(value, "The value must be null");</pre>
 	 * @param object the object to check

@@ -106,7 +106,7 @@ public class IdGeneration {
      * SnowflakeId twitter的解决方案
      */
 	public static String getSnowflakeId(){
-    	return String.valueOf(idWorker.getId());
+    	return String.valueOf(idWorker.nextId());
     }
 
 

@@ -67,6 +67,9 @@ public class DateUtil {
         } else if (obj instanceof String) {
             String srcTime = ((String) obj).trim();
             try {
+                if(srcTime.indexOf('T') > 0){
+                    srcTime = srcTime.replace('T', ' ');
+                }
                 time = Formatter.valueOfSourceLength(srcTime).parse2(srcTime, TimeZone.getDefault());
             } catch (DateTimeException e) {
                 //log
@@ -230,6 +233,24 @@ public class DateUtil {
     }
 
     /**
+     * 对象转化为时间  java.time.LocalDate
+     *
+     * @param time 时间
+     * @return LocalDate
+     */
+    public static java.time.LocalDate toLocalDate(Object time, Object defaultValue) {
+        LocalDate currTime = toLocalDate(time);
+        if (null == currTime) {
+            if(defaultValue instanceof LocalDate) {
+                return (LocalDate)defaultValue;
+            }
+            currTime = toLocalDate(defaultValue);;
+        }
+        return currTime;
+    }
+
+
+    /**
      * 对象转化为时间 Timestamp
      *
      * @return Timestamp
@@ -237,8 +258,10 @@ public class DateUtil {
     public static Timestamp toNowTimestamp() {
         return toTimestamp(Calendar.getInstance().getTime());
     }
-
-
+	
+	// ======================================================================
+    // 自行扩展方法写下面
+	// ======================================================================
     /**
      * 时间区间内的步长时间
      */

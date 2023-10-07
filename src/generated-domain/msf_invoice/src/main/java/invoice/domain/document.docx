@@ -1,0 +1,103 @@
+     t_invoice_account
+    参数名	类型	是否必需	参数中文名	取值说明
+      id          主键
+      sellerName          销方主体名称
+      sellerTaxCode          税收号
+      sellerAddress          地址
+      sellerBankName          开户行名称
+      sellerBankAccount          收款账户
+      contactInformation          联系电话
+      drawer          开票员
+      payee          收款员
+      reviewer          复核员
+      invoiceChannelType          开票渠道 1-航信 2-百旺
+      invoiceConfig          参数
+      bizFormKey          关联业务表单KEY: businessType-交易类型
+      bizFormId          关联业务表单ID: 交易类型的值
+      remark          备注
+      deptId          部门Id
+      deptName          部门名称
+      operatorId          操作员Id
+      operatorName          操作员名称
+      createTime          创建时间
+      updateTime          最后更新时间
+      disableFlag          禁用标识 0 正常 1已禁用
+      delFlag          删除标识 0 正常 1已删除
+     t_invoice_record
+    参数名	类型	是否必需	参数中文名	取值说明
+      id          主键
+      accountId          开票主体主键
+      custId          用户Id
+      billNo          发票流水号
+      channelBillNo          渠道侧发票流水号
+      buyerType          发票抬头 1-个人发票抬头 2-单位发票抬头
+      buyerName          付款方
+      buyerTaxCode          纳税人识别号
+      buyerAddress          地址信息
+      buyerPhone          电话号码
+      buyerBankName          开户银行名称
+      buyerBankAccount          银行账户
+      buyerEmail          电子邮件
+      sellerName          销方主体名称
+      pdfUrl          发票PDF_URL
+      taxRate          税率
+      amt          开票金额(含税)
+      amtExcludedTax          不含税金额
+      tax          税额
+      invoiceCode          发票代码
+      invoiceNum          发票号码
+      approveTime          申请时间
+      invoiceTime          发票开票时间
+      isRedBack          发票类型: 0 蓝票 1 红票
+      blueBillNo          红冲原流水号
+      state          状态 1-成功 2-失败 3-开票中
+      stateMsg          状态的补充消息
+      remark          备注
+      businessType          业务类型 1-停车业务 2-广告业务
+      deptId          部门Id
+      deptName          部门名称
+      operatorId          操作员Id
+      operatorName          操作员名称
+      createTime          创建时间
+      updateTime          最后更新时间
+      disableFlag          禁用标识 0 正常 1已禁用
+      delFlag          删除标识 0 正常 1已删除
+     t_invoice_record_detail
+    参数名	类型	是否必需	参数中文名	取值说明
+      id          主键
+      recordId          开票记录主键
+      productId          商品Id
+      productName          商品名称
+      productNo          商品编码
+      productSpec          规格型号
+      productMeasureUnit          计量单位
+      productOrderNo          缴费订单号
+      productOrderAmt          缴费订单金额
+      productOrderTime          缴费交易时间
+      productOrderNum          缴费数量
+      price          含税金额
+      priceExcludedTax          含税金额
+      amtExcludedTax          不含税金额
+      tax          税额
+      taxRate          税率
+      discount          优惠
+     t_invoice_title
+    参数名	类型	是否必需	参数中文名	取值说明
+      id          主键
+      custId          用户Id
+      buyerType          发票抬头 1-个人发票抬头 2-单位发票抬头
+      buyerName          买方名称 个人-姓名 单位-单位名称
+      buyerTaxCode          纳税人识别号
+      buyerAddress          地址信息
+      buyerPhone          电话号码
+      buyerBankName          开户银行名称
+      buyerBankAccount          银行账户
+      buyerEmail          电子邮件
+      remark          备注
+      defaultFlag          是否默认 0-否 1-默认
+      operatorId          操作员Id
+      operatorName          操作员名称
+      createTime          创建时间
+      updateTime          最后更新时间
+      disableFlag          禁用标识 0 正常 1已禁用
+      delFlag          删除标识 0 正常 1已删除
