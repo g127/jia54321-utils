@@ -144,6 +144,24 @@ public class DateUtil {
     }
 
     /**
+     * 当前时间字符串 日期格式 "yyyyMMddHHmmss" 14位长度
+     *
+     * @return String
+     */
+    public static Long toNowLong14YYYYMMDDHHMMSS() {
+        return Long.valueOf(toTimeString(Calendar.getInstance().getTime(), Formatter.PATTERN_YYYYMMDDHHMMSS));
+    }
+
+    /**
+     * 当前时间字符串 日期格式 "yyyyMMdd" 8位长度
+     *
+     * @return String
+     */
+    public static Integer toNowInt8YYYYMMDD() {
+        return Integer.valueOf(toTimeString(Calendar.getInstance().getTime(), Formatter.PATTERN_YYYY_MM_DD_PURE));
+    }
+
+    /**
      * 当前时间字符串 日期格式 "yyyy-MM-dd"
      *
      * @return String
