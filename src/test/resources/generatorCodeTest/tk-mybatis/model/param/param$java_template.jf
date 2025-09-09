@@ -1,0 +1,117 @@
+package #(packageName);
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.msf.digit.analysis.api.model.dto.BaseDTO;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * 模型参数类 #(tableMetaExtend.remarks)
+ * @author dev
+ */
+@Data
+@NoArgsConstructor
+@ApiModel(value = "#(tableMetaExtend.remarks)的参数")
+public class #(className) implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @ApiModel(value = "#(tableMetaExtend.remarks)的查询参数")
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @NoArgsConstructor
+    public static class Query extends BaseDTO implements Serializable{
+        private static final long serialVersionUID = 1L;
+
+        @ApiModelProperty(value="", dataType = "java.lang.Integer")
+        private Integer id;
+
+        /**  开始  */
+        private String startTime;
+        /**  结束  */
+        private String endTime;
+
+        /**  运营商编号  */
+        @ApiModelProperty(value="运营商编号", dataType = "java.lang.String", position = 2)
+        private Long agentId;
+
+        /**  停车场编号  */
+        @ApiModelProperty(value="停车场编号", dataType = "java.lang.String", position = 3)
+        private String parkCode;
+
+        @JsonIgnore
+        private List<Long> agentIds;
+
+        @JsonIgnore
+        private List<String> parkCodes;
+    }
+
+    @ApiModel(value = "#(tableMetaExtend.remarks)的EntityDTO")
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    @NoArgsConstructor
+    public static class EntityDTO extends BaseDTO implements Serializable {
+        private static final long serialVersionUID = 1L;
+    #for(cm : tableMeta.columnMetas)
+
+        @ApiModelProperty(value="#(cm.remarks)", dataType = "#(cm.javaType)")
+        private #(cm.javaType.replace("java.lang.", "").replace("java.math.", "")) #(cm.attrName);
+    #end
+    }
+
+    @ApiModel(value = "#(tableMetaExtend.remarks)的统计")
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    @NoArgsConstructor
+    public static class CountDTO implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        @ApiModelProperty(value="总计", dataType = "java.math.BigDecimal")
+        private BigDecimal totalAmount;
+    }
+
+    @ApiModel(value = "#(tableMetaExtend.remarks)的RecordDTO")
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @NoArgsConstructor
+    public static class RecordDTO extends EntityDTO implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+    }
+
+    @ApiModel(value = "#(tableMetaExtend.remarks)的Create对象")
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @NoArgsConstructor
+    public static class CreateParam extends EntityDTO implements Serializable {
+        private static final long serialVersionUID = 1L;
+    }
+
+    @ApiModel(value = "#(tableMetaExtend.remarks)的UpdateParam对象")
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @NoArgsConstructor
+    public static class UpdateParam extends EntityDTO implements Serializable {
+        private static final long serialVersionUID = 1L;
+    }
+
+    @ApiModel(value = "#(tableMetaExtend.remarks)的DeleteParam对象")
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    @NoArgsConstructor
+    public static class DeleteParam extends BaseDTO implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        @NotEmpty(message = "id不能为空！")
+        private String id;
+    }
+
+}
+

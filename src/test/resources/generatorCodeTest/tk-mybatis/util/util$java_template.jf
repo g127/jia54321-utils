@@ -1,0 +1,20 @@
+package #(packageName);
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+
+public class #(className) {
+
+#for(cm : tableMeta.columnMetas)
+	#if( cm.javaType.indexOf("BigDecimal") >= 0 )
+	#("entity.get" + firstCharToUpperCase(cm.attrName) + "(),")
+	#end
+#end
+
+}
+

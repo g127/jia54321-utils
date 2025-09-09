@@ -1,0 +1,28 @@
+package #(packageName);
+
+import com.msf.bir.base.BaseRepository;
+import #(basePackageName).param.#(entityName)Param;
+import #(basePackageName).entity.#(entityName)Entity;
+
+import java.util.List;
+
+/**
+ * Mapper类 #(tableMetaExtend.remarks)
+ * @author dev
+ */
+public interface #(className) extends BaseRepository<#(entityName)Entity> {
+    /**
+     * 汇总小计
+     * @param query 查询条件
+     * @return 结果
+     */
+    #(entityName)Param.CountDTO queryHeader(#(entityName)Param.Query query);
+
+    /**
+     * 查询列表
+     * @param query 查询条件
+     * @return 结果
+     */
+    List<#(entityName)Param.RecordDTO> queryList(#(entityName)Param.Query query);
+}
+

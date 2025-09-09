@@ -1,0 +1,103 @@
+package #(packageName);
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import #(basePackageName).model.entity.EnterpriseInfoEntity;
+import #(basePackageName).repository.EnterpriseInfoEntityMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import tk.mybatis.mapper.entity.Example;
+
+import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static #(basePackageName).api.constants.Constants.TOP_CUST_ID;
+
+/**
+ * Service实现类 #(tableMetaExtend.remarks)
+ * @author dev
+ */
+ @Service
+ @Slf4j
+public class #(className) implements #(entityName)Service  {
+
+    @Resource
+    private #(entityName)Mapper #(entityObjectName)Mapper;
+
+    @Resource
+    private EnterpriseInfoEntityMapper enterpriseInfoEntityMapper;
+
+    private void processParkCodeList(#(entityName)Param.Query query) {
+        if(Objects.nonNull(query.getParkCode()) && query.getParkCode().length() > 0 ) {
+            // 组装
+            query.setParkCodes(CollUtil.newArrayList(query.getParkCode()));
+        } else if(Objects.nonNull(query.getAgentId())  && !Objects.equals(query.getAgentId(), Long.valueOf(TOP_CUST_ID))) {
+            // 查询某个运营商下面符合条件的所有子节点
+            List<EnterpriseInfoEntity> parkList =
+                    enterpriseInfoEntityMapper.queryAllChildren( p -> p.getType() == 4 && p.getDelFlag() == 1, query.getAgentId());
+            // 组装
+            query.setParkCodes(parkList.stream().map(EnterpriseInfoEntity::getParkCode).collect(Collectors.toList()));
+        }
+    }
+
+
+    @Override
+    public #(entityName)Param.CountDTO queryHeader(#(entityName)Param.Query query) {
+        //
+        processParkCodeList(query);
+        //
+        return #(entityObjectName)Mapper.queryHeader(query);
+    }
+
+    @Override
+    public PageInfo<#(entityName)Param.RecordDTO> queryPage(#(entityName)Param.Query query) {
+        //
+        processParkCodeList(query);
+        //
+        PageHelper.startPage(query.getPage(), query.getLimit());
+        PageInfo<#(entityName)Param.RecordDTO> pageInfo = new PageInfo<>(#(entityObjectName)Mapper.queryList(query));
+        //
+        return pageInfo;
+    }
+
+
+    @Override
+    public Long saveAdd(#(entityName)Param.CreateParam createParam) {
+        #(entityObjectName)Mapper.insert(BeanUtil.copyProperties(createParam, #(entityName)Entity.class));
+        return 1L;
+    }
+
+    @Override
+    public Long saveAddList(List<#(entityName)Param.CreateParam> createParams) {
+        #(entityObjectName)Mapper.insertList(BeanUtil.copyToList(createParams, #(entityName)Entity.class));
+        return (long) createParams.size();
+    }
+
+    @Override
+    public Long update(#(entityName)Param.UpdateParam updateParam) {
+        #(entityObjectName)Mapper.updateByPrimaryKeySelective(BeanUtil.copyProperties(updateParam, #(entityName)Entity.class));
+        return 1L;
+    }
+
+    @Override
+    public Long delete(#(entityName)Param.DeleteParam deleteParam) {
+        List<String> mainIdList = StrUtil.splitTrim(deleteParam.getId(), ",");
+        if (!ObjectUtils.isEmpty(mainIdList)) {
+            Example example = new Example(#(entityName)Entity.class);
+            Example.Criteria criteria = example.createCriteria();
+            criteria.andIn("id", mainIdList);
+            #(entityObjectName)Mapper.deleteByExample(example);
+            return (long) mainIdList.size();
+        }
+        return 0L;
+    }
+
+}
+

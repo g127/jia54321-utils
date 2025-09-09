@@ -76,6 +76,30 @@ public class MetaBuilder extends com.jfinal.plugin.activerecord.generator.MetaBu
 		rs.close();
 	}
 
+    /**
+     * 为生成器添加类型映射，将数据库反射得到的类型映射到指定类型，
+     * 从而在生成过程中用指定类型替换数据反射得到的类型
+     *
+     * 添加的映射可以覆盖默认的映射，从而可以自由定制映射关系
+     *
+     * <pre>
+     * 例如：
+     *    generator.addTypeMaping(LocalDateTime.class, LocalDateTime.class)
+     *    generator.addTypeMaping(LocalDate.class, LocalDate.class)
+     *
+     * 例如：
+     *    generator.addTypeMaping(java.sql.Date.class, LocalDateTime.class)
+     * </pre>
+     * 以上配置在生成 base model 时碰到 Date 类型时会生成为 LocalDateTime 类型
+     */
+    public void addTypeMapping(Class<?> from, Class<?> to) {
+        this.typeMapping.addMapping(from, to);
+    }
+
+    public void removeTypeMapping(String from) {
+        this.typeMapping.removeMapping(from);
+    }
+
 }
 
 

@@ -1,26 +1,31 @@
 package com.jia54321.utils.jfinal.activerecord.generator;
 
-import com.jfinal.kit.Kv;
-import com.jfinal.plugin.activerecord.dialect.Dialect;
 import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.activerecord.generator.TableMeta;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jia54321.utils.CamelNameUtil;
+import com.jia54321.utils.Helper;
 import com.jia54321.utils.IOUtil;
-import com.jia54321.utils.LdapUtil;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Function;
-
-import static org.junit.Assert.*;
+import java.util.stream.Collectors;
 
 /**
  * 代码生成测试
@@ -30,161 +35,13 @@ public class GeneratorTest {
     static final Logger log = LoggerFactory.getLogger(GeneratorTest.class);
 
     /**
-     * 会员 定义数据源
+     * 定义数据源
      * @return
      */
-    public static DataSource getDataSource() {
-        DruidPlugin druidPlugin = new DruidPlugin(
-                "jdbc:mysql://106.14.150.97:31529/msf_member?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
-                "park",
-                "g&!BKilp$Mrl4k#h");
+    public static DataSource getDataSource(String url, String username, String password) {
+        DruidPlugin druidPlugin = new DruidPlugin(url, username, password);
         druidPlugin.start();
         return druidPlugin.getDataSource();
-    }
-
-    /**
-     * 对账 定义数据源
-     * @return
-     */
-    public static DataSource getDataSource2() {
-        DruidPlugin druidPlugin = new DruidPlugin(
-                "jdbc:mysql://106.14.150.97:31529/msf_check_bill?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
-                "park",
-                "g&!BKilp$Mrl4k#h");
-        druidPlugin.start();
-        return druidPlugin.getDataSource();
-    }
-
-    /**
-     * 定义数据源  襄州测试
-     * 36.134.79.20:13306
-     * park
-     * Park@2022**
-     * @return
-     */
-    public static DataSource getDataSource3() {
-        DruidPlugin druidPlugin = new DruidPlugin(
-                "jdbc:mysql://36.134.79.20:13306/flypark?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
-                "park",
-                "Park@2022**");
-        druidPlugin.start();
-        return druidPlugin.getDataSource();
-    }
-
-    /**
-     * 定义数据源  襄州测试
-     * 36.134.79.20:13306
-     * park
-     * Park@2022**
-     * @return
-     */
-    public static DataSource getDataSource4() {
-        DruidPlugin druidPlugin = new DruidPlugin(
-                "jdbc:mysql://106.14.150.97:31529/msf_invoice?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
-                "park",
-                "g&!BKilp$Mrl4k#h");
-        druidPlugin.start();
-        return druidPlugin.getDataSource();
-    }
-
-    /**
-     * 生成代码
-     */
-    public String getMavenProjectDir() {
-        //获取当前文件所在的路径
-        String localClassPath = this.getClass().getResource("/").getPath();
-        File targetFile = new File(localClassPath).getParentFile();
-        String projectDir = targetFile.getParent();
-        ////
-        ////        "generator/java"
-        return projectDir;
-    }
-
-    /**
-     * 生成代码
-     * @param packageName
-     * @param includeName
-     */
-    public static void gen(final String packageName, final String includeName) {
-        // 项目目录
-        String projectDir = System.getProperty("user.dir");
-
-        IOUtil.createDirPath(projectDir);
-
-        String basePackageName = packageName;
-        String baseOutputDir = projectDir + "/src/generator/java/"  + basePackageName.replace('.', '/');
-        // model 所使用的包名 (MappingKit 默认使用的包名)
-        String modelPackageName = basePackageName + ".domain";
-
-        // base model 所使用的包名
-        String baseModelPackageName = modelPackageName + ".base";
-
-        // base model 文件保存路径
-        String baseModelOutputDir = projectDir + "/src/generator/java/" + baseModelPackageName.replace('.', '/');
-
-        System.out.println("输出路径：" + baseModelOutputDir);
-
-        // model 文件保存路径 (MappingKit 与 DataDictionary 文件默认保存路径)
-        String modelOutputDir = baseModelOutputDir + "/..";
-
-        String mappingKitPackageName = basePackageName;
-        String mappingKitOutputDir = projectDir + "/src/generator/java/" + basePackageName.replace('.', '/');
-        ;
-
-        // service 所使用的包名
-        String servicePackageName = basePackageName + ".service";
-        // service 文件保存路径
-        String serviceOutputDir = projectDir + "/src/generator/java/" + servicePackageName.replace('.', '/');
-
-
-        // serviceImpl 所使用的包名
-        String serviceImplPackageName = servicePackageName + ".impl";
-        // serviceImpl 文件保存路径
-        String serviceImplOutputDir = serviceOutputDir + "/impl";
-
-        DataSource dataSource = getDataSource();
-        // 创建生成器
-        Generator generator = new Generator(dataSource,
-                basePackageName, baseOutputDir,
-                baseModelPackageName, baseModelOutputDir,
-                modelPackageName, modelOutputDir,
-                mappingKitPackageName, mappingKitOutputDir,
-                servicePackageName, serviceOutputDir,
-                serviceImplPackageName, serviceImplOutputDir);
-
-        generator.setMetaBuilder(new MetaBuilder(dataSource).skip(
-                tableName -> {
-                    return !tableName.startsWith(includeName);
-                })
-        );
-
-        // 配置是否生成备注
-        generator.setGenerateRemarks(true);
-
-        // 设置数据库方言
-        generator.setDialect(new MysqlDialect());
-
-        // 设置是否生成链式 setter 方法，强烈建议配置成 false，否则 fastjson 反序列化会跳过有返回值的 setter 方法
-        generator.setGenerateChainSetter(false);
-
-        // 添加不需要生成的表名
-        generator.addExcludedTable("adv");
-
-        // 设置是否在 Model 中生成 dao 对象
-        generator.setGenerateDaoInModel(false);
-
-        // 设置是否生成字典文件
-        generator.setGenerateDataDictionary(false);
-
-        // 设置需要被移除的表名前缀用于生成modelName。例如表名 "osc_user"，移除前缀 "osc_"后生成的model名为 "User"而非 OscUser
-        generator.setRemovedTableNamePrefixes("ims_renren_shop_");
-
-
-        generator.setGenerateServiceDictionary(false);
-        generator.setGenerateServiceImplDictionary(false);
-
-        // 生成
-        generator.generate();
     }
 
     /**
@@ -193,46 +50,33 @@ public class GeneratorTest {
      * @param includeName
      */
     public void generate(DataSource ds , String projectDir, String packageName, final String includeName, Consumer<List<TableMetaExtend>> consumer) {
+        Path projectPath = Paths.get(projectDir);
+
         // =====================================================================================================================
-        // 定义输出目录位置
+        // 模板目录Dir
         // =====================================================================================================================
-        String basePackageName = packageName;
-        String srcJavaPath = "/src/main/java/";
-        String baseOutputDir = projectDir + srcJavaPath + basePackageName.replace('.', '/');
-        IOUtil.createDirPath(baseOutputDir);
-        System.out.println("Generate path in " + projectDir );
+        TabGenerator generator = new TabGenerator();
+        generator.init("generatorCodeTest/tk-mybatis", packageName, projectPath.toString());
+
         // =====================================================================================================================
 
         // =====================================================================================================================
-        // 包名，模板定义
-        // =====================================================================================================================
-        // model 所使用的包名 (MappingKit 默认使用的包名)
-        String modelPackageName = basePackageName + ".domain";
-        // model 文件保存路径
-        String modelOutputDir = projectDir + srcJavaPath + modelPackageName.replace('.', '/');
-        // model 模板
-        String modelTemplateClassPath = "/generatorCodeTest/model_template.jf";
-        // model 生成器
-        BaseModelGenerator modelGenerator = new BaseModelGenerator(modelPackageName, modelOutputDir).setTemplate(modelTemplateClassPath);
-
-        // model doc 所使用的包名 (MappingKit 默认使用的包名)
-        String modelDocPackageName = basePackageName + ".doc";
-        // model doc 文件保存路径
-        String modelDocOutputDir = projectDir + srcJavaPath + modelPackageName.replace('.', '/');
-        // model doc 模板
-        String modelDocTemplateClassPath = "/generatorCodeTest/model_doc_template_test.jf";
-        ModelDocGenerator modelDocGenerator = new ModelDocGenerator(modelDocPackageName, modelDocOutputDir).setTemplate(modelDocTemplateClassPath);
-        // =====================================================================================================================
-
-        // =====================================================================================================================
-        com.jfinal.plugin.activerecord.generator.MetaBuilder metaBuilder = new MetaBuilder(ds).skip(
-                tableName -> {
-                    return !tableName.startsWith(includeName);
-                }
+        MetaBuilder metaBuilder = new MetaBuilder(ds);
+        metaBuilder.skip(
+                // 不匹配的全部跳过
+                tableName -> Arrays.stream(includeName.split(","))
+                        .filter(Helper::isNotEmpty)
+                        .noneMatch(tableName::startsWith)
         );
         metaBuilder.setDialect(new MysqlDialect());
         // 配置是否生成备注
         metaBuilder.setGenerateRemarks(true);
+        //
+//        metaBuilder.addTypeMapping(java.sql.Date.class, LocalDateTime.class);
+//        metaBuilder.addTypeMapping(java.sql.Timestamp.class, LocalDateTime.class);
+//        metaBuilder.addTypeMapping(LocalDateTime.class, LocalDateTime.class);
+//        metaBuilder.addTypeMapping(LocalDate.class, LocalDate.class);
+//        metaBuilder.addTypeMapping(LocalTime.class, LocalTime.class);
         // =====================================================================================================================
 
 
@@ -244,7 +88,7 @@ public class GeneratorTest {
             return ;
         }
 
-        List<TableMetaExtend> tableMetasExtendExtend = new ArrayList<>(tableMetas.size());
+        List<TableMetaExtend> tableMetaExtends = new ArrayList<>(tableMetas.size());
 
         for (int i = 0; i < tableMetas.size(); i++) {
             TableMeta old           = tableMetas.get(i);
@@ -255,7 +99,7 @@ public class GeneratorTest {
             newObj.columnMetas      = old.columnMetas; // 字段 meta
 
             // ---------
-            newObj.basePackageName  = basePackageName;
+            newObj.basePackageName  = packageName;
             newObj.baseModelName    = old.baseModelName;	  // 生成的 base model 名
             newObj.baseModelContent = old.baseModelContent;	  // 生成的 base model 内容
 
@@ -275,14 +119,13 @@ public class GeneratorTest {
 
             newObj.serviceImplName      = old.modelName + "ServiceImpl";
 
-            tableMetasExtendExtend.add(newObj);
+            tableMetaExtends.add(newObj);
         }
 
         if(null != consumer) {
-            consumer.accept(tableMetasExtendExtend);
+            consumer.accept(tableMetaExtends);
         } else {
-            modelGenerator.generate(tableMetasExtendExtend);
-            modelDocGenerator.generate(tableMetasExtendExtend);
+            generator.generate(tableMetaExtends);
         }
 
         long usedTime = (System.currentTimeMillis() - start) / 1000;
@@ -292,32 +135,26 @@ public class GeneratorTest {
 
     @Test
     public void testGen() {
-//        DataSource ds = getDataSource();
-//        String projectDir = System.getProperty("user.dir") + "/target/generated-domain/msf_member/";
-//        generate(ds, projectDir, "member", "t_park");
-//        generate(ds, projectDir, "member", "t_car_feesroleinfo");
-//        generate(ds, projectDir, "member", "t_car_memberamountinfo_cloud");
+        /** 当前工作目录, 执行Java程序的路径 */
+        final Path userDir = new File(System.getProperty("user.dir")).toPath();
+        final Path generatedDir = userDir.resolve("src/generated-domain");
 
-//        DataSource ds2 = getDataSource2();
-//        String projectDir2 = System.getProperty("user.dir") + "/target/generated-domain/msf_check_bill/";
-//        generate(ds2, projectDir2, "checkBill", "t_check");
-//        generate(ds2, projectDir2, "checkBill", "t_clear");
-
-
-//        DataSource ds3 = getDataSource3();
-//        String projectDir3 = System.getProperty("user.dir") + "/target/generated-domain/msf_business_center/";
-//        generate(ds3, projectDir3, "msfBusinessCenter", "t_park_escape");
-
-
-
-        DataSource ds4 = getDataSource4();
-        String projectDir4 = System.getProperty("user.dir") + "/src/generated-domain/msf_invoice/";
-        generate(ds4, projectDir4, "invoice", "t_invoice" , null);
-
-    }
-
-    @Test
-    public void testGenDbDoc() {
-
+        // 使用DatabaseMetaData获取mysql表的注释
+        // 此时获取不到表名的注释，原因是需要在jdbc url 添加如下参数useInformationSchema=true
+        generate(
+                // 数据源
+                getDataSource(
+                        "jdbc:mysql://114.115.160.57:3306/flypark?useInformationSchema=true&useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true",
+                        "root",
+                        "Rd4rfv^T"
+                ),
+                // 生成目录
+                generatedDir.toString(),
+                // 包名
+                "com.msf.digit.analysis",
+                // 表名
+                "dim_,",
+                null
+        );
     }
 }

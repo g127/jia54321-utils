@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="#(basePackageName).repository.#(entityName)Mapper" >
+
+    <resultMap id="BaseEntityMap" type="#(basePackageName).model.entity.#(entityName)Entity">
+      #for(cm : tableMeta.columnMetas)
+        #if ( cm.javaType.equals("java.lang.Long") )
+        <result column="#(cm.name)" property="#(cm.attrName)" jdbcType="BIGINT" />
+        #else if ( cm.javaType.equals("java.lang.String") )
+        <result column="#(cm.name)" property="#(cm.attrName)" jdbcType="VARCHAR" />
+        #else if ( cm.javaType.equals("java.lang.Integer") || cm.javaType.equals("java.lang.Boolean") )
+        <result column="#(cm.name)" property="#(cm.attrName)" jdbcType="INTEGER" />
+        #else if ( cm.javaType.equals("java.math.BigDecimal") )
+        <result column="#(cm.name)" property="#(cm.attrName)" jdbcType="DECIMAL" />
+        #else
+        <result column="#(cm.name)" property="#(cm.attrName)" />
+        #end
+      #end
+    </resultMap>
+
+    <resultMap id="CountMap" type="#(basePackageName).model.param.#(entityName)Param$CountDTO">
+        <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <resultMap id="RecordMap" type="#(basePackageName).model.param.#(entityName)Param$RecordDTO">
+       #for(cm : tableMeta.columnMetas)
+         #if ( cm.javaType.equals("java.lang.Long") )
+         <result column="#(cm.name)" property="#(cm.attrName)" jdbcType="BIGINT" />
+         #else if ( cm.javaType.equals("java.lang.String") )
+         <result column="#(cm.name)" property="#(cm.attrName)" jdbcType="VARCHAR" />
+         #else if ( cm.javaType.equals("java.lang.Integer") || cm.javaType.equals("java.lang.Boolean") )
+         <result column="#(cm.name)" property="#(cm.attrName)" jdbcType="INTEGER" />
+         #else if ( cm.javaType.equals("java.math.BigDecimal") )
+         <result column="#(cm.name)" property="#(cm.attrName)" jdbcType="DECIMAL" />
+         #else
+         <result column="#(cm.name)" property="#(cm.attrName)" />
+         #end
+       #end
+    </resultMap>
+
+    <sql id="common-request">
+        <if test="id != null" >
+            and id = #{id}
+        </if>
+        <if test="agentIds != null and agentIds.size() > 0 ">
+            <foreach collection="agentIds" item="item" index="index" open="AND agent_id IN(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="parkCodes != null and parkCodes.size() > 0 ">
+            <foreach collection="parkCodes" item="item" index="index" open="AND park_code IN(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="queryHeader" resultMap="CountMap">
+        select IFNULL(sum(total_amount), 0) as total_amount
+          from #(tableName)
+        <where>
+            <include refid="common-request" />
+        </where>
+    </select>
+
+    <select id="queryList" resultMap="RecordMap">
+        select #for(cm : tableMeta.columnMetas)#(cm.name), #end 1
+          from #(tableName)
+        <where>
+            <include refid="common-request"></include>
+        </where>
+    </select>
+
+</mapper>
