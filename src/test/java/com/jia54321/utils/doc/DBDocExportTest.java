@@ -1,89 +1,87 @@
-//package com.jia54321.utils.doc;
-//
-//import cn.smallbun.screw.core.Configuration;
-//import cn.smallbun.screw.core.engine.EngineConfig;
-//import cn.smallbun.screw.core.engine.EngineFileType;
-//import cn.smallbun.screw.core.engine.EngineTemplateType;
-//import cn.smallbun.screw.core.process.ProcessConfig;
-//import cn.smallbun.screw.core.execute.DocumentationExecute;
-//import cn.smallbun.screw.core.process.ProcessConfig;
-//import com.jfinal.kit.PropKit;
-//import com.jfinal.plugin.druid.DruidPlugin;
-//import com.jfinal.plugin.hikaricp.HikariCpPlugin;
-//import com.zaxxer.hikari.HikariConfig;
-//import com.zaxxer.hikari.HikariDataSource;
-//
-//import javax.sql.DataSource;
-//import java.util.Arrays;
-//import java.util.List;
-//
-//public class DBDocExportTest {
-//
-//    /**
-//     * 会员 定义数据源
-//     * @return
-//     */
-//    public static DataSource getDataSource() {
-//        DruidPlugin druidPlugin = new DruidPlugin(
-//                "jdbc:mysql://114.115.160.57:31529/flypark?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
-//                "park",
-//                "g&!BKilp$Mrl4k#h");
-//        druidPlugin.start();
-//        return druidPlugin.getDataSource();
-//    }
-//
-//    public static DataSource getDataSource2() {
-//        // 数据源
-//        HikariCpPlugin hikariCpPlugin = new HikariCpPlugin(
-//                "jdbc:mysql://114.115.160.57:31529/flypark?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
-//                "park",
-//                "g&!BKilp$Mrl4k#h");
-//        hikariCpPlugin.start();
-//        return hikariCpPlugin.getDataSource();
-//    }
-//
-//    public static DataSource getDataSource4() {
-//        // 数据源
-//        HikariCpPlugin hikariCpPlugin = new HikariCpPlugin(
-//                "jdbc:mysql://127.0.0.1:3306/finance?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8",
-//                "park",
-//                "park123");
-//        hikariCpPlugin.start();
-//        return hikariCpPlugin.getDataSource();
-//    }
-//
-//    public static void main(String[] args) {
-//
-//        DataSource dataSource = getDataSource4();
-//        // 1、生成文件配置
-//        EngineConfig engineConfig = EngineConfig.builder()
-//                // 生成文件路径
-//                .fileOutputDir("D:/1111111111")
-//                // 打开目录
-//                .openOutputDir(false)
-//                // 文件类型
-//                .fileType(EngineFileType.WORD)
-//                // 生成模板实现
-//                .produceType(EngineTemplateType.freemarker).build();
-//
-//        // 忽略表名
-//        List<String> ignoreTableName = Arrays.asList("test");
-//        // 忽略表前缀
-//        List<String> ignorePrefix    = Arrays.asList("test_", "test");
-//        // 忽略表后缀
-//        List<String> ignoreSuffix = Arrays.asList("_test", "test");
-//
-//        // 2、配置想要忽略的表
-//        ProcessConfig processConfig = ProcessConfig.builder().ignoreTableName(ignoreTableName)
-//                .ignoreTablePrefix(ignorePrefix).ignoreTableSuffix(ignoreSuffix).build();
-//
-//        // 3、生成文档配置（包含以下自定义版本号、描述等配置连接）
-//        Configuration config = Configuration.builder().version("1.0.0").description("数据库文档").dataSource(dataSource)
-//                .engineConfig(engineConfig).produceConfig(processConfig).build();
-//
-//        // 4、执行生成
-//        new DocumentationExecute(config).execute();
-//    }
-//
-//
-//}
+package com.jia54321.utils.doc;
+
+
+import com.jia54321.utils.doc.dbTable.BasicTable;
+import com.jia54321.utils.doc.dbTable.BasicTableGenerator;
+import com.jia54321.utils.jfinal.activerecord.generator.GeneratorTest;
+import com.jia54321.utils.jfinal.activerecord.generator.TableMetaExtend;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class DBDocExportTest {
+
+    public static List<BasicTable> toBasicTableList(List<TableMetaExtend> tableMetaExtendList){
+        List<BasicTable> basicTables = new ArrayList<>();
+        for (TableMetaExtend tableMetaExtend : tableMetaExtendList) {
+            BasicTable basicTable = new BasicTable(tableMetaExtend.name, tableMetaExtend.remarks);
+            tableMetaExtend.columnMetas.forEach(columnMeta -> basicTable.addColumn(
+                    columnMeta.name,
+                    columnMeta.type,
+                    !Objects.equals(columnMeta.isNullable, "NO"),
+                    columnMeta.defaultValue,
+                    columnMeta.remarks,
+                    Objects.equals(columnMeta.isPrimaryKey, "PRI")
+            ));
+            basicTables.add(basicTable);
+        }
+        return basicTables;
+    }
+
+    public static void genDoc(List<TableMetaExtend> tableMetaExtendList) {
+        try {
+            // 1. 准备表格数据
+            List<BasicTable> basicTables = toBasicTableList(tableMetaExtendList);
+
+            // 2.
+            SimpleMarkerProcessor simpleMarkerProcessor = new SimpleMarkerProcessor(
+                    new EnhancedContentInserter(new EnhancedTableGenerator(new BasicTableGenerator(),1))
+            );
+
+            // 3.
+            simpleMarkerProcessor.processDocument(
+                    "D:\\guogang\\DevProjectFiles\\ws-fly-tnar\\工作安排\\武汉城投停车项目\\交付文件\\design_template.docx",
+                    "D:\\guogang\\DevProjectFiles\\ws-fly-tnar\\工作安排\\武汉城投停车项目\\交付文件\\gggg.docx",
+                    basicTables);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        /** 当前工作目录, 执行Java程序的路径 */
+        final Path userDir = new File(System.getProperty("user.dir")).toPath();
+
+        final String templateDirName = "mybatis-plus/";
+        final String templateDirName2 = "tk-mybatis/";
+        final Path generatedDir = userDir.resolve("src/generated-domain/").resolve(templateDirName);
+        final Path templateDir = Paths.get("generatorCodeTest", templateDirName);
+
+        // 使用DatabaseMetaData获取mysql表的注释
+        // 此时获取不到表名的注释，原因是需要在jdbc url 添加如下参数useInformationSchema=true
+        GeneratorTest.generate(
+                templateDir.toString(),
+//                "generatorCodeTest/tk-mybatis",
+                // 数据源
+                GeneratorTest.getDataSource(
+                        "jdbc:mysql://114.115.160.57:3306/flypark?useInformationSchema=true&useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true",
+                        "root",
+                        "Rd4rfv^T"
+                ),
+                // 生成目录
+                generatedDir.toString(),
+                // 包名
+                "com.msf.code",
+                // 表名
+                "t_charging,",
+                DBDocExportTest::genDoc
+        );
+    }
+
+
+}

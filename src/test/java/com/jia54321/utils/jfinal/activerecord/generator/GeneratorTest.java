@@ -5,27 +5,18 @@ import com.jfinal.plugin.activerecord.generator.TableMeta;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jia54321.utils.CamelNameUtil;
 import com.jia54321.utils.Helper;
-import com.jia54321.utils.IOUtil;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * 代码生成测试
@@ -49,7 +40,7 @@ public class GeneratorTest {
      * @param packageName
      * @param includeName
      */
-    public void generate(String templateDir, DataSource ds , String projectDir, String packageName, final String includeName, Consumer<List<TableMetaExtend>> consumer) {
+    public static void generate(String templateDir, DataSource ds , String projectDir, String packageName, final String includeName, Consumer<List<TableMetaExtend>> consumer) {
         Path projectPath = Paths.get(projectDir);
 
         // =====================================================================================================================

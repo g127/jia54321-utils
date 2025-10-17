@@ -1,0 +1,15 @@
+数据库设计文档
+
+{{DATABASE_INFO}}
+
+第一章 用户相关表
+
+{{TABLE:USER}}
+
+第二章 订单相关表  
+
+{{TABLE:ORDER}}
+
+附录 完整表结构
+
+{{ALL_TABLES}}
