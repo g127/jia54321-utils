@@ -1,0 +1,42 @@
+package #(packageName);
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+/**
+ * 实体类 #(tableMetaExtend.remarks)
+ * @author dev
+ */
+@Data
+public class #(className) implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+
+    @ApiModel(value = "#(tableMetaExtend.remarks)Excel记录对象")
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    @NoArgsConstructor
+    public static class Record implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+    #for(cm : tableMeta.columnMetas)
+        @ExcelColumn(value = "#(cm.remarks)")
+        private #(cm.javaType.replace("java.lang.", "").replace("java.math.", "")) #(cm.attrName);
+
+    #end
+    }
+
+    @ApiModel(value = "#(tableMetaExtend.remarks)Excel汇总对象")
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    @NoArgsConstructor
+    public static class Header implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        @ExcelColumn(value = "总计")
+        private BigDecimal totalAmount;
+    }
+
+}
+

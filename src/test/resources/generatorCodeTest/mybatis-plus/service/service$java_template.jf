@@ -1,0 +1,50 @@
+package #(packageName);
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.List;
+
+/**
+ * Service接口 #(tableMetaExtend.remarks)
+ * @author dev
+ */
+public interface #(className) extends IService<#(entityName)> {
+    /**
+     * 汇总小计
+     * @param query 查询条件
+     * @return 结果
+     */
+    #(entityName)Param.CountDTO queryHeader(#(entityName)Param.Query query);
+
+    /**
+     * 查询列表
+     * @param query 查询条件
+     * @return 结果
+     */
+    Page<#(entityName)Param.RecordDTO> queryPage(#(entityName)Param.Query query);
+
+    /**
+     * 保存
+     * @param createParam
+     */
+    Long saveAdd(#(entityName)Param.CreateParam createParam);
+
+    /**
+     * 批量保存
+     * @param createParams
+     */
+    Long saveAddList(List<#(entityName)Param.CreateParam> createParams);
+
+    /**
+     * 保存
+     * @param updateParam
+     */
+    Long update(#(entityName)Param.UpdateParam updateParam);
+
+    /**
+     * 保存
+     * @param deleteParam
+     */
+    Long delete(#(entityName)Param.DeleteParam deleteParam);
+}
+

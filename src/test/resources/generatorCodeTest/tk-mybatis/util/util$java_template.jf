@@ -10,11 +10,25 @@ import java.time.LocalDateTime;
 
 public class #(className) {
 
-#for(cm : tableMeta.columnMetas)
-	#if( cm.javaType.indexOf("BigDecimal") >= 0 )
-	#("entity.get" + firstCharToUpperCase(cm.attrName) + "(),")
-	#end
-#end
+    // 获取全部属性
+    #for(cm : tableMeta.columnMetas)
+        #if( cm.javaType.indexOf("BigDecimal") >= 0 )
+        #("entity.get" + firstCharToUpperCase(cm.attrName) + "(),")
+        #end
+    #end
+
+    // 迁移历史表
+    replace into #(tableName)_his (
+        #for(cm : tableMeta.columnMetas)
+               #(cm.name)
+        #end
+    ) ( select
+        #for(cm : tableMeta.columnMetas)
+               #(cm.name)
+        #end
+          from #(tableName)
+         where 1=1
+    ) ;
 
 }
 

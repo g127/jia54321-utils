@@ -49,14 +49,14 @@ public class GeneratorTest {
      * @param packageName
      * @param includeName
      */
-    public void generate(DataSource ds , String projectDir, String packageName, final String includeName, Consumer<List<TableMetaExtend>> consumer) {
+    public void generate(String templateDir, DataSource ds , String projectDir, String packageName, final String includeName, Consumer<List<TableMetaExtend>> consumer) {
         Path projectPath = Paths.get(projectDir);
 
         // =====================================================================================================================
         // 模板目录Dir
         // =====================================================================================================================
         TabGenerator generator = new TabGenerator();
-        generator.init("generatorCodeTest/tk-mybatis", packageName, projectPath.toString());
+        generator.init(templateDir, packageName, projectPath.toString());
 
         // =====================================================================================================================
 
@@ -137,11 +137,17 @@ public class GeneratorTest {
     public void testGen() {
         /** 当前工作目录, 执行Java程序的路径 */
         final Path userDir = new File(System.getProperty("user.dir")).toPath();
-        final Path generatedDir = userDir.resolve("src/generated-domain");
+
+        final String templateDirName = "mybatis-plus/";
+        final String templateDirName2 = "tk-mybatis/";
+        final Path generatedDir = userDir.resolve("src/generated-domain/").resolve(templateDirName);
+        final Path templateDir = Paths.get("generatorCodeTest", templateDirName);
 
         // 使用DatabaseMetaData获取mysql表的注释
         // 此时获取不到表名的注释，原因是需要在jdbc url 添加如下参数useInformationSchema=true
         generate(
+                templateDir.toString(),
+//                "generatorCodeTest/tk-mybatis",
                 // 数据源
                 getDataSource(
                         "jdbc:mysql://114.115.160.57:3306/flypark?useInformationSchema=true&useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true",
@@ -151,9 +157,9 @@ public class GeneratorTest {
                 // 生成目录
                 generatedDir.toString(),
                 // 包名
-                "com.msf.digit.analysis",
+                "com.msf.code",
                 // 表名
-                "dim_,",
+                "t_charging_platform,",
                 null
         );
     }

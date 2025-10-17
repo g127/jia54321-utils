@@ -1,19 +1,19 @@
 package #(packageName);
 
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 实体类 #(tableMetaExtend.remarks)
  * @author dev
  */
 @Data
-@Table(name = "#(tableName)")
+@TableName("#(tableName)")
 public class #(className) implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -21,15 +21,11 @@ public class #(className) implements Serializable {
 #for(cm : tableMeta.columnMetas)
 	/**  #(cm.remarks) */
 	#if ( cm.name.equals(tableMeta.primaryKey) )
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	#else
-	@Column(name = "#(cm.name)")
+    @TableId(value = "#(cm.name)", type = IdType.AUTO)
 	#end
 	@ApiModelProperty(value="#(cm.remarks)", dataType = "#(cm.javaType)")
 	private #(cm.javaType.replace("java.lang.", "").replace("java.math.", "")) #(cm.attrName);
 
 #end
-
 }
 

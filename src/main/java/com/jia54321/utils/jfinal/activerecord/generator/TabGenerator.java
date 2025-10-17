@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,15 +16,26 @@ public class TabGenerator extends AbstractTemplateGenerator<TableMetaExtend>  {
      * 切分，返回实体名称
      *  eg: t_user_detail ==> UserDetail
      * @param tabName 表名
+     * @param skipUnderscoreNum 跳过的下划线数量
      * @return
      */
-    public String getEntityName(String tabName) {
+    public String getEntityName(String tabName, int skipUnderscoreNum) {
         if(tabName.matches("[a-zA-Z]+[_][a-zA-Z0-9_]+]")) {
             throw new RuntimeException("表名不符合规范 <==" + tabName);
         }
 
+        String skipPrefixTabName = tabName;
+        for (String skipPrefix : this.getUselessTablePrefixList()) {
+            if (Objects.nonNull(skipPrefix) && tabName.startsWith(skipPrefix)) {
+                skipPrefixTabName = tabName.substring(skipPrefix.length());
+                // 满足一种即可退出
+                break;
+            }
+        }
+
+
         // t_user_detail ==> stream:  t, user, detail
-        return Stream.of(tabName.split("_")).skip(1)
+        return Stream.of(skipPrefixTabName.split("_")).skip(skipUnderscoreNum)
                 .map(s -> Character.toUpperCase(s.charAt(0)) + s.substring(1))
                 .collect(Collectors.joining());
     }
@@ -85,7 +97,7 @@ public class TabGenerator extends AbstractTemplateGenerator<TableMetaExtend>  {
             // t_user_detail
             String tabName = tableMeta.name;
             // eg: t_user_detail ==> UserDetail
-            String entityName = getEntityName(tabName);
+            String entityName = getEntityName(tabName, 0);
             String entityObjectName =  Character.toLowerCase(entityName.charAt(0)) + entityName.substring(1);
             // eg: service_impl$java_template.jf ==> ServiceImpl.java
             String suffixName = getSuffixName(templatePath.toFile().getName());

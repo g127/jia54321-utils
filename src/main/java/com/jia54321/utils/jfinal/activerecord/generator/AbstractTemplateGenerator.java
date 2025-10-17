@@ -31,21 +31,54 @@ public abstract class AbstractTemplateGenerator<S extends TableMeta> implements 
 
     protected Engine engine;
 
+    /**
+     * 模版目录
+     */
     protected String templateDir;
-    protected String packageName;
+
+    /**
+     * 输出路径
+     */
     protected String outputDir;
 
+    /**
+     * 包名
+     */
+    protected String packageName;
+
+    /**
+     * 无意义的表前缀
+     */
+    protected List<String> uselessTablePrefixList = Stream.of("t_", "T_").collect(Collectors.toCollection(ArrayList::new));
+
+    /**
+     * 模版目录
+     */
     public String getTemplateDir() {
         return templateDir;
     }
 
+    /**
+     * 包名
+     */
     public String getPackageName() {
         return packageName;
     }
 
+    /**
+     * 输出路径
+     */
     public String getOutputDir() {
         return outputDir;
     }
+
+    /**
+     * 无意义的表前缀
+     */
+    public List<String> getUselessTablePrefixList() {
+        return uselessTablePrefixList;
+    }
+
 
     public void init(String templateDir, String packageName, String outputDir) {
         if (StrKit.isBlank(templateDir)) {
