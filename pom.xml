@@ -21,6 +21,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <hutool-all.version>5.8.11</hutool-all.version>
+
         <!-- aspectj -->
         <aspectj.version>1.8.13</aspectj.version>
 
@@ -29,11 +31,10 @@
 
         <!-- okhttp -->
         <okhttp.version>3.14.9</okhttp.version>
-        <okhttp.logging-interceptor.version>3.14.9</okhttp.logging-interceptor.version>
 
 
         <!-- json -->
-        <fastjson.version>1.2.62</fastjson.version>
+        <fastjson.version>1.2.69</fastjson.version>
         <!-- yaml -->
         <snakeyaml.version>1.17</snakeyaml.version>
         <!-- google guava -->
@@ -87,6 +88,13 @@
     </developers>
 
     <dependencies>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool-all.version}</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -118,7 +126,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>logging-interceptor</artifactId>
-            <version>${okhttp.logging-interceptor.version}</version>
+            <version>${okhttp.version}</version>
         </dependency>
 
         <!-- http client end -->
@@ -304,6 +312,18 @@
             <version>1.18.30</version> <!-- 使用最新版本 -->
             <scope>provided</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/cn.smallbun.screw/screw-core -->
+        <dependency>
+            <groupId>cn.smallbun.screw</groupId>
+            <artifactId>screw-core</artifactId>
+            <version>1.0.5</version>
+        </dependency>
+        <!-- HikariCP -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.4.5</version>
+        </dependency>
         <!--
         <dependency>
             <groupId>org.t-io</groupId>
@@ -312,23 +332,6 @@
         </dependency>
         -->
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-            <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-ws -->
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp-ws</artifactId>
-                <version>3.4.2</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.squareup.okhttp3</groupId>
-                        <artifactId>okhttp</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <!-- network end -->
-        </dependencies>
-    </dependencyManagement>
     <!-- Package as an executable jar -->
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
